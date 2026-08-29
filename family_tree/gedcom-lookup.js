@@ -310,8 +310,19 @@
 (function injectFooterNav() {
     if (document.getElementById('site-footer-nav')) return;
     
-    // Detect page depth from GEDCOM_PATH or current URL
-    const depth = (window.GEDCOM_PATH || '').split('/').filter(p => p === '..').length;
+    // Detect page depth from GEDCOM_PATH or current URL path
+    let depth = 0;
+    if (window.GEDCOM_PATH) {
+        depth = (window.GEDCOM_PATH).split('/').filter(p => p === '..').length;
+    } else {
+        // Fallback: detect from URL path (count directories after /family_tree/)
+        const path = window.location.pathname;
+        const match = path.match(/\/family_tree\/(.+)/);
+        if (match) {
+            const subPath = match[1];
+            depth = (subPath.match(/\//g) || []).length;
+        }
+    }
     const root = depth === 0 ? './' : '../'.repeat(depth);
     
     const nav = document.createElement('nav');

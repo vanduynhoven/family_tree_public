@@ -37,6 +37,7 @@
 
     // Achievement definitions. `check(state)` returns { earned, progress, goal }.
     var DEFINITIONS = [
+        // ── Exploration achievements ──
         {
             id: 'explorer',
             icon: '🧭',
@@ -48,6 +49,28 @@
             }
         },
         {
+            id: 'adventurer',
+            icon: '🎒',
+            title: 'Adventurer',
+            desc: 'Viewed 15 people',
+            check: function (s) {
+                var n = s.peopleViewed.length;
+                return { earned: n >= 15, progress: Math.min(n, 15), goal: 15 };
+            }
+        },
+        {
+            id: 'super_explorer',
+            icon: '🦸',
+            title: 'Super Explorer',
+            desc: 'Viewed 30 people!',
+            check: function (s) {
+                var n = s.peopleViewed.length;
+                return { earned: n >= 30, progress: Math.min(n, 30), goal: 30 };
+            }
+        },
+        
+        // ── Time travel achievements ──
+        {
             id: 'historian',
             icon: '📜',
             title: 'Historian',
@@ -58,6 +81,40 @@
             }
         },
         {
+            id: 'time_traveler',
+            icon: '⏰',
+            title: 'Time Traveler',
+            desc: 'Found someone from the 1700s',
+            check: function (s) {
+                var hit = s.years.some(function (y) { return y >= 1700 && y <= 1799; });
+                return { earned: hit, progress: hit ? 1 : 0, goal: 1 };
+            }
+        },
+        {
+            id: 'ancient_finder',
+            icon: '🏛️',
+            title: 'Ancient Finder',
+            desc: 'Found someone from the 1500s or earlier!',
+            check: function (s) {
+                var hit = s.years.some(function (y) { return y <= 1599; });
+                return { earned: hit, progress: hit ? 1 : 0, goal: 1 };
+            }
+        },
+        {
+            id: 'century_hopper',
+            icon: '🦘',
+            title: 'Century Hopper',
+            desc: 'Found people from 4 different centuries',
+            check: function (s) {
+                var centuries = {};
+                s.years.forEach(function (y) { centuries[Math.floor(y / 100)] = true; });
+                var n = Object.keys(centuries).length;
+                return { earned: n >= 4, progress: Math.min(n, 4), goal: 4 };
+            }
+        },
+        
+        // ── Geography achievements ──
+        {
             id: 'globe_trotter',
             icon: '🌍',
             title: 'Globe Trotter',
@@ -66,11 +123,142 @@
                 var n = s.countries.length;
                 return { earned: n >= 3, progress: Math.min(n, 3), goal: 3 };
             }
+        },
+        {
+            id: 'world_traveler',
+            icon: '✈️',
+            title: 'World Traveler',
+            desc: 'Found family in 5 countries',
+            check: function (s) {
+                var n = s.countries.length;
+                return { earned: n >= 5, progress: Math.min(n, 5), goal: 5 };
+            }
+        },
+        {
+            id: 'dutch_roots',
+            icon: '🌷',
+            title: 'Dutch Roots',
+            desc: 'Found family in the Netherlands',
+            check: function (s) {
+                var hit = s.countries.indexOf('Netherlands') !== -1;
+                return { earned: hit, progress: hit ? 1 : 0, goal: 1 };
+            }
+        },
+        {
+            id: 'american_dream',
+            icon: '🗽',
+            title: 'American Dream',
+            desc: 'Found family in the United States',
+            check: function (s) {
+                var hit = s.countries.indexOf('United States') !== -1;
+                return { earned: hit, progress: hit ? 1 : 0, goal: 1 };
+            }
+        },
+        
+        // ── Story achievements ──
+        {
+            id: 'story_reader',
+            icon: '📖',
+            title: 'Story Reader',
+            desc: 'Read a family story',
+            check: function (s) {
+                var hit = s.storiesRead && s.storiesRead.length >= 1;
+                return { earned: hit, progress: hit ? 1 : 0, goal: 1 };
+            }
+        },
+        {
+            id: 'bookworm',
+            icon: '🐛',
+            title: 'Bookworm',
+            desc: 'Read 5 family stories',
+            check: function (s) {
+                var n = s.storiesRead ? s.storiesRead.length : 0;
+                return { earned: n >= 5, progress: Math.min(n, 5), goal: 5 };
+            }
+        },
+        {
+            id: 'master_storyteller',
+            icon: '👑',
+            title: 'Master Storyteller',
+            desc: 'Read 10 family stories!',
+            check: function (s) {
+                var n = s.storiesRead ? s.storiesRead.length : 0;
+                return { earned: n >= 10, progress: Math.min(n, 10), goal: 10 };
+            }
+        },
+        
+        // ── Special achievements ──
+        {
+            id: 'ship_spotter',
+            icon: '🚢',
+            title: 'Ship Spotter',
+            desc: 'Learned about the ocean voyage',
+            check: function (s) {
+                return { earned: !!s.sawShipStory, progress: s.sawShipStory ? 1 : 0, goal: 1 };
+            }
+        },
+        {
+            id: 'family_tree_fan',
+            icon: '🌳',
+            title: 'Family Tree Fan',
+            desc: 'Visited the interactive tree view',
+            check: function (s) {
+                return { earned: !!s.visitedTree, progress: s.visitedTree ? 1 : 0, goal: 1 };
+            }
+        },
+        {
+            id: 'chart_champion',
+            icon: '🥧',
+            title: 'Chart Champion',
+            desc: 'Visited the fan chart',
+            check: function (s) {
+                return { earned: !!s.visitedChart, progress: s.visitedChart ? 1 : 0, goal: 1 };
+            }
+        },
+        {
+            id: 'timeline_tracker',
+            icon: '📅',
+            title: 'Timeline Tracker',
+            desc: 'Visited the interactive timeline',
+            check: function (s) {
+                return { earned: !!s.visitedTimeline, progress: s.visitedTimeline ? 1 : 0, goal: 1 };
+            }
+        },
+        {
+            id: 'generation_jumper',
+            icon: '🔢',
+            title: 'Generation Jumper',
+            desc: 'Visited 5 different generation pages',
+            check: function (s) {
+                var n = s.generationsVisited ? s.generationsVisited.length : 0;
+                return { earned: n >= 5, progress: Math.min(n, 5), goal: 5 };
+            }
+        },
+        {
+            id: 'completionist',
+            icon: '🏆',
+            title: 'Completionist',
+            desc: 'Visited all 7 generation pages!',
+            check: function (s) {
+                var n = s.generationsVisited ? s.generationsVisited.length : 0;
+                return { earned: n >= 7, progress: Math.min(n, 7), goal: 7 };
+            }
         }
     ];
 
     function defaultState() {
-        return { peopleViewed: [], years: [], countries: [], earned: [] };
+        return { 
+            peopleViewed: [], 
+            years: [], 
+            countries: [], 
+            earned: [],
+            storiesRead: [],
+            generationsVisited: [],
+            sawShipStory: false,
+            visitedTree: false,
+            visitedChart: false,
+            visitedTimeline: false
+        };
     }
 
     function load() {
@@ -83,7 +271,13 @@
                 peopleViewed: Array.isArray(parsed.peopleViewed) ? parsed.peopleViewed : d.peopleViewed,
                 years: Array.isArray(parsed.years) ? parsed.years : d.years,
                 countries: Array.isArray(parsed.countries) ? parsed.countries : d.countries,
-                earned: Array.isArray(parsed.earned) ? parsed.earned : d.earned
+                earned: Array.isArray(parsed.earned) ? parsed.earned : d.earned,
+                storiesRead: Array.isArray(parsed.storiesRead) ? parsed.storiesRead : d.storiesRead,
+                generationsVisited: Array.isArray(parsed.generationsVisited) ? parsed.generationsVisited : d.generationsVisited,
+                sawShipStory: !!parsed.sawShipStory,
+                visitedTree: !!parsed.visitedTree,
+                visitedChart: !!parsed.visitedChart,
+                visitedTimeline: !!parsed.visitedTimeline
             };
         } catch (e) {
             return defaultState();
@@ -130,6 +324,24 @@
     }
     function trackCountry(name) {
         if (addUnique(state.countries, name)) { evaluate(); }
+    }
+    function trackStoryRead(storyId) {
+        if (addUnique(state.storiesRead, String(storyId))) { evaluate(); }
+    }
+    function trackGenerationVisit(gen) {
+        if (addUnique(state.generationsVisited, String(gen))) { evaluate(); }
+    }
+    function trackShipStory() {
+        if (!state.sawShipStory) { state.sawShipStory = true; evaluate(); }
+    }
+    function trackTreeVisit() {
+        if (!state.visitedTree) { state.visitedTree = true; evaluate(); }
+    }
+    function trackChartVisit() {
+        if (!state.visitedChart) { state.visitedChart = true; evaluate(); }
+    }
+    function trackTimelineVisit() {
+        if (!state.visitedTimeline) { state.visitedTimeline = true; evaluate(); }
     }
 
     function reset() {
@@ -223,6 +435,50 @@
 
     // ── Auto-wiring: make browsing count ─────────────────────
     function autoScan() {
+        var path = global.location.pathname;
+        
+        // Track page type visits
+        if (path.indexOf('/visualizations/tree') !== -1) {
+            trackTreeVisit();
+        }
+        if (path.indexOf('/visualizations/family_chart') !== -1 || path.indexOf('/family_chart') !== -1) {
+            trackChartVisit();
+        }
+        if (path.indexOf('/timeline') !== -1) {
+            trackTimelineVisit();
+        }
+        
+        // Track generation page visits
+        var genMatch = path.match(/generation_(\d+)/);
+        if (genMatch) {
+            trackGenerationVisit(genMatch[1]);
+        }
+        // Also track gen 0 (ancestors)
+        if (path.indexOf('generation_0') !== -1 || path.indexOf('early_ancestors') !== -1) {
+            trackGenerationVisit('0');
+        }
+        
+        // Track stories page interactions
+        if (path.indexOf('/stories') !== -1) {
+            // Wire up story card clicks
+            setTimeout(function() {
+                var storyCards = document.querySelectorAll('.story-card');
+                storyCards.forEach(function(card, i) {
+                    card.addEventListener('click', function() {
+                        var title = card.querySelector('h3');
+                        var storyId = title ? title.textContent.trim() : ('story-' + i);
+                        trackStoryRead(storyId);
+                        // Check for ship story
+                        if (storyId.toLowerCase().indexOf('ocean') !== -1 || 
+                            storyId.toLowerCase().indexOf('ship') !== -1 ||
+                            storyId.toLowerCase().indexOf('crossing') !== -1) {
+                            trackShipStory();
+                        }
+                    });
+                });
+            }, 100);
+        }
+        
         // 1) Person badges — clicking (or their presence) counts as viewing a person.
         //    On the index, .badge / .people-list span elements represent people.
         var personEls = document.querySelectorAll('.people-list .badge, [data-person-id]');
@@ -262,6 +518,12 @@
         trackPersonView: trackPersonView,
         trackYear: trackYear,
         trackCountry: trackCountry,
+        trackStoryRead: trackStoryRead,
+        trackGenerationVisit: trackGenerationVisit,
+        trackShipStory: trackShipStory,
+        trackTreeVisit: trackTreeVisit,
+        trackChartVisit: trackChartVisit,
+        trackTimelineVisit: trackTimelineVisit,
         renderPanel: renderPanel,
         reset: reset,
         getState: function () { return JSON.parse(JSON.stringify(state)); },
