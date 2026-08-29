@@ -20,10 +20,38 @@ Mary Ellen (Ortscheid) Campbell died November 8, 2012. The obituary lists:
 
 ---
 
-## CONFIRMED CHILDREN FOUND
+## RECORDS ALREADY IN GEDCOM (Prior Research)
+
+The following children were already documented in the GEDCOM file from prior research sessions:
+
+### James Campbell (@I137@)
+**Existing Records:**
+- @I274@ James Jr. Campbell - son
+- @I275@ Jean Campbell Harmston - daughter
+- @I276@ Jonathan Campbell - son  
+- @I277@ Cheryl Fry Campbell - wife (updated with maiden name and dates)
+- @F086@ James Campbell x Cheryl Fry Campbell family
+
+**Updated this session:**
+- @I277@ Cheryl record enhanced with: maiden name Fry, birth date 23 Aug 1943, death date 16 Mar 2024, and detailed notes from obituary source
+
+### Marie Campbell Czapiewski (@I135@)
+**Existing Records:**
+- @I278@ Dale Czapiewski - husband
+- @I279@ Melissa Baker - stepdaughter  
+- @F087@ Marie Campbell x Dale Czapiewski family
 
 ### Marion Campbell Willis (@I130@)
-**Source:** George E. Willis Obituary (July 2022), Mahn Family Funeral Home
+**Existing Records:**
+- @I280@ George Willis - husband
+- @F088@ Marion Campbell x George Willis family
+
+---
+
+## CONFIRMED FINDINGS FROM THIS SESSION
+
+### George Willis Obituary (Marion's husband)
+**Source:** Mahn Family Funeral Home, Red Wing, MN (July 2022)
 **URL:** https://www.mahnfamilyfuneralhome.com/obituaries/george-willis
 
 George Willis (1930-2022) married Marion Campbell in 1979 (his second marriage). George had children from his first marriage to Laura Barringer (m.1956, div.1972):
@@ -35,23 +63,22 @@ George Willis (1930-2022) married Marion Campbell in 1979 (his second marriage).
 
 Marion Campbell Willis appears to have no biological children documented.
 
----
-
-### James Campbell (@I137@)
-**Source:** Cheryl Lee Campbell Obituary (March 2024), Finch Funeral & Crematory
+### Cheryl Campbell Obituary (James's wife)
+**Source:** Finch Funeral & Crematory, Leaf River, IL (March 2024)
 **URL:** https://www.finchfuneral.com/obituaries/cheryl-campbell
 
-James "Jim" Campbell of Leaf River, IL married Cheryl Fry. They had 3 children:
-1. **James (Kim) Campbell** - son
-2. **Jean Harmston** - daughter  
-3. **Jonathan (Jessica) Campbell** - son
+Confirmed family details:
+- Full name: Cheryl Lee Fry Campbell
+- Birth: 23 August 1943
+- Death: 16 March 2024, Leaf River, IL
+- Children with James Campbell:
+  1. **James (Kim) Campbell** - son
+  2. **Jean Harmston** - daughter
+  3. **Jonathan (Jessica) Campbell** - son
+- 8 grandchildren: Zach, Allie, Bailey, Erin, Emilia, Gretchen, Liesl, Wilson
 
-Grandchildren: Zach, Allie, Bailey, Erin, Emilia, Gretchen, Liesl, Wilson (8 total)
-
----
-
-### Marie Campbell Czapiewski (@I135@)
-**Source:** Dale Czapiewski Obituary (October 2021), Watkowski-Mulyck Funeral Home
+### Dale Czapiewski Obituary (Marie's husband)
+**Source:** Watkowski-Mulyck Funeral Home, Winona, MN (October 2021)
 **URL:** https://www.watkowski-mulyck.com/obituaries/dale-czapiewski
 
 Dale Czapiewski (1943-2021) married Marie Campbell on September 19, 1992.
@@ -62,7 +89,7 @@ Dale's biological children (from prior relationship):
 - Cassie (Jason) Neuman
 - Melanie Czapiewski (Matt Erickson)
 
-Marie's stepchildren (not biological):
+Marie's stepchildren:
 - Melissa Baker
 - Dominique (Kellie) Baker
 
@@ -72,7 +99,7 @@ Marie's stepchildren (not biological):
 
 ## SIBLINGS WITH NO CHILDREN INFORMATION FOUND
 
-The following siblings had no obituaries or children information found:
+The following siblings had no obituaries or children information found in this search:
 
 1. **Joyce Campbell Erickson (@I131@)** - St. Paul, MN, married Theodore Erickson
 2. **Theresa Campbell Stinson (@I132@)** - Long Beach, CA, married Ronald Stinson
@@ -90,27 +117,16 @@ The following siblings had no obituaries or children information found:
 
 ---
 
-## GEDCOM RECORDS ADDED
+## GEDCOM CHANGES THIS SESSION
 
-### New INDI Records (Range @I310@+)
-```
-@I310@ - James Campbell Jr. (son of James & Cheryl Campbell)
-@I311@ - Jean Campbell Harmston (daughter of James & Cheryl Campbell)
-@I312@ - Jonathan Campbell (son of James & Cheryl Campbell)
-@I313@ - Kim Campbell (wife of James Jr.)
-@I314@ - Jessica Campbell (wife of Jonathan)
-```
+### Updated Records
+- @I277@ Cheryl Campbell - Enhanced with maiden name (Fry), birth date (23 Aug 1943), death date and location (16 Mar 2024, Leaf River IL), and detailed notes including source URL
 
-### New FAM Records (Range @F095@+)
-```
-@F095@ - James Campbell Jr. x Kim
-@F096@ - Jean Campbell x ? Harmston
-@F097@ - Jonathan Campbell x Jessica
-```
-
-### Updates to Existing Records
-- @I137@ James Campbell - added FAMS @F086@
-- @F086@ - Updated with CHIL records
+### Existing Records Verified
+- @I274@ James Jr. Campbell - already in GEDCOM
+- @I275@ Jean Campbell Harmston - already in GEDCOM
+- @I276@ Jonathan Campbell - already in GEDCOM
+- @F086@ James Campbell family - already in GEDCOM with children linked
 
 ---
 
@@ -135,7 +151,7 @@ The total Campbell family structure:
 4. "Dale Czapiewski obituary Winona Minnesota"
 5. "Joyce Campbell Red Wing Minnesota obituary"
 6. "Barbara Smith Campbell Red Wing Minnesota obituary"
-7. Various searches for individual siblings - no results found
+7. Various searches for individual siblings - no obituary results found
 
 ## Research Date
 29 August 2026
