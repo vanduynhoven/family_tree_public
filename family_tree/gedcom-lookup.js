@@ -25,6 +25,10 @@
     let nameIndex = {}; // lowercase name → id[]
     let loaded = false;
     
+    // Calculate root path based on page depth (for links)
+    const pageDepth = (window.GEDCOM_PATH || '').split('/').filter(p => p === '..').length;
+    const rootPath = pageDepth === 0 ? './' : '../'.repeat(pageDepth);
+    
     // ── GEDCOM Mini-Parser ───────────────────────────────────────────────────
     function parseGEDCOM(text) {
         const lines = text.split('\n').map(l => l.trim()).filter(l => l);
@@ -200,7 +204,7 @@
                 ${lines.length ? lines.join('') : '<li style="color:#888">No additional information recorded.</li>'}
             </ul>
             <div style="margin-top:16px;padding-top:12px;border-top:1px solid rgba(255,255,255,0.1);font-size:0.8em;color:#666">
-                GEDCOM ID: ${escHtml(id)} · <a href="visualizations/tree.html" style="color:#3498db" onclick="this.closest('#gedcom-popup-overlay').style.display='none'">View in tree →</a>
+                GEDCOM ID: ${escHtml(id)} · <a href="${rootPath}visualizations/tree.html?person=${encodeURIComponent(id)}" style="color:#3498db" onclick="this.closest('#gedcom-popup-overlay').style.display='none'">View in tree →</a>
             </div>
         `;
         overlay.style.display = 'flex';
