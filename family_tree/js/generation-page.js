@@ -9,6 +9,7 @@
 const GenerationPage = {
     gedcom: null,
     config: null,
+    showExtended: false, // Default: only show Van Duynhovens
     
     /**
      * Initialize the generation page
@@ -16,6 +17,7 @@ const GenerationPage = {
      */
     async init(config) {
         this.config = config || window.GENERATION_CONFIG || {};
+        this.showExtended = false; // Default: Van Duynhovens only
         
         try {
             // Load GEDCOM
@@ -24,7 +26,8 @@ const GenerationPage = {
             const text = await response.text();
             this.gedcom = this.parseGEDCOM(text);
             
-            // Render the page
+            // Render filter controls and page
+            this.renderFilterControls();
             this.renderPage();
             
             // Hide loading, show content
@@ -38,6 +41,154 @@ const GenerationPage = {
             const loading = document.getElementById('loading');
             if (loading) loading.textContent = 'Error loading family data: ' + err.message;
         }
+    },
+    
+    /**
+     * Check if person is a Van Duynhoven (by surname)
+     */
+    isVanDuynhoven(ind) {
+        if (!ind) return false;
+        const surname = (ind.surname || '').toLowerCase();
+        const name = (ind.name || '').toLowerCase();
+        // Match various spellings: van Duynhoven, van Duijnhoven, vanDuynhoven, etc.
+        return surname.includes('duynhoven') || 
+               surname.includes('duijnhoven') ||
+               name.includes('duynhoven') || 
+               name.includes('duijnhoven');
+    },
+    
+    /**
+     * Render filter controls
+     */
+    renderFilterControls() {
+        // Find or create filter container
+        let filterContainer = document.getElementById('filter-controls');
+        if (!filterContainer) {
+            // Insert after stats row if it exists, otherwise before people-cards
+            const statsRow = document.getElementById('dynamic-stats');
+            const peopleCards = document.getElementById('people-cards');
+            const insertBefore = peopleCards?.parentElement;
+            
+            if (insertBefore) {
+                filterContainer = document.createElement('div');
+                filterContainer.id = 'filter-controls';
+                filterContainer.className = 'filter-controls';
+                
+                // Insert after the "Generation X Members" section title
+                const sectionTitle = insertBefore.querySelector('.section-title');
+                if (sectionTitle) {
+                    sectionTitle.parentNode.insertBefore(filterContainer, sectionTitle.nextSibling);
+                } else {
+                    insertBefore.insertBefore(filterContainer, peopleCards);
+                }
+            }
+        }
+        
+        if (!filterContainer) return;
+        
+        filterContainer.innerHTML = `
+            <div class="filter-toggle-group">
+                <button class="filter-btn ${!this.showExtended ? 'active' : ''}" 
+                        onclick="GenerationPage.setFilter(false)"
+                        title="Show only people with Van Duynhoven surname">
+                    <span class="filter-icon">👨‍👩‍👧‍👦</span> Van Duynhovens Only
+                </button>
+                <button class="filter-btn ${this.showExtended ? 'active' : ''}" 
+                        onclick="GenerationPage.setFilter(true)"
+                        title="Show spouses and extended family members">
+                    <span class="filter-icon">💍</span> Include Spouses & Extended
+                </button>
+            </div>
+            <div class="filter-hint">
+                ${this.showExtended ? 
+                    '👥 Showing all family members including spouses' : 
+                    '🔹 Showing Van Duynhovens by blood/name only'}
+            </div>
+        `;
+        
+        // Add styles if not already present
+        if (!document.getElementById('filter-styles')) {
+            const style = document.createElement('style');
+            style.id = 'filter-styles';
+            style.textContent = `
+                .filter-controls {
+                    margin: 20px 0;
+                    padding: 16px;
+                    background: rgba(255,255,255,0.03);
+                    border-radius: 12px;
+                    border: 1px solid rgba(255,255,255,0.1);
+                }
+                .filter-toggle-group {
+                    display: flex;
+                    gap: 8px;
+                    flex-wrap: wrap;
+                    justify-content: center;
+                }
+                .filter-btn {
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+                    padding: 10px 18px;
+                    border: 2px solid rgba(255,255,255,0.2);
+                    border-radius: 25px;
+                    background: rgba(255,255,255,0.05);
+                    color: #aaa;
+                    cursor: pointer;
+                    font-size: 14px;
+                    font-weight: 500;
+                    transition: all 0.2s ease;
+                }
+                .filter-btn:hover {
+                    background: rgba(255,255,255,0.1);
+                    border-color: rgba(255,255,255,0.3);
+                    color: #fff;
+                }
+                .filter-btn.active {
+                    background: linear-gradient(135deg, #3498db, #2980b9);
+                    border-color: #3498db;
+                    color: #fff;
+                    box-shadow: 0 4px 15px rgba(52,152,219,0.3);
+                }
+                .filter-icon {
+                    font-size: 16px;
+                }
+                .filter-hint {
+                    text-align: center;
+                    margin-top: 12px;
+                    font-size: 13px;
+                    color: #888;
+                }
+                .person-card-fun.spouse-card {
+                    border-left: 4px solid #9b59b6;
+                    opacity: 0.9;
+                }
+                .person-card-fun.spouse-card .card-header {
+                    position: relative;
+                }
+                .person-card-fun.spouse-card::before {
+                    content: '💍 Spouse';
+                    position: absolute;
+                    top: 12px;
+                    right: 12px;
+                    background: rgba(155,89,182,0.3);
+                    color: #bb8fce;
+                    padding: 4px 10px;
+                    border-radius: 12px;
+                    font-size: 11px;
+                    font-weight: 600;
+                }
+            `;
+            document.head.appendChild(style);
+        }
+    },
+    
+    /**
+     * Set filter and re-render
+     */
+    setFilter(showExtended) {
+        this.showExtended = showExtended;
+        this.renderFilterControls();
+        this.renderPage();
     },
     
     /**
@@ -224,16 +375,40 @@ const GenerationPage = {
     
     /**
      * Get all individuals for a specific generation
+     * Filters by Van Duynhoven surname unless showExtended is true
      */
     getGenerationMembers(genNum) {
         this.calculateGenerations();
         const members = [];
+        const spouseIds = new Set();
+        
+        // First pass: get Van Duynhovens of this generation
         for (const [id, ind] of Object.entries(this.gedcom.individuals)) {
             const gen = this._generations[id];
-            if (gen === genNum) {
-                members.push({ ...ind, id });
+            if (gen === genNum && this.isVanDuynhoven(ind)) {
+                members.push({ ...ind, id, isVanDuynhoven: true });
+                
+                // Track their spouses for potential inclusion
+                for (const famId of (ind.fams || [])) {
+                    const fam = this.gedcom.families[famId];
+                    if (fam) {
+                        const spouseId = fam.husb === id ? fam.wife : fam.husb;
+                        if (spouseId) spouseIds.add(spouseId);
+                    }
+                }
             }
         }
+        
+        // Second pass: add spouses if showExtended is true
+        if (this.showExtended) {
+            for (const spouseId of spouseIds) {
+                const spouse = this.gedcom.individuals[spouseId];
+                if (spouse && !members.find(m => m.id === spouseId)) {
+                    members.push({ ...spouse, id: spouseId, isVanDuynhoven: false, isSpouse: true });
+                }
+            }
+        }
+        
         // Sort by birth year
         members.sort((a, b) => {
             const ya = this.extractYear(a.birth?.date);
@@ -472,6 +647,7 @@ const GenerationPage = {
         const siblings = this.getSiblings(ind);
         const isAncestor = this.isDirectAncestor(ind);
         const emoji = this.getPersonEmoji(ind);
+        const isSpouseCard = ind.isSpouse && !ind.isVanDuynhoven;
         
         const birthInfo = ind.birth?.date ? 
             `${this.formatDate(ind.birth.date)}${ind.birth.place ? ', ' + this.formatPlaceShort(ind.birth.place) : ''}` : '';
@@ -487,7 +663,7 @@ const GenerationPage = {
         );
         
         return `
-        <article class="person-card-fun" data-id="${ind.id}">
+        <article class="person-card-fun${isSpouseCard ? ' spouse-card' : ''}" data-id="${ind.id}">
             <div class="card-header">
                 <div class="avatar ${isAncestor ? 'ancestor' : (ind.sex === 'F' ? 'female' : '')}">${emoji}</div>
                 <div class="name-area">
