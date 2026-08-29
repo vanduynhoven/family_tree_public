@@ -13,7 +13,7 @@ This folder contains research into the maternal and spouse ancestor lines beyond
 | [VAN_DEN_ELZEN_ANCESTORS.md](VAN_DEN_ELZEN_ANCESTORS.md) | Anna Maria van den Elzen's family | Found parents: Johannes van den Elzen & Francyna van der Horst; 6 siblings identified |
 | [CORNELISSEN_ANCESTORS.md](CORNELISSEN_ANCESTORS.md) | Anna Maria Cornelissen's family | Found grandparents: Peter Cornelissen × Johanna Verhoeven, Martinus Verbruggen × Petronella van de Biggelaar |
 | [VERWEGEN_ANCESTORS.md](VERWEGEN_ANCESTORS.md) | Geertruda Verwegen's family | Found parents: Johannes Verwegen & Mechelina van den Berk; 5+ siblings |
-| [EXTENDED_ANCESTORS.md](EXTENDED_ANCESTORS.md) | Earliest known ancestors | **Extended to Generation -1!** Found Petrus Joannis van Duijnhoven × Elisabeth van Boxtel (married 1808) |
+| [EXTENDED_ANCESTORS.md](EXTENDED_ANCESTORS.md) | Earliest known ancestors | **Extended to Generation -1!** Found Petrus Joannis van Duijnhoven × Elisabeth van Boxtel (married 1796; widow remarried 1808) |
 
 ### US Descendants Research
 
@@ -30,7 +30,7 @@ This folder contains research into the maternal and spouse ancestor lines beyond
 ```
 GENERATION -1 (NEW!)
 ├── Petrus Joannis van Duijnhoven ══ Elisabeth van Boxtel
-│   └── Married 25 Jan 1808, Uden (DTB record found!)
+│   └── Married 21 Nov 1796, Uden (DTB record found!)
 │
 └── Joannes Hendriks van der Heijden ══ Anna Maria Pittens
     └── (Johanna's parents - records to be located)
