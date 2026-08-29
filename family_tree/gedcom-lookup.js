@@ -300,3 +300,39 @@
     // Expose for manual use
     window.gedcomLookup = { findId, showPopup, individuals: () => individuals };
 })();
+
+// ── Global Footer Quick Nav ──────────────────────────────────────────
+(function injectFooterNav() {
+    if (document.getElementById('site-footer-nav')) return;
+    
+    // Detect page depth from GEDCOM_PATH or current URL
+    const depth = (window.GEDCOM_PATH || '').split('/').filter(p => p === '..').length;
+    const root = depth === 0 ? './' : '../'.repeat(depth);
+    
+    const nav = document.createElement('nav');
+    nav.id = 'site-footer-nav';
+    nav.className = 'site-footer-nav';
+    nav.innerHTML = `
+        <a href="${root}index.html" class="nav-home">🏠 Home</a>
+        <span class="nav-sep">·</span>
+        <a href="${root}generation_0_ancestors/index.html">~1450</a>
+        <a href="${root}generation_1_1799/index.html">Gen 1</a>
+        <a href="${root}generation_2_1829/index.html">Gen 2</a>
+        <a href="${root}generation_3_1872/index.html">Gen 3</a>
+        <a href="${root}generation_4_1915/index.html">Gen 4</a>
+        <a href="${root}generation_5_1951/index.html">Gen 5</a>
+        <a href="${root}generation_6_1980s/index.html">Gen 6</a>
+        <a href="${root}generation_7_2000s/index.html">Gen 7</a>
+        <span class="nav-sep">·</span>
+        <a href="${root}visualizations/tree.html">🌿 Tree</a>
+        <a href="${root}visualizations/family_chart.html">🥧 Chart</a>
+        <a href="${root}manifest.html">🗂 Site Map</a>
+        <a href="${root}changelog.html">📋 Changelog</a>
+    `;
+    
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', () => document.body.appendChild(nav));
+    } else {
+        document.body.appendChild(nav);
+    }
+})();

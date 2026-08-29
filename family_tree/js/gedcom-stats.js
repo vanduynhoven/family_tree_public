@@ -165,12 +165,18 @@ const GedcomStats = {
         if (stats.generations.size > 0) {
             stats.minGeneration = Math.min(...stats.generations);
             stats.maxGeneration = Math.max(...stats.generations);
+            // Total span = from most negative to most positive, inclusive
             stats.generationCount = stats.maxGeneration - stats.minGeneration + 1;
+            // Range string like "-11 to 7"
+            stats.generationRange = `${stats.minGeneration} to ${stats.maxGeneration}`;
         }
 
         if (stats.earliestYear < 9999) {
-            stats.yearSpan = `${stats.earliestYear}–${stats.latestYear || 'Present'}`;
+            stats.yearSpan = `~${stats.earliestYear}–Present`;
         }
+        
+        // Last updated from HEAD commit date (approximated as today)
+        stats.lastUpdated = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
 
         return stats;
     },
@@ -219,6 +225,10 @@ const GedcomStats = {
                 return this.data.latestYear || 'Present';
             case 'yearSpan':
                 return this.data.yearSpan;
+            case 'generationRange':
+                return this.data.generationRange || `${this.data.minGeneration} to ${this.data.maxGeneration}`;
+            case 'lastUpdated':
+                return this.data.lastUpdated;
             case 'males':
                 return this.data.males;
             case 'females':
