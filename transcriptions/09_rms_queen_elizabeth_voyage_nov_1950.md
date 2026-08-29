@@ -57,9 +57,58 @@ They traveled as newlyweds, having married on October 5, 1950 in Bakel, just 6 w
 
 ---
 
-## Historical Context
+## Ship History: RMS Queen Elizabeth
 
-The RMS Queen Elizabeth was the largest ocean liner ever built at that time. Along with her sister ship RMS Queen Mary, she provided weekly transatlantic service between Southampton and New York. The ship was launched in 1938 but spent WWII as a troopship before entering civilian service in 1946.
+### Construction & Launch
+- **Shipyard**: John Brown & Company, Clydebank, Scotland
+- **Launched**: September 27, 1938 by Queen Elizabeth (later the Queen Mother)
+- **Cost**: £5 million (~£350 million in today's money)
+- **Length**: 1,031 feet (314 m) — longer than the Titanic by 148 feet
+- **Tonnage**: 83,673 gross tons — **the largest passenger liner ever built** at the time
+
+### World War II Service (1940-1946)
+The Queen Elizabeth never had a peacetime maiden voyage before the war. In a remarkable secret operation, she was moved to New York in March 1940 — painted gray, running in complete radio silence to avoid German U-boats. She spent the war as a troopship, carrying over **750,000 troops** across the Atlantic and worldwide. Hitler reportedly offered a bounty for her destruction.
+
+### Golden Age: Transatlantic Service (1946-1968)
+- **First civilian voyage**: October 16, 1946
+- **Service pattern**: Weekly Southampton ↔ Cherbourg ↔ New York (alternating with sister ship RMS Queen Mary)
+- **Total transatlantic crossings**: ~900+ round-trip voyages
+- **Passengers carried (lifetime)**: ~2.3 million people
+- **Last transatlantic voyage**: November 8, 1968
+
+### The End (1968-1972)
+- Sold after jet travel made ocean liners unprofitable
+- Renamed **Seawise University** and moved to Hong Kong for conversion to floating university
+- **January 9, 1972**: Destroyed by fire (arson suspected, never proven) — multiple simultaneous fires broke out
+- The wreck remained partially visible at low tide in Hong Kong harbor until 1978
+
+---
+
+## Interesting Facts
+
+### About the Ship
+- 🚢 **Largest ship in the world** when Johan & Anna Maria sailed — held this record until 1996
+- 👑 **Named by royalty** — Queen Elizabeth (the Queen Mother) launched her; her daughter Queen Elizabeth II later sailed on her
+- 🎬 **Hollywood famous** — appeared in films including "The Poseidon Adventure" (the fire scene was inspired by her actual destruction)
+- 🏆 **Blue Riband contender** — could cross the Atlantic in under 4 days at top speed (though never officially claimed the prize)
+- 💰 **Floating palace** — first-class suites cost the equivalent of $50,000 in today's money
+- 🍽️ **Massive provisioning** — each crossing loaded: 20,000 eggs, 4,500 lbs of bacon, 1,000 lbs of tea, 14,000 bottles of beer
+
+### About This Voyage (November 1950)
+- 📋 **615 cabin class passengers** listed on the manifest (Johan & Anna Maria among them)
+- 👨‍✈️ **Commodore G. E. Cove** commanded — one of Cunard's most senior captains
+- 🌊 **November crossings** were known for rough seas — the North Atlantic in late autumn was notoriously stormy
+- ⏱️ **4-5 day crossing** — compared to 2+ weeks on older ships, this was remarkably fast
+
+### About Dutch Emigration in 1950
+- 🇳🇱 **Government-encouraged** — The Netherlands had an official emigration program (1950s-1960s) due to post-war housing shortages and "overpopulation" concerns
+- 💵 **Subsidized passage** — Many Dutch emigrants received government assistance for their tickets
+- 🌾 **Minnesota destination** — Green Isle had an established Dutch-American farming community, making it attractive for newcomers
+- 💒 **Newlywed timing** — Johan and Anna Maria married October 5, 1950 and sailed November 16 — just 6 weeks later. This was common: couples married just before emigrating to start fresh together
+
+---
+
+## Historical Context
 
 For Dutch emigrants like Johan and Anna Maria, the typical route was:
 1. Train from Noord-Brabant to Rotterdam or Hook of Holland
@@ -70,6 +119,13 @@ For Dutch emigrants like Johan and Anna Maria, the typical route was:
 6. Arrive at Pier 90 in New York
 7. Process through immigration
 8. Board train to final destination (Minnesota)
+
+The RMS Queen Elizabeth was considered a prestigious way to emigrate — cabin class offered comfortable accommodations with private dining rooms, lounges, and deck promenades. This was a far cry from the "steerage" conditions of earlier emigrant ships.
+
+---
+
+## Sister Ship: RMS Queen Mary
+The Queen Elizabeth's sister ship, RMS Queen Mary, is now permanently docked in Long Beach, California as a hotel and museum. She provides a sense of what the Queen Elizabeth looked like — the two ships had similar interiors and Art Deco styling.
 
 ---
 
