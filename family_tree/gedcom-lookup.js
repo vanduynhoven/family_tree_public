@@ -16,8 +16,9 @@
 
     // ── Config ──────────────────────────────────────────────────────────────
     // Path to GEDCOM relative to this script (in the family_tree root)
-    // Pages at different depths override via window.GEDCOM_PATH
-    const GEDCOM_DEFAULT = '../vanduynhoven_family.ged';
+    // Default assumes page is in family_tree/ root. Subdirectory pages
+    // override via window.GEDCOM_PATH = '../vanduynhoven_family.ged'
+    const GEDCOM_DEFAULT = './vanduynhoven_family.ged';
     
     // ── State ────────────────────────────────────────────────────────────────
     let individuals = {};
