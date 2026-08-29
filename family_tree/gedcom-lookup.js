@@ -326,6 +326,7 @@
         <span class="nav-sep">·</span>
         <a href="${root}visualizations/tree.html">🌿 Tree</a>
         <a href="${root}visualizations/family_chart.html">🥧 Chart</a>
+        <a href="${root}timeline.html">📅 Timeline</a>
         <a href="${root}manifest.html">🗂 Site Map</a>
         <a href="${root}changelog.html">📋 Changelog</a>
     `;

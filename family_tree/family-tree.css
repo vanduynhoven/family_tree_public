@@ -188,6 +188,50 @@ nav.quick-nav a.viz-link {
 .badge.deceased { background: rgba(231,76,60,0.25); }
 .badge.dual-citizen { border: 1px solid #00bcd4; }
 
+
+/* ─── Fun Facts Badges ──────────────────────────── */
+.fun-facts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin: 18px 0;
+    justify-content: center;
+}
+.fun-fact-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 9px 16px;
+    border-radius: 22px;
+    font-size: 0.9em;
+    font-weight: 600;
+    color: #fff;
+    text-decoration: none;
+    border: 1px solid rgba(255,255,255,0.25);
+    box-shadow: 0 3px 12px rgba(0,0,0,0.25);
+    transition: transform 0.18s, box-shadow 0.18s;
+    line-height: 1.2;
+}
+.fun-fact-badge:hover {
+    transform: translateY(-3px) scale(1.03);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+}
+.fun-fact-badge .ff-emoji { font-size: 1.15em; }
+.fun-fact-badge.ff-ship   { background: linear-gradient(135deg, #2980b9, #3498db); border-color: #5dade2; }
+.fun-fact-badge.ff-family { background: linear-gradient(135deg, #c0392b, #e74c3c); border-color: #ec7063; }
+.fun-fact-badge.ff-ocean  { background: linear-gradient(135deg, #16a085, #1abc9c); border-color: #48c9b0; }
+.fun-fact-badge.ff-faith  { background: linear-gradient(135deg, #8e44ad, #9b59b6); border-color: #bb8fce; }
+.fun-fact-badge.ff-gold   { background: linear-gradient(135deg, #d68910, #f39c12); border-color: #f8c471; }
+.fun-fact-badge.ff-green  { background: linear-gradient(135deg, #229954, #27ae60); border-color: #58d68d; }
+.fun-fact-badge.ff-star   { background: linear-gradient(135deg, #b9770e, #e67e22); border-color: #eb984e; }
+.fun-facts-title {
+    text-align: center;
+    font-size: 0.85em;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: #888;
+    margin: 22px 0 4px;
+}
 /* ─── Generation Ring Numbers ───────────────────── */
 .gen-circle {
     width: 68px; height: 68px;
@@ -896,3 +940,101 @@ footer.page-footer {
 .site-footer-nav .nav-home { color: var(--accent); border-color: rgba(243,156,18,0.3); }
 /* Add bottom padding to body so content isn't hidden behind footer */
 body { padding-bottom: 48px !important; }
+
+/* ─── 👶 Kid Mode ─────────────────────────────────────────────────── */
+/* Floating toggle button (bottom-right, above the footer nav) */
+.kid-mode-toggle {
+    position: fixed;
+    right: 16px;
+    bottom: 58px;
+    z-index: 200;
+    padding: 10px 16px;
+    border: 2px solid #f39c12;
+    border-radius: 26px;
+    background: rgba(243, 156, 18, 0.18);
+    color: #ffd479;
+    font-family: inherit;
+    font-size: 0.9em;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+    transition: transform 0.2s, background 0.2s, box-shadow 0.2s;
+}
+.kid-mode-toggle:hover { transform: translateY(-2px); box-shadow: 0 6px 22px rgba(0, 0, 0, 0.55); }
+.kid-mode-toggle.on {
+    background: linear-gradient(135deg, #f39c12, #e74c3c);
+    color: #fff;
+    border-color: #ffd479;
+}
+
+/* Kid Mode active: bigger, friendlier text */
+body.kid-mode { font-size: 122%; line-height: 1.7; }
+body.kid-mode .subtitle,
+body.kid-mode .muted,
+body.kid-mode p,
+body.kid-mode .badge,
+body.kid-mode .gen-years,
+body.kid-mode .gen-loc { font-size: 1.08em; }
+body.kid-mode h1.page-title { font-size: 2.9em; }
+body.kid-mode h2.section-title { font-size: 1.85em; }
+body.kid-mode .gen-title { font-size: 1.25em; }
+body.kid-mode .stat-number { font-size: 1.15em; }
+/* Tree view: enlarge toolbar + detail-panel text when kid mode is on */
+body.kid-mode .tree-toolbar { font-size: 1.05em; }
+body.kid-mode .detail-panel { font-size: 1.1em; }
+
+.kid-emoji { font-style: normal; }
+
+/* Vocabulary tooltip words */
+.kid-term {
+    border-bottom: 2px dotted #f39c12;
+    cursor: help;
+    position: relative;
+    color: inherit;
+}
+/* Only decorate/enable tooltips while Kid Mode is on */
+body:not(.kid-mode) .kid-term { border-bottom: none; cursor: inherit; }
+body:not(.kid-mode) .kid-term::after,
+body:not(.kid-mode) .kid-term::before { display: none !important; }
+
+body.kid-mode .kid-term::after {
+    content: attr(data-def);
+    position: absolute;
+    left: 50%;
+    bottom: 145%;
+    transform: translateX(-50%) scale(0.96);
+    transform-origin: bottom center;
+    min-width: 170px;
+    max-width: 280px;
+    padding: 9px 12px;
+    background: #1a1a2e;
+    color: #fff;
+    border: 1px solid #f39c12;
+    border-radius: 10px;
+    font-size: 0.82em;
+    font-weight: 500;
+    line-height: 1.45;
+    text-align: center;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.15s, transform 0.15s;
+    z-index: 300;
+    white-space: normal;
+}
+body.kid-mode .kid-term::before {
+    content: '';
+    position: absolute;
+    left: 50%;
+    bottom: 145%;
+    transform: translateX(-50%) translateY(100%);
+    border: 6px solid transparent;
+    border-top-color: #f39c12;
+    opacity: 0;
+    transition: opacity 0.15s;
+    z-index: 301;
+}
+body.kid-mode .kid-term:hover::after,
+body.kid-mode .kid-term:focus::after { opacity: 1; transform: translateX(-50%) scale(1); }
+body.kid-mode .kid-term:hover::before,
+body.kid-mode .kid-term:focus::before { opacity: 1; }
