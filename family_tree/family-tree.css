@@ -1273,181 +1273,290 @@ body.kid-mode .kid-term:focus::before { opacity: 1; }
  * The nav sets --bottom-nav-clearance on :root at runtime so the
  * kid-mode toggle floats just above whatever height the nav currently is.
  */
-:root { --bottom-nav-clearance: 58px; }
+:root { --bottom-nav-clearance: 54px; }
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   Bottom Navigation Bar — Left-aligned with Home + Kid Mode always visible
+   Site Footer Navigation — Full-width fixed bottom bar
    ═══════════════════════════════════════════════════════════════════════════ */
-.bottom-nav {
+.site-footer-nav {
     position: fixed;
-    left: 16px;
-    bottom: 16px;
+    left: 0;
+    right: 0;
+    bottom: 0;
     z-index: 300;
     display: flex;
     align-items: center;
-    gap: 4px;
-    max-width: calc(100vw - 32px);
-    padding: 6px;
-    border: 1px solid var(--glass-border, rgba(255,255,255,0.12));
-    border-radius: 30px;
-    background: rgba(20, 20, 36, 0.92);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.5);
+    justify-content: space-between;
+    padding: 8px 16px;
+    background: rgba(15, 15, 30, 0.95);
+    border-top: 1px solid var(--glass-border, rgba(255,255,255,0.1));
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.4);
     font-family: inherit;
-    transition: max-width 0.32s cubic-bezier(0.4, 0, 0.2, 1),
-                padding 0.32s cubic-bezier(0.4, 0, 0.2, 1);
-    overflow: visible;
 }
 
-/* Fixed buttons container (Home, Kid Mode, Expand) */
-.bottom-nav .bn-fixed {
+/* Left nav section */
+.site-footer-nav .sfn-left {
     display: flex;
-    align-items: stretch;
-    gap: 2px;
-    flex: 0 0 auto;
+    align-items: center;
+    gap: 4px;
+    flex-wrap: wrap;
 }
 
-/* Home link button */
-.bottom-nav .bn-home-link {
+/* Right section (Kid Mode) */
+.site-footer-nav .sfn-right {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+}
+
+/* Nav links */
+.site-footer-nav .sfn-link {
     display: inline-flex;
     align-items: center;
-    justify-content: center;
-    width: 42px;
-    height: 42px;
+    gap: 6px;
+    padding: 8px 12px;
     border: none;
-    border-radius: 50%;
+    border-radius: 20px;
+    background: transparent;
+    color: #aaa;
+    text-decoration: none;
+    font-size: 0.88em;
+    font-weight: 600;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: color 0.15s, background 0.15s;
+}
+.site-footer-nav .sfn-link:hover {
+    color: #fff;
+    background: rgba(255, 255, 255, 0.1);
+}
+.site-footer-nav .sfn-link.active {
+    color: var(--accent, #f39c12);
+    background: rgba(243, 156, 18, 0.15);
+}
+.site-footer-nav .sfn-link span {
+    display: inline;
+}
+
+/* Home link special styling */
+.site-footer-nav .sfn-home {
     background: linear-gradient(135deg, var(--accent, #f39c12), var(--accent-red, #e74c3c));
     color: #fff;
-    font-size: 1.15em;
-    text-decoration: none;
-    transition: transform 0.15s, box-shadow 0.15s, filter 0.15s;
+    padding: 8px 14px;
 }
-.bottom-nav .bn-home-link:hover { 
+.site-footer-nav .sfn-home:hover {
     filter: brightness(1.1);
-    box-shadow: 0 4px 14px rgba(0,0,0,0.4);
-    transform: scale(1.05);
+    background: linear-gradient(135deg, var(--accent, #f39c12), var(--accent-red, #e74c3c));
 }
-.bottom-nav .bn-home-link.active {
+.site-footer-nav .sfn-home.active {
     background: linear-gradient(135deg, #27ae60, #2ecc71);
+    color: #fff;
 }
-.bottom-nav .bn-home-link:focus-visible { outline: 2px solid #ffd479; outline-offset: 2px; }
 
 /* Info button */
-.bottom-nav .bn-info-btn {
+.site-footer-nav .sfn-info {
+    color: #888;
+}
+.site-footer-nav .sfn-info:hover {
+    color: #5dade2;
+    background: rgba(52, 152, 219, 0.15);
+}
+
+/* ─── Dropdown containers ─── */
+.site-footer-nav .sfn-dropdown-container {
+    position: relative;
+}
+
+.site-footer-nav .sfn-dropdown-btn {
     display: inline-flex;
     align-items: center;
-    justify-content: center;
-    width: 36px;
-    height: 42px;
+    gap: 6px;
+    padding: 8px 12px;
+    border: none;
+    border-radius: 20px;
+    background: transparent;
+    color: #aaa;
+    font-size: 0.88em;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: color 0.15s, background 0.15s;
+}
+.site-footer-nav .sfn-dropdown-btn:hover {
+    color: #fff;
+    background: rgba(255, 255, 255, 0.1);
+}
+.site-footer-nav .sfn-dropdown-container.open .sfn-dropdown-btn {
+    color: #fff;
+}
+
+/* Purple theme for Generations */
+.site-footer-nav .sfn-purple .sfn-dropdown-btn {
+    color: #ce93d8;
+}
+.site-footer-nav .sfn-purple .sfn-dropdown-btn:hover,
+.site-footer-nav .sfn-purple.open .sfn-dropdown-btn {
+    background: rgba(142, 68, 173, 0.3);
+    color: #e1bee7;
+}
+
+/* Cyan theme for Visualizations */
+.site-footer-nav .sfn-cyan .sfn-dropdown-btn {
+    color: #4dd0e1;
+}
+.site-footer-nav .sfn-cyan .sfn-dropdown-btn:hover,
+.site-footer-nav .sfn-cyan.open .sfn-dropdown-btn {
+    background: rgba(0, 188, 212, 0.25);
+    color: #80deea;
+}
+
+/* Dropdown arrow */
+.site-footer-nav .sfn-arrow {
+    font-size: 0.7em;
+    transition: transform 0.25s ease;
+}
+.site-footer-nav .sfn-dropdown-container.open .sfn-arrow {
+    transform: rotate(180deg);
+}
+
+/* ─── Dropdown menu (expands UPWARD) ─── */
+.site-footer-nav .sfn-dropdown-menu {
+    position: absolute;
+    bottom: calc(100% + 8px);
+    left: 50%;
+    transform: translateX(-50%) translateY(10px);
+    min-width: 200px;
+    padding: 8px 0;
+    background: rgba(20, 20, 40, 0.98);
+    border: 1px solid var(--glass-border, rgba(255,255,255,0.15));
+    border-radius: 16px;
+    box-shadow: 0 -8px 40px rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s;
+    z-index: 100;
+}
+.site-footer-nav .sfn-dropdown-container.open .sfn-dropdown-menu {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(-50%) translateY(0);
+}
+
+/* Dropdown items */
+.site-footer-nav .sfn-dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 16px;
+    color: #cfcfe0;
+    text-decoration: none;
+    font-size: 0.9em;
+    transition: background 0.15s, color 0.15s;
+}
+.site-footer-nav .sfn-dropdown-item:hover {
+    background: rgba(255, 255, 255, 0.08);
+    color: #fff;
+}
+.site-footer-nav .sfn-dropdown-item.active {
+    background: rgba(243, 156, 18, 0.2);
+    color: #fff;
+}
+
+/* Purple dropdown hover (Generations) */
+.site-footer-nav .sfn-purple .sfn-dropdown-item:hover {
+    background: rgba(142, 68, 173, 0.25);
+    color: #e1bee7;
+}
+.site-footer-nav .sfn-purple .sfn-dropdown-item.active {
+    background: rgba(142, 68, 173, 0.4);
+}
+
+/* Cyan dropdown hover (Visualizations) */
+.site-footer-nav .sfn-cyan .sfn-dropdown-item:hover {
+    background: rgba(0, 188, 212, 0.2);
+    color: #80deea;
+}
+.site-footer-nav .sfn-cyan .sfn-dropdown-item.active {
+    background: rgba(0, 188, 212, 0.35);
+}
+
+.site-footer-nav .sfn-item-icon {
+    font-size: 1.15em;
+    width: 26px;
+    text-align: center;
+}
+.site-footer-nav .sfn-item-label {
+    font-weight: 600;
+    flex: 1;
+}
+.site-footer-nav .sfn-item-desc {
+    font-size: 0.78em;
+    color: #777;
+}
+
+/* ─── Kid Mode button ─── */
+.site-footer-nav .sfn-kid-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px;
     border: none;
     border-radius: 20px;
     background: rgba(255, 255, 255, 0.08);
     color: #aaa;
-    font-size: 1em;
-    cursor: pointer;
-    transition: background 0.15s, color 0.15s, transform 0.15s;
-}
-.bottom-nav .bn-info-btn:hover {
-    background: rgba(52, 152, 219, 0.25);
-    color: #5dade2;
-    transform: scale(1.05);
-}
-
-/* ═══════════════════════════════════════════════════════════════════════════
-   Kid Mode Widget — Separate bottom-right widget
-   ═══════════════════════════════════════════════════════════════════════════ */
-.kid-mode-widget {
-    position: fixed;
-    right: 16px;
-    bottom: 16px;
-    z-index: 300;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    padding: 6px;
-    border: 1px solid var(--glass-border, rgba(255,255,255,0.12));
-    border-radius: 30px;
-    background: rgba(20, 20, 36, 0.92);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.5);
-    transition: padding 0.2s, box-shadow 0.2s;
-}
-.kid-mode-widget.active {
-    border-color: rgba(155, 89, 182, 0.4);
-    box-shadow: 0 6px 30px rgba(155, 89, 182, 0.3);
-}
-
-/* Kid Mode toggle button */
-.kid-mode-widget .kmw-toggle {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
-    min-width: 42px;
-    height: 42px;
-    padding: 0 14px;
-    border: none;
-    border-radius: 21px;
-    background: rgba(255, 255, 255, 0.08);
-    color: #aaa;
-    font-size: 1em;
+    font-size: 0.88em;
     font-weight: 600;
     cursor: pointer;
     white-space: nowrap;
-    transition: background 0.2s, color 0.2s, transform 0.15s;
+    transition: background 0.2s, color 0.2s, box-shadow 0.2s;
 }
-.kid-mode-widget .kmw-toggle:hover {
+.site-footer-nav .sfn-kid-btn:hover {
     background: rgba(255, 255, 255, 0.15);
     color: #fff;
-    transform: scale(1.03);
 }
-.kid-mode-widget .kmw-toggle.on {
+.site-footer-nav .sfn-kid-btn.on {
     background: linear-gradient(135deg, #9b59b6, #8e44ad);
     color: #fff;
     box-shadow: 0 4px 16px rgba(155, 89, 182, 0.4);
 }
-.kid-mode-widget .kmw-toggle.on:hover {
+.site-footer-nav .sfn-kid-btn.on:hover {
     filter: brightness(1.1);
 }
 
 /* Achievements button */
-.kid-mode-widget .kmw-ach {
+.site-footer-nav .sfn-ach-btn {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 42px;
-    height: 42px;
+    width: 38px;
+    height: 38px;
     border: none;
     border-radius: 50%;
     background: linear-gradient(135deg, #f39c12, #e67e22);
     color: #fff;
-    font-size: 1.2em;
+    font-size: 1.15em;
     cursor: pointer;
     transition: transform 0.15s, box-shadow 0.15s, filter 0.15s;
 }
-.kid-mode-widget .kmw-ach:hover {
+.site-footer-nav .sfn-ach-btn:hover {
     transform: scale(1.1);
     filter: brightness(1.1);
     box-shadow: 0 4px 16px rgba(243, 156, 18, 0.5);
 }
 
-@media (max-width: 719px) {
-    .kid-mode-widget {
-        right: 10px;
-        bottom: 10px;
-    }
-}
-
-/* Info popup (footer content) */
-.bn-info-popup {
+/* ─── Info popup ─── */
+.sfn-info-popup {
     position: fixed;
     bottom: 70px;
     left: 16px;
     width: 320px;
     max-width: calc(100vw - 32px);
-    background: rgba(20, 20, 40, 0.96);
+    background: rgba(20, 20, 40, 0.98);
     border: 1px solid var(--glass-border, rgba(255,255,255,0.15));
     border-radius: 16px;
     box-shadow: 0 8px 40px rgba(0, 0, 0, 0.6);
@@ -1455,17 +1564,17 @@ body.kid-mode .kid-term:focus::before { opacity: 1; }
     -webkit-backdrop-filter: blur(12px);
     z-index: 400;
     opacity: 0;
-    transform: translateY(10px) scale(0.95);
+    transform: translateY(10px);
     pointer-events: none;
     transition: opacity 0.25s ease, transform 0.25s ease;
 }
-.bn-info-popup.open {
+.sfn-info-popup.open {
     opacity: 1;
-    transform: translateY(0) scale(1);
+    transform: translateY(0);
     pointer-events: auto;
 }
 
-.bn-popup-close {
+.sfn-popup-close {
     position: absolute;
     top: 8px;
     right: 10px;
@@ -1475,314 +1584,67 @@ body.kid-mode .kid-term:focus::before { opacity: 1; }
     border-radius: 50%;
     background: rgba(255, 255, 255, 0.1);
     color: #888;
-    font-size: 1.2em;
+    font-size: 1.3em;
     line-height: 1;
     cursor: pointer;
     transition: background 0.15s, color 0.15s;
 }
-.bn-popup-close:hover {
+.sfn-popup-close:hover {
     background: rgba(231, 76, 60, 0.3);
     color: #e74c3c;
 }
 
-.bn-info-content {
+.sfn-info-content {
     padding: 16px 18px 18px;
 }
-.bn-info-content h3 {
+.sfn-info-content h3 {
     margin: 0 0 12px;
     font-size: 1.1em;
     color: #fff;
 }
-.bn-info-sources {
+.sfn-info-sources {
     font-size: 0.82em;
     color: #aaa;
     margin: 0 0 10px;
     line-height: 1.5;
 }
-.bn-info-stats {
+.sfn-info-stats {
     font-size: 0.88em;
     color: #cfcfe0;
     margin: 0 0 6px;
 }
-.bn-info-updated {
+.sfn-info-updated {
     font-size: 0.78em;
     color: #777;
-    margin: 0 0 14px;
-}
-.bn-info-links {
-    display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
-}
-.bn-info-links a {
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-    padding: 8px 14px;
-    border-radius: 20px;
-    background: rgba(255, 255, 255, 0.08);
-    color: #cfcfe0;
-    text-decoration: none;
-    font-size: 0.85em;
-    font-weight: 600;
-    transition: background 0.15s, color 0.15s;
-}
-.bn-info-links a:hover {
-    background: rgba(52, 152, 219, 0.25);
-    color: #5dade2;
+    margin: 0;
 }
 
-/* Expand toggle button */
-.bottom-nav .bn-expand {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 36px;
-    height: 42px;
-    border: none;
-    border-radius: 20px;
-    background: rgba(255, 255, 255, 0.08);
-    color: #aaa;
-    font-size: 0.85em;
-    cursor: pointer;
-    transition: background 0.15s, color 0.15s, transform 0.15s;
-}
-.bottom-nav .bn-expand:hover {
-    background: rgba(255, 255, 255, 0.15);
-    color: #fff;
-}
-.bottom-nav.expanded .bn-expand {
-    background: linear-gradient(135deg, #27ae60, #229954);
-    color: #fff;
-}
-.bottom-nav.expanded .bn-expand:hover {
-    filter: brightness(1.1);
-}
-
-/* Chevron rotation */
-.bottom-nav .bn-chevron {
-    display: inline-block;
-    font-size: 0.9em;
-    line-height: 1;
-    transition: transform 0.3s ease;
-}
-.bottom-nav.expanded .bn-chevron { transform: rotate(180deg); }
-
-/* ─── Expandable items container ─── */
-.bottom-nav .bn-items {
-    display: flex;
-    align-items: center;
-    gap: 2px;
-    max-width: 0;
-    opacity: 0;
-    overflow-x: auto;
-    overflow-y: hidden;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: thin;
-    transition: max-width 0.32s cubic-bezier(0.4, 0, 0.2, 1),
-                opacity 0.25s ease 0.05s,
-                margin-left 0.32s ease;
-    margin-left: 0;
-}
-.bottom-nav.expanded .bn-items {
-    max-width: 70vw;
-    opacity: 1;
-    margin-left: 6px;
-}
-.bottom-nav .bn-items::-webkit-scrollbar { height: 5px; }
-.bottom-nav .bn-items::-webkit-scrollbar-thumb {
-    background: rgba(255,255,255,0.25);
-    border-radius: 3px;
-}
-
-/* Nav item links */
-.bottom-nav .bn-items > a {
-    flex: 0 0 auto;
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-    padding: 8px 12px;
-    border-radius: 18px;
-    color: var(--subtle, #cfcfe0);
-    text-decoration: none;
-    font-size: 0.86em;
-    font-weight: 600;
-    white-space: nowrap;
-    transition: color 0.15s, background 0.15s;
-}
-.bottom-nav .bn-items > a:hover {
-    color: var(--accent, #f39c12);
-    background: rgba(243, 156, 18, 0.15);
-}
-.bottom-nav .bn-items > a.active {
-    color: #fff;
-    background: rgba(243, 156, 18, 0.28);
-}
-
-/* ─── Dropdown containers (Generations, Visualizations) ─── */
-.bottom-nav .bn-dropdown-container {
-    position: relative;
-    flex: 0 0 auto;
-}
-
-.bottom-nav .bn-dropdown-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-    padding: 8px 12px;
-    border: none;
-    border-radius: 18px;
-    background: rgba(255, 255, 255, 0.08);
-    color: #cfcfe0;
-    font-size: 0.86em;
-    font-weight: 600;
-    cursor: pointer;
-    white-space: nowrap;
-    transition: background 0.15s, color 0.15s;
-}
-.bottom-nav .bn-dropdown-btn:hover {
-    background: rgba(255, 255, 255, 0.15);
-    color: #fff;
-}
-.bottom-nav .bn-dropdown-container.open .bn-dropdown-btn {
-    color: #fff;
-}
-
-/* Purple theme for Generations */
-.bottom-nav .bn-purple .bn-dropdown-btn {
-    background: rgba(142, 68, 173, 0.25);
-    color: #ce93d8;
-}
-.bottom-nav .bn-purple .bn-dropdown-btn:hover {
-    background: rgba(142, 68, 173, 0.4);
-    color: #e1bee7;
-}
-.bottom-nav .bn-purple.open .bn-dropdown-btn {
-    background: rgba(142, 68, 173, 0.5);
-    color: #fff;
-}
-
-/* Cyan theme for Visualizations */
-.bottom-nav .bn-cyan .bn-dropdown-btn {
-    background: rgba(0, 188, 212, 0.2);
-    color: #4dd0e1;
-}
-.bottom-nav .bn-cyan .bn-dropdown-btn:hover {
-    background: rgba(0, 188, 212, 0.35);
-    color: #80deea;
-}
-.bottom-nav .bn-cyan.open .bn-dropdown-btn {
-    background: rgba(0, 188, 212, 0.45);
-    color: #fff;
-}
-
-/* Dropdown arrow */
-.bottom-nav .bn-dd-arrow {
-    font-size: 0.75em;
-    transition: transform 0.25s ease;
-}
-.bottom-nav .bn-dropdown-container.open .bn-dd-arrow {
-    transform: rotate(180deg);
-}
-
-/* ─── Dropdown panel (expands UPWARD) ─── */
-.bottom-nav .bn-dropdown {
-    position: absolute;
-    bottom: calc(100% + 10px);
-    left: 50%;
-    transform: translateX(-50%) scale(0.95);
-    min-width: 180px;
-    max-height: 0;
-    overflow: hidden;
-    opacity: 0;
-    background: rgba(20, 20, 40, 0.96);
-    border: 1px solid var(--glass-border, rgba(255,255,255,0.15));
-    border-radius: 16px;
-    box-shadow: 0 -8px 30px rgba(0, 0, 0, 0.5);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    transition: max-height 0.3s ease, opacity 0.2s ease, transform 0.2s ease;
-    z-index: 10;
-}
-.bottom-nav .bn-dropdown-container.open .bn-dropdown {
-    max-height: 450px;
-    opacity: 1;
-    transform: translateX(-50%) scale(1);
-    padding: 8px 0;
-}
-
-/* Dropdown items */
-.bottom-nav .bn-dropdown-item {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 10px 16px;
-    color: #cfcfe0;
-    text-decoration: none;
-    font-size: 0.9em;
-    transition: background 0.15s, color 0.15s;
-}
-.bottom-nav .bn-dropdown-item:hover {
-    background: rgba(255, 255, 255, 0.08);
-    color: #fff;
-}
-.bottom-nav .bn-dropdown-item.active {
-    background: rgba(243, 156, 18, 0.25);
-    color: #fff;
-}
-
-/* Purple dropdown items (Generations) */
-.bottom-nav .bn-purple .bn-dropdown-item:hover {
-    background: rgba(142, 68, 173, 0.2);
-    color: #e1bee7;
-}
-.bottom-nav .bn-purple .bn-dropdown-item.active {
-    background: rgba(142, 68, 173, 0.35);
-    color: #fff;
-}
-
-/* Cyan dropdown items (Visualizations) */
-.bottom-nav .bn-cyan .bn-dropdown-item:hover {
-    background: rgba(0, 188, 212, 0.2);
-    color: #80deea;
-}
-.bottom-nav .bn-cyan .bn-dropdown-item.active {
-    background: rgba(0, 188, 212, 0.35);
-    color: #fff;
-}
-
-.bottom-nav .bn-dd-icon {
-    font-size: 1.1em;
-    width: 24px;
-    text-align: center;
-}
-.bottom-nav .bn-dd-label {
-    font-weight: 600;
-    flex: 1;
-}
-.bottom-nav .bn-dd-desc {
-    font-size: 0.8em;
-    color: #888;
-}
-
-/* ─── Desktop: keep on left ─── */
-@media (min-width: 720px) {
-    .bottom-nav.expanded .bn-items { max-width: 600px; }
-}
-
-/* ─── Mobile: allow more width ─── */
-@media (max-width: 719px) {
-    .bottom-nav {
-        left: 10px;
-        right: auto;
-        max-width: calc(100vw - 20px);
+/* ─── Mobile responsive ─── */
+@media (max-width: 900px) {
+    .site-footer-nav .sfn-link span,
+    .site-footer-nav .sfn-dropdown-btn span:not(.sfn-arrow),
+    .site-footer-nav .sfn-kid-btn span {
+        display: none;
     }
-    .bottom-nav.expanded .bn-items { max-width: calc(100vw - 200px); }
-    .bottom-nav .bn-dropdown {
+    .site-footer-nav .sfn-link,
+    .site-footer-nav .sfn-dropdown-btn,
+    .site-footer-nav .sfn-kid-btn {
+        padding: 8px 10px;
+    }
+    .site-footer-nav .sfn-dropdown-menu {
         left: 0;
-        transform: scale(0.95);
+        transform: translateY(10px);
     }
-    .bottom-nav .bn-dropdown-container.open .bn-dropdown {
-        transform: scale(1);
+    .site-footer-nav .sfn-dropdown-container.open .sfn-dropdown-menu {
+        transform: translateY(0);
+    }
+}
+
+@media (max-width: 600px) {
+    .site-footer-nav {
+        padding: 6px 10px;
+    }
+    .site-footer-nav .sfn-left {
+        gap: 2px;
     }
 }
