@@ -537,13 +537,8 @@
                 }
             });
             
-            // When live GEDCOM stats arrive, fold in earliest year too
-            document.addEventListener('gedcom-stats-loaded', function (ev) {
-                if (!isKidModeOn()) return; // Check at event time
-                if (ev.detail && ev.detail.earliestYear && ev.detail.earliestYear < 9999) {
-                    trackYear(ev.detail.earliestYear);
-                }
-            });
+            // NOTE: We no longer auto-track from gedcom-stats-loaded.
+            // Years should only be tracked when viewing individual person details.
             
             autoScanWired = true;
         }
