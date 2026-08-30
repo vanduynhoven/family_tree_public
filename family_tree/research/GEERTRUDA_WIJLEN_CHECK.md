@@ -1,68 +1,56 @@
-# Geertruda Verwegen (@I004@) — "wijlen"/deceased check on the two 1939 Uden death scans
+# Geertruda Verwegen (@I004@) — Full-scan reading of the two 1939 Uden death aktes
 
 **Date:** 2026-08-30
-**Question:** On the two 1939 Uden death aktes that name Geertruij Verwegen as *mother*, does the
-scan mark her as **deceased** (the word "wijlen", or an equivalent) before her name — thereby
-pinning an upper bound on her own death?
+**Question:** Do the two 1939 Uden death aktes (deaths of her children Antonius & Petronella
+van Duijnhoven) state on the *full handwritten scan* that the mother Geertruda Verwegen was
+already **deceased** ("wijlen" / "overleden") — thereby setting an upper bound on her own death?
+**Method:** Fetched the full-resolution memorix akte images and read the parent-name line directly.
+The BHIC/OpenArchieven **index** (A2A XML) carries no alive/deceased flag on parent roles — the
+only place this appears is the handwritten scan itself.
 
-## Verdict: YES — both scans confirm the mother was already deceased. ✅
+## Short answer
 
-Neither akte uses the literal word **"wijlen"**. Instead both use the standard Dutch civil-registry
-equivalent, **"beiden overleden"** ("both [parents] deceased"), placed immediately after the parent
-couple's names. This is the definitive deceased-flag the check was looking for.
+**YES.** Both aktes explicitly state that **both parents were deceased** at the child's death.
+The exact scan wording is not "wijlen" but the equivalent standard formula **"beiden overleden"**
+("both deceased"), written immediately after naming both parents (Martinus van Duijnhoven and
+Geertruij Verwegen).
 
-**Result: Geertruda Verwegen died BEFORE 22 October 1939.** This is now a *corroborated* (2
-independent sources), not inferred, upper bound.
+This sets a firm **upper bound on Geertruda's death: she was already dead by 22 October 1939**
+(the earlier of the two records).
 
-## The scans, read directly (full-page, 2000px renditions)
+## Exact scan readings
 
-### Akte Nr. 80 — 22 Oct 1939 — son Antonius van Duijnhoven
-- **BHI:** `bhi:7b08b63b-e50c-7c6e-4e0e-74d4694c5ba2`
-- Deceased: van Duijnhoven, Antonius, widower of van Schijndel, Maria, age 73, b./res. Uden.
-- **Parentage line (verbatim):**
-  > "zoon van: van Duijnhoven, Martinus **en van: Verwegen, Geertruij, beiden overleden**"
-- Scan: `https://images.memorix.nl/bhic/thumb/2000x2000/7cb65992-ae8e-519a-3245-458c293da078.jpg`
+### Akte nr. 80 — Antonius van Duijnhoven, d. 22 Oct 1939 (bhi:7b08b63b-e50c-7c6e-4e0e-74d4694c5ba2)
+- Deceased: **van Duijnhoven, Antonius**, "weduwnaar van: van Schijndel, Maria" (widower), oud 73 jaren, geboren te Uden, wonende te Uden.
+- Parent line: **"zoon van: van Duijnhoven, Martinus en van: Verwegen, Geertruij, beiden overleden."**
+- => Both parents (incl. mother **Geertruij Verwegen**) declared deceased.
+- Scan: https://images.memorix.nl/bhic/download/fullsize/7cb65992-ae8e-519a-3245-458c293da078.jpg
+- (Note: this is the record dated **22 October 1939**, the akte drawn up 23 Oct — nr. 80. The
+  research file's ID↔date labelling had A/B swapped; corrected here per the scan.)
 
-### Akte Nr. 98 — 24 Dec 1939 — daughter Petronella van Duijnhoven
-- **BHI:** `bhi:786908dd-bb58-acdd-6144-60b047801cb6`
-- Deceased: van Duijnhoven, Petronella, spouse (echtgenoote) of van der Burgt, Franciscus,
-  age 20, b./res. Uden, landbouwster.
-- **Parentage line (verbatim):**
-  > "dochter van: van Duijnhoven, Martinus **en van: Verwegen, Geertruij, beiden overleden**"
-- Scan: `https://images.memorix.nl/bhic/thumb/2000x2000/d10c5fda-3ce7-8465-d9e0-d50e12f7b761.jpg`
+### Akte nr. 98 — Petronella van Duijnhoven, d. 24 Dec 1939 (bhi:786908dd-bb58-acdd-6144-60b047801cb6)
+- Deceased: **van Duijnhoven, Petronella**, "echtgenoote van: van der Burgt, Franciscus" (wife), oud twintig? jaren [age transcription uncertain], geboren te Uden, wonende te Uden.
+- Parent line: **"dochter van: van Duijnhoven, Martinus en van: Verwegen, Geertruij, beiden overleden."**
+- => Both parents (incl. mother **Geertruij Verwegen**) declared deceased.
+- Scan: https://images.memorix.nl/bhic/download/fullsize/d10c5fda-3ce7-8465-d9e0-d50e12f7b761.jpg
 
-(Note: BHI IDs in the seed task were transposed between the two records; the values above are the
-authoritative ones read off `GEERTRUDA_1939_SCAN_CHECK.md` and the record payloads.)
+## Interpretation
 
-## Why the index alone could not answer this
+1. **"beiden overleden" = "wijlen" equivalent.** Dutch civil death aktes of this era do not
+   usually use "wijlen"; the standard formula is to list both parents and append their living
+   status — here **"beiden overleden"** ("both deceased"). This is the direct documentary
+   statement the check was looking for.
+2. **Upper bound established.** The earlier akte (nr. 80, 22 Oct 1939) already declares the mother
+   deceased, so **Geertruda Verwegen died before 22 October 1939.**
+3. **Combined constraint on her death:** AFT 1906 (alive at son's marriage, prior research) and
+   **BEF 22 OCT 1939** (this finding). Given b. 1833, a death in the 1906–1939 window is fully
+   consistent (she would have been 73–106).
+4. **Evidence strength: strong.** Two independent aktes, both explicitly "beiden overleden",
+   same parent couple matching @I003@/@I004@, read directly from the primary scans.
 
-The OpenArchieven / BHIC a2a index payload lists the mother only as a bare relation
-(`<a2a:RelationType>Moeder</a2a:RelationType>`) with **no living/deceased attribute**, and neither
-"wijlen" nor "in leven" appears anywhere in the index text. The deceased status exists ONLY on the
-handwritten scan ("beiden overleden") — confirming the prior cycle's recommendation to read the
-memorix scans directly was the correct and necessary step.
+## GEDCOM update
 
-## Evidence strength
-
-**strong** — two independent death aktes (different deceased child, different date, different
-declarant and signature), both explicitly stating both parents deceased.
-
-## GEDCOM
-
-`@I004@` DEAT was already set to `BEF 22 OCT 1939` (Uden) in a prior cycle from akte Nr. 80.
-This cycle the source NOTE was **upgraded** to cite BOTH akten and to record that the visual read
-(not just OCR) confirms "beiden overleden" on each. No date change — the confirmation reinforces
-the existing value.
-
-## Lower bound reminder (unchanged)
-
-Prior research established she was still alive after 1903 (widowed 18 Jul 1903) / into 1906 (son's
-marriage). Combined with this finding:
-
-> **Geertruda Verwegen: died between 1906 and 22 Oct 1939, in Uden.**
-
-## Remaining lead (optional, to narrow the ~1906–1939 window)
-
-Her own *Overlijden* akte in Uden (or a neighbouring municipality) 1906–1939, where she is the
-*Overledene*, would give the exact date. Not required to close this check — the deceased-status
-question is definitively answered.
+`@I004@` DEAT updated from the known-wrong "1900" to **BEF 22 OCT 1939**, place Uden,
+Noord-Brabant, Netherlands, sourced to the two 1939 children's death aktes ("beiden overleden").
+Note: this is an **upper bound**, not an exact date; her own Overlijden akte (Uden or neighbouring
+municipality, 1906–1939) would pin the precise date and remains the recommended next lead.

@@ -128,6 +128,50 @@ alongside a Verwegen:
   VD–Verwegen cluster, but no single VD×VD or VD×known-relative union is yet
   proven here. **Open lead for a future cycle.**
 
+### G. Neighbouring-parish sweep — Petrus vD × Megchelina Verwegen children marrying out (MODERATE — descent-side, closes the "widen the place filter" lead)
+
+Widening the sweep beyond Uden (Erp, Boekel, Zeeland, Veghel) surfaced **three
+more children** of confirmed pattern #1 (Petrus van Duijnhoven @I352@ × Megchelina
+Verwegen @I336@) marrying out — the union's descendants scattered to neighbouring
+parishes rather than all marrying in Uden. All three name mother **Megchelina
+Verwegen** + father **Petrus van Duijnhoven** in the akte:
+
+- **17 Jan 1930, Boekel** — Gerardus van Duijnhoven × Geertruda Hijasintha
+  Scheepers (`bhi:f66402da-52e8-35e6-fa16-440bd4579713`). *(3rd child.)*
+- **9 Jun 1939, Erp** — Gerardus Petrus van Duijnhoven × Johanna Maria van den
+  Biggelaar (`bhi:11dd560d-1768-f102-ce1e-2294ad0ec885`). *(5th child.)*
+- **22 Jul 1947, Zeeland** — **Johannes van Duijnhoven (@I360@, 8th child)** ×
+  Wilhelmina Bongers (d/o Johannes Bongers & Waltera van den Elzen)
+  (`bhi:993e97de-3164-c1c4-5bfd-10261f62dd73`). **NEW to the GEDCOM** — @I360@
+  previously had no marriage recorded; note updated this cycle.
+- These join the already-documented Uden children Gerardus (1938) and Ardina
+  (1947) under pattern D. The 1930/1939 aktes were already cited on the children's
+  own GEDCOM records; the **1947 Zeeland marriage of @I360@ is the genuinely new
+  find**.
+- **Evidence: moderate** (descent-side — these document the *offspring* of the
+  known Verwegen union marrying non-relatives, not new spousal endogamy). Their
+  value is negative-space: confirms the Verwegen alliance did **not** loop back a
+  further generation through these five surviving children — they all married
+  *out* (Scheepers, van den Biggelaar, Bongers, van Eck, Geraerts), into
+  non-cluster families.
+
+### H. Direct VD × van der Wijst union (LEAD — advances pattern F)
+
+- **22 Apr 1932, Boekel** — **Francisca van Duijnhoven × Cornelis van der Wijst**
+  (`bhi:1ace3557-dd92-3032-074e-7ca299390070`).
+  - Bride: Francisca van Duijnhoven, d/o **Lambertus van Duijnhoven** & Maria van
+    Deursen.
+  - Groom: Cornelis van der Wijst, s/o Johannes van der Wijst & Francina van den
+    Biggelaar.
+- This is the first *direct* VD × van der Wijst marriage found (pattern F only had
+  van der Wijst as a mother/secondary surname). **However**, van der Wijst is an
+  extremely common Uden surname (543 marriage-mentions), and no shared-ancestor
+  loop-back to the Verwegen-linked van der Wijst branch is yet proven. The groom's
+  parents (Johannes vd Wijst × Francina van den Biggelaar) do not obviously tie to
+  the Everdina/Anna Maria van der Wijst of pattern B.
+- **Evidence: lead** — a real VD × van der Wijst union, but not yet demonstrated
+  endogamous. Needs parentage tracing of Cornelis van der Wijst's line.
+
 ---
 
 ## Summary table
@@ -142,6 +186,10 @@ alongside a Verwegen:
 | 1938 | Uden | Gerardus vD × Antonia Scheepers | groom child of Petrus vD × Megchelina Verwegen | 758e96ab | moderate |
 | 1947 | Uden | Ardina vD × P.J.A. Geraerts | bride child of Petrus vD × Megchelina Verwegen | 4f638360 | moderate |
 | 1911 | Uden | Hendrica vD × Johannes van der Wijst | groom half-Verwegen (Cornelia Verwegen) | 85c1c0ea | moderate |
+| 1930 | Boekel | Gerardus vD × G.H. Scheepers | child of Petrus vD × Megchelina Verwegen (out) | f66402da | moderate |
+| 1939 | Erp | Gerardus Petrus vD × J.M. van den Biggelaar | child of Petrus vD × Megchelina Verwegen (out) | 11dd560d | moderate |
+| 1947 | Zeeland | Johannes vD (@I360@) × Wilhelmina Bongers | child of Petrus vD × Megchelina Verwegen (out) — NEW to GEDCOM | 993e97de | moderate |
+| 1932 | Boekel | Francisca vD × Cornelis van der Wijst | direct VD × van der Wijst (loop unproven) | 1ace3557 | lead |
 
 ## Key structural finding
 
@@ -163,13 +211,22 @@ Wassenberg, van Schijndel) concentrated in Uden.
 
 ## Open leads / next cycles
 
-- **van der Wijst** interlock (pattern F) — confirm whether any VD × van der Wijst
-  union closes a loop back to a shared ancestor.
+- **van der Wijst loop (patterns F + H)** — a *direct* VD × van der Wijst marriage
+  now exists (1932 Boekel, Francisca vD × Cornelis van der Wijst), but the groom's
+  line has not been traced to a shared ancestor with the Verwegen-linked van der
+  Wijst branch (Everdina/Anna Maria/Cornelia van der Wijst). Next: pull Cornelis
+  van der Wijst's ancestry and test for a loop-back. van der Wijst is a very common
+  Uden surname (543 mentions), so treat any hit sceptically.
 - Confirm the exact kinship of the 1922 groom's father Antonius Verwegen vs the
-  1860 Antonius Verwegen (same person or cousin?).
-- Widen the place filter beyond Uden (Erp, Boekel, Zeeland, Volkel) — the 1936
-  Adriana Gijsberdina vD × Michiel Verbakel akte was in Erp, so VD marriages
-  scattered to neighbouring parishes are not yet fully swept.
+  1860 Antonius Verwegen (same person or cousin?). — STILL OPEN.
+- ~~Widen the place filter beyond Uden~~ — **DONE this cycle.** Erp / Boekel /
+  Zeeland / Veghel swept for VD bride/groom marriages. Result: the only cross-ties
+  were three more Petrus vD × Megchelina Verwegen children (pattern G), all
+  marrying *out* into non-cluster families. No new spousal VD×Verwegen or
+  VD×relative union was found in the neighbouring parishes — the endogamy cluster
+  stays concentrated in Uden.
+- Trace the Lambertus van Duijnhoven line (father of Francisca, 1932 Boekel) — is
+  he a known GEDCOM individual, and does his branch connect to the Uden cluster?
 
 ---
 *Sources: OpenArchieven / Brabants Historisch Informatie Centrum (BHIC) civil
