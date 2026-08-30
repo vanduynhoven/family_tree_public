@@ -13,7 +13,7 @@ import { CHARACTERS, getCharacter } from './CharacterData.js';
 import { NPC_DATA, CROP_ITEMS }     from './NpcData.js';
 import { ERAS, FISH_TABLES, SCREEN_COLS, SCREEN_ROWS } from './EraData.js';
 import {
-  TILE, setEra,
+  TILE, T, setEra,
   drawSky, drawTiles, drawBobber,
 } from './Renderer.js';
 
@@ -76,10 +76,35 @@ export class Game {
   }
 
   _afterIntro(char) {
-    // Load the starting era
     const startEra = char.startEra ?? 0;
     this.loadEra(startEra);
     this._state = STATE.PLAYING;
+
+    // Canvas click → navigate or act
+    this._clickTarget  = null;
+    this._clickArrived = false;
+    this.engine.canvas.addEventListener('click', e => {
+      const rect = this.engine.canvas.getBoundingClientRect();
+      const sx = e.clientX - rect.left;
+      const sy = e.clientY - rect.top;
+      this.handleCanvasClick(sx, sy);
+    });
+    // Touch tap (single finger, no drag)
+    let _touchStart = null;
+    this.engine.canvas.addEventListener('touchstart', e => {
+      if (e.touches.length === 1) _touchStart = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+    }, { passive: true });
+    this.engine.canvas.addEventListener('touchend', e => {
+      if (!_touchStart) return;
+      const t = e.changedTouches[0];
+      const dx = t.clientX - _touchStart.x, dy = t.clientY - _touchStart.y;
+      if (Math.hypot(dx, dy) < 10) { // tap, not drag
+        const rect = this.engine.canvas.getBoundingClientRect();
+        this.handleCanvasClick(t.clientX - rect.left, t.clientY - rect.top);
+      }
+      _touchStart = null;
+    }, { passive: true });
+
     this.engine.start((dt, frame) => this._tick(dt, frame));
     this.ui.showToast(`⏰ ${ERAS[startEra]?.year} — Find your ancestors!`);
   }
@@ -120,18 +145,28 @@ export class Game {
     }, 350);
   }
 
-  // ── Interaction ──────────────────────────────────────
+  // ── Interaction — unified context-sensitive action ───
+  // Called by: E key, Space key, X key, mobile Talk button,
+  //            mobile Attack button, canvas click (when adjacent)
 
   interact() {
     if (this._state !== STATE.PLAYING) return;
+
+    // During dialog: advance it
     if (this._dialogNPC) { this.ui.advanceDialog(); return; }
 
+    // 1. Enemy nearby? → attack it
+    const nearEnemy = this._nearestEnemy(TILE * 1.6);
+    if (nearEnemy) { this._doAttack(nearEnemy); return; }
+
+    // 2. NPC nearby? → talk
     const npc = this.world.nearestNPC(this.player);
     if (npc) { this._startDialog(npc); return; }
 
+    // 3. At portal? → open era select
     if (this.world.atPortal(this.player)) { this.ui.showEraSel(); return; }
 
-    // Harvest crop
+    // 4. Crop ready? → harvest
     const crop = this.world.atCrop(this.player);
     if (crop) {
       this.world.harvestCrop(crop.r, crop.c);
@@ -146,7 +181,7 @@ export class Game {
       return;
     }
 
-    // Pick up dropped items
+    // 5. Dropped item nearby? → pick up
     for (const drop of this.world.activeDrops) {
       if (this.player.distTo(drop) < TILE * 1.5) {
         if (this.player.collectItem(drop.item)) {
@@ -159,23 +194,149 @@ export class Game {
         return;
       }
     }
+
+    // 6. Near fishable water? → start fishing
+    if (this.world.isFishable(this.player)) { this.fish(); return; }
   }
 
-  attack() {
-    if (this._state !== STATE.PLAYING) return;
-    if (this.player.swingTimer > 0) return;
-    this.player.swingTimer = 0.25;
+  // attack() kept as alias for legacy mobile button wiring
+  attack() { this.interact(); }
 
+  _doAttack(enemy) {
+    if (!enemy || this.player.swingTimer > 0) return;
+    this.player.swingTimer = 0.25;
+    this.player.faceToward(enemy);
     const hb = this.player.getSwingHitbox();
-    for (const enemy of this.world.activeEnemies) {
-      if (enemy.alive && this.player.hitboxOverlaps(hb, enemy)) {
-        const dx = enemy.cx - this.player.cx;
-        const dy = enemy.cy - this.player.cy;
+    for (const e of this.world.activeEnemies) {
+      if (e.alive && this.player.hitboxOverlaps(hb, e)) {
+        const dx = e.cx - this.player.cx;
+        const dy = e.cy - this.player.cy;
         const len = Math.hypot(dx, dy) || 1;
-        enemy.takeDamage(25, dx/len, dy/len);
+        e.takeDamage(25, dx/len, dy/len);
         this.music.sfxHit?.();
       }
     }
+  }
+
+  _nearestEnemy(maxDist) {
+    let best = null, bestDist = maxDist;
+    for (const e of this.world.activeEnemies) {
+      if (!e.alive) continue;
+      const d = this.player.distTo(e);
+      if (d < bestDist) { bestDist = d; best = e; }
+    }
+    return best;
+  }
+
+  // ── Click-to-navigate / click-to-act ─────────────────
+  // Called from canvas click listener set up in _afterIntro
+
+  handleCanvasClick(screenX, screenY) {
+    if (this._state !== STATE.PLAYING) return;
+    if (this._dialogNPC) { this.ui.advanceDialog(); return; }
+    if (this.ui.journalOpen || this.ui.eraSelOpen) return;
+
+    // Convert screen → world coords
+    const wx = screenX + this.engine.cameraX;
+    const wy = screenY + this.engine.cameraY;
+
+    // Check what was clicked — prioritise interactive objects
+
+    // 1. NPC?
+    for (const npc of this.world.activeNPCs) {
+      if (Math.hypot(npc.cx - wx, npc.cy - wy) < TILE * 0.9) {
+        this._navigateTo(npc.cx, npc.cy, () => this._startDialog(npc));
+        return;
+      }
+    }
+
+    // 2. Enemy?
+    for (const e of this.world.activeEnemies) {
+      if (e.alive && Math.hypot(e.cx - wx, e.cy - wy) < TILE * 0.9) {
+        this._navigateTo(e.cx, e.cy, () => this._doAttack(e));
+        return;
+      }
+    }
+
+    // 3. Dropped item?
+    for (const drop of this.world.activeDrops) {
+      if (drop.alive && Math.hypot(drop.cx - wx, drop.cy - wy) < TILE * 1.0) {
+        this._navigateTo(drop.cx, drop.cy, () => {
+          if (this.player.collectItem(drop.item)) {
+            this.ui.showItemToast(drop.item);
+            this.ui.renderInventory(this.player.inventory);
+            drop.alive = false;
+            this.events.emit('item_collected', { itemId: drop.item.id });
+            this.music.sfxCollect?.();
+          }
+        });
+        return;
+      }
+    }
+
+    // 4. Portal?
+    if (this.world.tileAt(wx, wy) === T.PORTAL) {
+      this._navigateTo(wx, wy, () => this.ui.showEraSel());
+      return;
+    }
+
+    // 5. Crop?
+    const cr = Math.floor(wy / TILE), cc = Math.floor(wx / TILE);
+    if (this.world.map[cr]?.[cc] === T.CROP_READY) {
+      this._navigateTo(wx, wy, () => this.interact());
+      return;
+    }
+
+    // 6. Plain ground — just walk there
+    if (!this.world.solidAt(wx, wy)) {
+      this._navigateTo(wx, wy, null);
+    }
+  }
+
+  // Simple point-click navigation: walk the player toward (tx, ty),
+  // call onArrival when close enough (< TILE*0.8).
+  _navigateTo(tx, ty, onArrival) {
+    this._clickTarget  = { tx, ty, onArrival };
+    this._clickArrived = false;
+  }
+
+  _tickClickNav(dt) {
+    if (!this._clickTarget) return;
+    const { tx, ty, onArrival } = this._clickTarget;
+    const dist = Math.hypot(this.player.cx - tx, this.player.cy - ty);
+
+    if (dist < TILE * 0.8) {
+      this._clickTarget = null;
+      onArrival?.();
+      return;
+    }
+
+    // Synthesise key-like movement via direct player position update
+    const dx = tx - this.player.cx;
+    const dy = ty - this.player.cy;
+    const len = Math.hypot(dx, dy);
+    const spd = this.player.speed * dt;
+    const nx  = this.player.x + (dx / len) * spd;
+    const ny  = this.player.y + (dy / len) * spd;
+    const pad = 3;
+
+    if (!this.world.solidAt(nx + pad, this.player.y + pad) &&
+        !this.world.solidAt(nx + this.player.w - pad, this.player.y + this.player.h - pad)) {
+      this.player.x = nx;
+    }
+    if (!this.world.solidAt(this.player.x + pad, ny + pad) &&
+        !this.world.solidAt(this.player.x + this.player.w - pad, ny + this.player.h - pad)) {
+      this.player.y = ny;
+    }
+    this.player.walkCycle += dt * 9;
+
+    // Update facing toward target
+    if (Math.abs(dx) > Math.abs(dy)) this.player.facing = dx > 0 ? 'right' : 'left';
+    else this.player.facing = dy > 0 ? 'down' : 'up';
+
+    // Cancel nav if player manually moves
+    const keys = this.engine.keys;
+    if (keys.up || keys.down || keys.left || keys.right) this._clickTarget = null;
   }
 
   fish() {
@@ -309,12 +470,15 @@ export class Game {
 
     // Dialog advance: E / Space always works during dialog
     if (this._dialogNPC) {
-      if (engine.consumeAction()) this.ui.advanceDialog();
+      if (engine.consumeAction() || engine.consumeAttack()) this.ui.advanceDialog();
     } else if (!inputBlocked) {
-      if (engine.consumeAttack()) this.attack();
-      if (engine.consumeFish())   this.fish();
-      if (engine.consumeAction()) this.interact();
+      // Single unified action: E / Space / X / attack button all call interact()
+      if (engine.consumeAction() || engine.consumeAttack()) this.interact();
+      if (engine.consumeFish()) this.fish();
     }
+
+    // Click-to-navigate tick (runs when no keyboard movement)
+    if (!inputBlocked) this._tickClickNav(dt);
 
     // ── Check screen exit ──────────────────────────────
     const exitDir = this.world.checkScreenExit(this.player);
@@ -358,6 +522,24 @@ export class Game {
     // ── Minimap ────────────────────────────────────────
     this.ui.drawMinimap(ctx, this.world, W);
 
+    // Click target cursor
+    if (this._clickTarget) {
+      const { tx, ty } = this._clickTarget;
+      const sx = tx - Math.floor(engine.cameraX);
+      const sy = ty - Math.floor(engine.cameraY);
+      const r  = TILE * 0.28;
+      ctx.strokeStyle = 'rgba(255,255,120,0.7)';
+      ctx.lineWidth = 2;
+      ctx.setLineDash([4, 3]);
+      ctx.beginPath(); ctx.arc(sx, sy, r, 0, Math.PI * 2); ctx.stroke();
+      ctx.setLineDash([]);
+      // Cross-hair lines
+      ctx.beginPath(); ctx.moveTo(sx - r*1.3, sy); ctx.lineTo(sx - r*0.5, sy); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(sx + r*0.5, sy); ctx.lineTo(sx + r*1.3, sy); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(sx, sy - r*1.3); ctx.lineTo(sx, sy - r*0.5); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(sx, sy + r*0.5); ctx.lineTo(sx, sy + r*1.3); ctx.stroke();
+    }
+
     // ── Prompt ────────────────────────────────────────
     const nearNPC = this.world.nearestNPC(this.player);
     const atPortal = this.world.atPortal(this.player);
@@ -366,6 +548,8 @@ export class Game {
 
     if (nearNPC && !this._dialogNPC) {
       this.ui.showPrompt(`💬 Talk to ${nearNPC.data?.given || nearNPC.name} — E`);
+    } else if (this._nearestEnemy(TILE * 1.6)) {
+      this.ui.showPrompt('⚔️ Enemy nearby — E to attack');
     } else if (atPortal) {
       this.ui.showPrompt('⏰ Time Portal — E to travel');
     } else if (atCrop) {

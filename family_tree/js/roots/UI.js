@@ -68,11 +68,10 @@ export class UI {
 
       <!-- Action buttons -->
       <div id="rt-actions">
-        <div class="rt-ab" id="ab-attack">⚔️<span>Attack</span></div>
-        <div class="rt-ab" id="ab-talk">💬<span>Talk</span></div>
-        <div class="rt-ab rt-ab-fish" id="ab-fish" style="display:none">🎣<span>Fish</span></div>
-        <div class="rt-ab" id="ab-era">⏰<span>Time</span></div>
-        <div class="rt-ab" id="ab-journal">📖<span>Journal</span></div>
+        <div class="rt-ab" id="ab-attack" onclick="G?.interact()">⚔️💬<span>Act</span></div>
+        <div class="rt-ab rt-ab-fish" id="ab-fish" style="display:none" onclick="G?.fish()">🎣<span>Fish</span></div>
+        <div class="rt-ab" id="ab-era" onclick="G?.ui.showEraSel()">⏰<span>Time</span></div>
+        <div class="rt-ab" id="ab-journal" onclick="G?.ui.toggleJournal()">📖<span>Journal</span></div>
       </div>
 
       <!-- Damage flash -->
@@ -127,11 +126,11 @@ export class UI {
     });
     $('rt-dialog')?.addEventListener('click', () => this.advanceDialog());
     $('rt-journal-close')?.addEventListener('click', () => this.closeJournal());
-    $('ab-attack')?.addEventListener('click', () => this.game.attack());
-    $('ab-talk')?.addEventListener('click', () => this.game.interact());
-    $('ab-fish')?.addEventListener('click', () => this.game.fish());
-    $('ab-era')?.addEventListener('click', () => this.showEraSel());
-    $('ab-journal')?.addEventListener('click', () => this.toggleJournal());
+    // Single unified action button
+    $('ab-attack')?.addEventListener('click', () => this.game.interact());
+    $('ab-fish')?.addEventListener('click',   () => this.game.fish());
+    $('ab-era')?.addEventListener('click',    () => this.showEraSel());
+    $('ab-journal')?.addEventListener('click',() => this.toggleJournal());
     $('rt-era-close')?.addEventListener('click', () => this.closeEraSel());
     $('rt-intro-skip')?.addEventListener('click', () => this._skipIntro());
 
@@ -191,13 +190,13 @@ export class UI {
   showPrompt(text) {
     const el = document.getElementById('rt-prompt');
     if (el) { el.textContent = text; el.style.display = 'block'; }
-    document.getElementById('ab-talk')?.classList.add('lit');
+    document.getElementById('ab-attack')?.classList.add('lit');
   }
 
   hidePrompt() {
     const el = document.getElementById('rt-prompt');
     if (el) el.style.display = 'none';
-    document.getElementById('ab-talk')?.classList.remove('lit');
+    document.getElementById('ab-attack')?.classList.remove('lit');
   }
 
   showToast(text, color = '#f0c040') {
