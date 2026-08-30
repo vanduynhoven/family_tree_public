@@ -249,6 +249,58 @@
                 var n = s.generationsVisited ? s.generationsVisited.length : 0;
                 return { earned: n >= 7, progress: Math.min(n, 7), goal: 7 };
             }
+        },
+        
+        // ── Dutch Learning achievements ──
+        {
+            id: 'dutch_starter',
+            icon: '🇳🇱',
+            title: 'Dutch Starter',
+            desc: 'Got 3 Dutch words correct in a row!',
+            check: function (s) {
+                var best = s.dutchBestStreak || 0;
+                return { earned: best >= 3, progress: Math.min(best, 3), goal: 3 };
+            }
+        },
+        {
+            id: 'dutch_learner',
+            icon: '📚',
+            title: 'Dutch Learner',
+            desc: 'Got 5 Dutch words correct in a row!',
+            check: function (s) {
+                var best = s.dutchBestStreak || 0;
+                return { earned: best >= 5, progress: Math.min(best, 5), goal: 5 };
+            }
+        },
+        {
+            id: 'dutch_speaker',
+            icon: '🗣️',
+            title: 'Dutch Speaker',
+            desc: 'Got 10 Dutch words correct in a row!',
+            check: function (s) {
+                var best = s.dutchBestStreak || 0;
+                return { earned: best >= 10, progress: Math.min(best, 10), goal: 10 };
+            }
+        },
+        {
+            id: 'dutch_master',
+            icon: '👑',
+            title: 'Dutch Master',
+            desc: 'Got 20 Dutch words correct in a row!',
+            check: function (s) {
+                var best = s.dutchBestStreak || 0;
+                return { earned: best >= 20, progress: Math.min(best, 20), goal: 20 };
+            }
+        },
+        {
+            id: 'dutch_vocabulary',
+            icon: '📖',
+            title: 'Word Collector',
+            desc: 'Learned 25 different Dutch words',
+            check: function (s) {
+                var n = s.dutchWordsLearned ? s.dutchWordsLearned.length : 0;
+                return { earned: n >= 25, progress: Math.min(n, 25), goal: 25 };
+            }
         }
     ];
 
@@ -263,7 +315,9 @@
             sawShipStory: false,
             visitedTree: false,
             visitedChart: false,
-            visitedTimeline: false
+            visitedTimeline: false,
+            dutchBestStreak: 0,
+            dutchWordsLearned: []
         };
     }
 
@@ -283,7 +337,9 @@
                 sawShipStory: !!parsed.sawShipStory,
                 visitedTree: !!parsed.visitedTree,
                 visitedChart: !!parsed.visitedChart,
-                visitedTimeline: !!parsed.visitedTimeline
+                visitedTimeline: !!parsed.visitedTimeline,
+                dutchBestStreak: typeof parsed.dutchBestStreak === 'number' ? parsed.dutchBestStreak : 0,
+                dutchWordsLearned: Array.isArray(parsed.dutchWordsLearned) ? parsed.dutchWordsLearned : []
             };
         } catch (e) {
             return defaultState();
@@ -352,6 +408,23 @@
     }
     function trackTimelineVisit() {
         if (!state.visitedTimeline) { state.visitedTimeline = true; evaluate(); }
+    }
+    
+    // Dutch learning tracking - returns true if a new achievement was earned (for streak reset)
+    function trackDutchStreak(currentStreak) {
+        var changed = false;
+        if (currentStreak > state.dutchBestStreak) {
+            state.dutchBestStreak = currentStreak;
+            changed = true;
+        }
+        if (changed) {
+            var newAchievements = evaluate();
+            return newAchievements.length > 0;
+        }
+        return false;
+    }
+    function trackDutchWord(word) {
+        if (addUnique(state.dutchWordsLearned, String(word))) { evaluate(); }
     }
 
     function reset() {
@@ -568,6 +641,8 @@
         trackTreeVisit: trackTreeVisit,
         trackChartVisit: trackChartVisit,
         trackTimelineVisit: trackTimelineVisit,
+        trackDutchStreak: trackDutchStreak,
+        trackDutchWord: trackDutchWord,
         renderPanel: renderPanel,
         togglePanel: togglePanel,
         reset: reset,
