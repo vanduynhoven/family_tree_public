@@ -1,180 +1,547 @@
 // ═══════════════════════════════════════════════════════════
-//  Music — Web Audio API 8-bit chiptune per era + SFX
-//  All sound generated procedurally — no audio files
+//  Music.js — Multi-voice chiptune sequencer
+//  Inspired by Zelda (NES/SNES), Stardew Valley, Chrono Trigger
+//  3 simultaneous voices: melody (square), bass (triangle), harmony (pulse)
+//  + percussion track (noise bursts)
+//  All generated via Web Audio API — no audio files
 // ═══════════════════════════════════════════════════════════
 
+// ── Music theory helpers ──────────────────────────────────
+const NOTE = (() => {
+  const names = ['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];
+  const freqs = {};
+  for (let oct = 2; oct <= 7; oct++) {
+    names.forEach((n, i) => {
+      freqs[`${n}${oct}`] = 440 * Math.pow(2, (oct - 4) + (i - 9) / 12);
+    });
+  }
+  freqs['R'] = 0; // rest
+  return freqs;
+})();
+
+// Beat duration in seconds at a given BPM
+function beat(bpm, beats = 1) { return (60 / bpm) * beats; }
+
+// ── Track definitions ─────────────────────────────────────
+// Each track: { bpm, voices: [ {type, notes: [[note, dur_beats], ...], loop} ] }
+// note = frequency or NOTE key; dur_beats = duration in beats
+// type: 'square'|'triangle'|'sawtooth'|'pulse'|'noise'
+
+const TRACKS = [
+
+  // ── Track 0 · Era 0 · 1539 Medieval Brabant ───────────────
+  // Zelda-style modal folk melody in D Dorian — mysterious, ancient
+  {
+    bpm: 96,
+    voices: [
+      // Melody — square wave, Zelda-style
+      {
+        type: 'square', vol: 0.22, vibrato: true,
+        notes: [
+          ['D4',2],['F4',1],['G4',1],  ['A4',2],['G4',1],['F4',1],
+          ['E4',2],['D4',2],            ['C4',2],['D4',2],
+          ['F4',2],['E4',1],['D4',1],  ['E4',4],
+          ['G4',2],['F4',1],['E4',1],  ['D4',2],['C4',1],['D4',1],
+          ['A3',2],['C4',1],['D4',1],  ['D4',4],
+        ],
+      },
+      // Bass — triangle wave
+      {
+        type: 'triangle', vol: 0.18,
+        notes: [
+          ['D3',4], ['A3',4], ['C3',4], ['D3',4],
+          ['F3',4], ['G3',4], ['A3',4], ['D3',4],
+        ],
+      },
+      // Harmony — arpeggiated pulse
+      {
+        type: 'pulse', vol: 0.10, arp: true,
+        notes: [
+          ['D4',1],['F4',1],['A4',1],['D4',1],  // Dm arp
+          ['A3',1],['E4',1],['A4',1],['A3',1],  // Am arp
+          ['C4',1],['E4',1],['G4',1],['C4',1],  // C arp
+          ['D4',1],['F4',1],['A4',1],['D4',1],  // Dm arp
+        ],
+      },
+    ],
+  },
+
+  // ── Track 1 · Era 1 · 1660 Dutch Golden Age ──────────────
+  // Stately harpsichord-feel in G major — merchant, confident, bright
+  {
+    bpm: 112,
+    voices: [
+      {
+        type: 'square', vol: 0.20, vibrato: false,
+        notes: [
+          ['G4',1],['A4',1],['B4',2],  ['D5',2],['B4',1],['A4',1],
+          ['G4',2],['F#4',2],          ['E4',2],['G4',2],
+          ['A4',1],['B4',1],['C5',2],  ['B4',4],
+          ['D5',2],['C5',1],['B4',1],  ['A4',2],['G4',2],
+        ],
+      },
+      {
+        type: 'triangle', vol: 0.16,
+        notes: [
+          ['G3',2],['D3',2],  ['B3',2],['G3',2],
+          ['E3',2],['B3',2],  ['A3',2],['D3',2],
+          ['G3',4],           ['D3',4],
+        ],
+      },
+      {
+        type: 'pulse', vol: 0.09, arp: true,
+        notes: [
+          ['G4',1],['B4',1],['D5',1],['G4',1],
+          ['D4',1],['F#4',1],['A4',1],['D4',1],
+          ['E4',1],['G4',1],['B4',1],['E4',1],
+          ['A3',1],['C#4',1],['E4',1],['A3',1],
+        ],
+      },
+    ],
+  },
+
+  // ── Track 2 · Era 2 · 1799 Napoleonic ────────────────────
+  // Minor march in A minor — tense, military, Chrono Trigger feel
+  {
+    bpm: 108,
+    voices: [
+      {
+        type: 'square', vol: 0.22, vibrato: false,
+        notes: [
+          ['A4',1],['R',0.5],['A4',0.5],['C5',2],
+          ['B4',1],['A4',1],['G4',2],
+          ['F4',2],['E4',2],
+          ['A4',3],['R',1],
+          ['E4',1],['F4',1],['G4',1],['A4',1],
+          ['B4',2],['C5',2],
+          ['E5',2],['D5',1],['C5',1],
+          ['A4',4],
+        ],
+      },
+      {
+        type: 'triangle', vol: 0.18,
+        notes: [
+          ['A2',2],['E3',2],  ['F3',2],['C3',2],
+          ['A2',2],['E3',2],  ['A2',4],
+          ['G2',2],['D3',2],  ['A2',2],['E3',2],
+          ['F3',2],['C3',2],  ['A2',4],
+        ],
+      },
+      {
+        type: 'noise', vol: 0.08,  // percussion
+        notes: [
+          ['kick',1],['R',0.5],['snare',0.5],  ['kick',1],['snare',1],
+          ['kick',1],['R',0.5],['snare',0.5],  ['kick',2],
+        ],
+      },
+    ],
+  },
+
+  // ── Track 3 · Era 3 · 1872 Industrial ────────────────────
+  // Heavy rhythmic pulse in E minor — grinding, mechanical, dramatic
+  {
+    bpm: 104,
+    voices: [
+      {
+        type: 'sawtooth', vol: 0.16, vibrato: false,
+        notes: [
+          ['E4',2],['G4',1],['A4',1],
+          ['B4',2],['A4',2],
+          ['G4',2],['F#4',2],
+          ['E4',4],
+          ['D4',2],['E4',1],['F#4',1],
+          ['G4',2],['B4',2],
+          ['A4',2],['G4',1],['F#4',1],
+          ['E4',4],
+        ],
+      },
+      {
+        type: 'triangle', vol: 0.20,
+        notes: [
+          ['E2',1],['E2',1],['E3',1],['R',1],
+          ['B2',1],['B2',1],['B3',1],['R',1],
+          ['G2',1],['G2',1],['G3',1],['R',1],
+          ['E2',4],
+        ],
+      },
+      {
+        type: 'noise', vol: 0.10,
+        notes: [
+          ['kick',0.5],['R',0.5],['kick',0.5],['snare',0.5],
+          ['kick',0.5],['R',0.5],['kick',0.5],['snare',0.5],
+          ['kick',0.5],['R',0.5],['kick',0.5],['snare',0.5],
+          ['kick',0.5],['kick',0.5],['snare',0.5],['snare',0.5],
+        ],
+      },
+    ],
+  },
+
+  // ── Track 4 · Era 4 · 1950 Atlantic Ocean ────────────────
+  // Lilting sea shanty waltz in C major — hopeful, rolling, emotional
+  {
+    bpm: 116, // 3/4 feel
+    voices: [
+      {
+        type: 'triangle', vol: 0.22, vibrato: true,
+        notes: [
+          ['C5',2],['E5',1],  ['G4',2],['E5',1],
+          ['F5',2],['D5',1],  ['E5',3],
+          ['G5',2],['E5',1],  ['F5',2],['D5',1],
+          ['C5',3],
+          ['A4',2],['C5',1],  ['G4',2],['E4',1],
+          ['F4',2],['A4',1],  ['G4',3],
+          ['E4',2],['G4',1],  ['F4',2],['E4',1],
+          ['C4',3],
+        ],
+      },
+      {
+        type: 'square', vol: 0.14,
+        notes: [
+          ['C3',3],  ['G3',3],  ['F3',3],  ['C3',3],
+          ['A3',3],  ['E3',3],  ['F3',3],  ['G3',3],
+        ],
+      },
+      {
+        type: 'pulse', vol: 0.10, arp: true,
+        notes: [
+          ['C4',1],['E4',1],['G4',1],
+          ['G3',1],['B3',1],['D4',1],
+          ['F3',1],['A3',1],['C4',1],
+          ['C3',1],['E3',1],['G3',1],
+        ],
+      },
+    ],
+  },
+
+  // ── Track 5 · Era 5 · 1955 Minnesota ─────────────────────
+  // Bright Americana in G major — open, optimistic, country feel
+  {
+    bpm: 120,
+    voices: [
+      {
+        type: 'square', vol: 0.20, vibrato: false,
+        notes: [
+          ['G4',1],['A4',1],['B4',1],['D5',1],
+          ['E5',2],['D5',2],
+          ['C5',1],['B4',1],['A4',2],
+          ['G4',4],
+          ['B4',1],['C5',1],['D5',1],['E5',1],
+          ['D5',2],['C5',2],
+          ['B4',1],['A4',1],['G4',2],
+          ['D4',4],
+        ],
+      },
+      {
+        type: 'triangle', vol: 0.18,
+        notes: [
+          ['G3',2],['D3',2],  ['C3',2],['G3',2],
+          ['A3',2],['E3',2],  ['D3',2],['G3',2],
+          ['G3',2],['D3',2],  ['C3',2],['G3',2],
+          ['D3',4],           ['G2',4],
+        ],
+      },
+      {
+        type: 'pulse', vol: 0.08, arp: true,
+        notes: [
+          ['G4',1],['B4',1],['D5',1],['G4',1],
+          ['C4',1],['E4',1],['G4',1],['C4',1],
+          ['A3',1],['C#4',1],['E4',1],['A3',1],
+          ['D4',1],['F#4',1],['A4',1],['D4',1],
+        ],
+      },
+    ],
+  },
+
+  // ── Track 6 · Era 6 · 1984 ────────────────────────────────
+  // Synth-pop in A minor — pulsing, nostalgic, slightly ominous
+  {
+    bpm: 126,
+    voices: [
+      {
+        type: 'sawtooth', vol: 0.18, vibrato: true,
+        notes: [
+          ['A4',2],['C5',1],['B4',1],
+          ['G4',2],['A4',2],
+          ['F4',2],['E4',2],
+          ['A4',4],
+          ['E5',2],['D5',2],
+          ['C5',2],['B4',2],
+          ['A4',2],['G4',2],
+          ['A4',4],
+        ],
+      },
+      {
+        type: 'square', vol: 0.20,
+        notes: [
+          ['A2',0.5],['R',0.5],['A3',0.5],['R',0.5],
+          ['G2',0.5],['R',0.5],['G3',0.5],['R',0.5],
+          ['F2',0.5],['R',0.5],['F3',0.5],['R',0.5],
+          ['E2',0.5],['R',0.5],['E3',0.5],['R',0.5],
+        ],
+      },
+      {
+        type: 'noise', vol: 0.09,
+        notes: [
+          ['kick',0.5],['R',0.5],['kick',0.5],['R',0.5],
+          ['snare',0.5],['R',0.5],['snare',0.5],['R',0.5],
+          ['kick',0.5],['R',0.25],['kick',0.25],['R',0.5],['kick',0.5],
+          ['snare',1],['R',1],
+        ],
+      },
+    ],
+  },
+
+  // ── Track 7 · Era 7 · 2020 ────────────────────────────────
+  // Lo-fi chill in C major — reflective, warm, full-circle
+  // Quotes Era 0's melody in the second loop
+  {
+    bpm: 88,
+    voices: [
+      {
+        type: 'triangle', vol: 0.18, vibrato: true,
+        notes: [
+          ['E5',3],['D5',1],  ['C5',2],['G4',2],
+          ['A4',2],['B4',2],  ['C5',4],
+          ['G4',2],['A4',2],  ['E4',2],['F4',2],
+          ['G4',4],
+          // Era 0 melody quote:
+          ['D5',2],['F5',1],['G5',1],  ['A5',2],['G5',1],['F5',1],
+          ['E5',2],['D5',2],           ['C5',4],
+        ],
+      },
+      {
+        type: 'square', vol: 0.12,
+        notes: [
+          ['C3',4],  ['G3',4],  ['A3',4],  ['F3',4],
+          ['G3',4],  ['D3',4],  ['C3',4],  ['G2',4],
+        ],
+      },
+      {
+        type: 'pulse', vol: 0.07, arp: true,
+        notes: [
+          ['C4',1],['E4',1],['G4',1],['C5',1],
+          ['G3',1],['B3',1],['D4',1],['G4',1],
+          ['A3',1],['C4',1],['E4',1],['A4',1],
+          ['F3',1],['A3',1],['C4',1],['F4',1],
+        ],
+      },
+    ],
+  },
+
+];
+
+// ── Music engine ──────────────────────────────────────────
 export class Music {
   constructor() {
-    this._ctx     = null;
-    this._master  = null;
-    this._muted   = false;
-    this._trackInterval = null;
-    this._noteIdx = 0;
-    this._currentTrack = null;
+    this._ctx       = null;
+    this._master    = null;
+    this._muted     = false;
+    this._trackIdx  = -1;
+    this._voices    = [];       // active voice schedulers
+    this._startTime = 0;
   }
 
   _ensureCtx() {
     if (this._ctx) return;
     this._ctx    = new (window.AudioContext || window.webkitAudioContext)();
     this._master = this._ctx.createGain();
-    this._master.gain.value = 0.25;
+    this._master.gain.value = 0.28;
     this._master.connect(this._ctx.destination);
   }
 
   toggleMute() {
     this._muted = !this._muted;
-    if (this._master) this._master.gain.value = this._muted ? 0 : 0.25;
+    if (this._master) {
+      this._master.gain.setTargetAtTime(this._muted ? 0 : 0.28, this._ctx.currentTime, 0.1);
+    }
     return this._muted;
   }
 
-  // ── Track definitions (note arrays) ─────────────────
-  //  Each note: [freq_hz, duration_ms]  0 freq = rest
-
-  static TRACKS = [
-    // 0 · 1539 — Medieval drone/lute (pentatonic, slow)
-    [[220,400],[0,200],[261,300],[0,100],[293,400],[0,200],[220,600],[0,400],
-     [196,400],[0,200],[220,300],[0,100],[261,400],[0,200],[196,600],[0,600]],
-
-    // 1 · 1660 — Baroque harpsichord (rapid arpeggios)
-    [[523,100],[659,100],[784,100],[1047,100],[784,100],[659,100],[523,100],[0,100],
-     [494,100],[622,100],[740,100],[988,100],[740,100],[622,100],[494,100],[0,200]],
-
-    // 2 · 1799 — Military fife and drum (minor march)
-    [[440,200],[0,100],[440,200],[0,100],[523,400],[0,200],
-     [494,200],[0,100],[440,200],[0,100],[392,400],[0,300],
-     [440,200],[0,100],[494,200],[0,100],[440,400],[0,400]],
-
-    // 3 · 1872 — Industrial mechanical march (heavy)
-    [[110,300],[0,50],[220,300],[0,50],[165,400],[0,100],
-     [110,300],[0,50],[196,300],[0,50],[155,500],[0,150],
-     [110,200],[220,200],[110,200],[220,200],[165,600],[0,400]],
-
-    // 4 · 1950 — Sea shanty (lilting 6/8)
-    [[392,300],[440,300],[494,300],[0,150],[440,300],[392,600],[0,300],
-     [349,300],[392,300],[440,300],[0,150],[392,300],[349,600],[0,450]],
-
-    // 5 · 1955 — Americana country (bright, open)
-    [[659,200],[784,200],[880,200],[0,100],[784,200],[659,400],[0,200],
-     [587,200],[659,200],[784,200],[0,100],[659,200],[587,400],[0,300],
-     [523,200],[587,200],[659,200],[0,100],[784,400],[659,200],[0,400]],
-
-    // 6 · 1984 — Synth-pop (pulsing bass + lead)
-    [[220,150],[0,50],[220,150],[0,50],[330,300],[0,100],[294,300],[0,100],
-     [220,150],[0,50],[220,150],[0,50],[262,300],[0,100],[246,300],[0,200]],
-
-    // 7 · 2020 — Lo-fi chill (quoting Era 0 at the end)
-    [[330,400],[0,200],[392,400],[0,200],[440,600],[0,400],
-     [392,400],[0,200],[330,400],[0,200],[294,600],[0,400],
-     [220,400],[0,200],[261,300],[0,100],[293,400],[0,200],[220,600],[0,600]], // Era 0 quote
-  ];
-
-  playTrack(eraId) {
+  playTrack(idx) {
     this._ensureCtx();
-    if (this._trackInterval) { clearInterval(this._trackInterval); this._trackInterval = null; }
-    const notes = Music.TRACKS[eraId] || Music.TRACKS[0];
-    this._noteIdx = 0;
-    this._currentTrack = notes;
-    this._scheduleNote();
-  }
-
-  _scheduleNote() {
-    if (!this._currentTrack) return;
-    const note = this._currentTrack[this._noteIdx];
-    if (!note) return;
-    const [freq, dur] = note;
-    if (freq > 0 && !this._muted) this._playNote(freq, dur / 1000 * 0.85, 'square');
-    this._noteIdx = (this._noteIdx + 1) % this._currentTrack.length;
-    this._trackInterval = setTimeout(() => this._scheduleNote(), dur);
-  }
-
-  _playNote(freq, dur, type = 'square', vol = 0.15) {
-    if (!this._ctx) return;
-    const osc  = this._ctx.createOscillator();
-    const gain = this._ctx.createGain();
-    osc.type  = type;
-    osc.frequency.value = freq;
-    gain.gain.setValueAtTime(vol, this._ctx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.001, this._ctx.currentTime + dur);
-    osc.connect(gain); gain.connect(this._master);
-    osc.start(); osc.stop(this._ctx.currentTime + dur);
+    this._stopVoices();
+    this._trackIdx = idx;
+    const track = TRACKS[idx] || TRACKS[0];
+    this._startTime = this._ctx.currentTime + 0.05;
+    track.voices.forEach(v => this._scheduleVoice(track.bpm, v));
   }
 
   stop() {
-    if (this._trackInterval) { clearInterval(this._trackInterval); this._trackInterval = null; }
-    this._currentTrack = null;
+    this._stopVoices();
+    this._trackIdx = -1;
   }
 
-  // ── SFX ─────────────────────────────────────────────
-
-  sfxHit() {
-    this._ensureCtx();
-    this._playNoise(0.15, 0.06, 800);
-    this._playNote(200, 0.08, 'sine', 0.2);
+  _stopVoices() {
+    this._voices.forEach(id => clearTimeout(id));
+    this._voices = [];
   }
 
-  sfxCollect() {
-    this._ensureCtx();
-    this._playNote(523, 0.08, 'sine', 0.2);
-    setTimeout(() => this._playNote(659, 0.08, 'sine', 0.2), 80);
+  // Schedule a single voice — loops indefinitely
+  _scheduleVoice(bpm, voiceDef) {
+    const totalBeats = voiceDef.notes.reduce((s, [, d]) => s + d, 0);
+    const loopDur    = beat(bpm, totalBeats);
+
+    const schedule = (loopStart) => {
+      let t = loopStart;
+      voiceDef.notes.forEach(([note, dur]) => {
+        const durSec = beat(bpm, dur);
+        if (note !== 'R') {
+          this._playVoiceNote(voiceDef, note, t, durSec * 0.88);
+        }
+        t += durSec;
+      });
+      // Schedule next loop
+      const delay = (loopStart + loopDur - this._ctx.currentTime) * 1000 - 50;
+      const id = setTimeout(() => {
+        if (this._trackIdx === -1) return;
+        schedule(loopStart + loopDur);
+      }, Math.max(0, delay));
+      this._voices.push(id);
+    };
+
+    schedule(this._startTime);
   }
 
-  sfxPortal() {
+  _playVoiceNote(voiceDef, note, startTime, dur) {
+    const ctx = this._ctx;
+    if (!ctx) return;
+
+    const now = ctx.currentTime;
+    if (startTime < now - 0.01) return; // already past
+
+    const gain = ctx.createGain();
+    gain.connect(this._master);
+
+    // Envelope: fast attack, short decay, sustain, release
+    const atk  = Math.min(0.02, dur * 0.08);
+    const rel  = Math.min(0.08, dur * 0.25);
+    const vol  = voiceDef.vol || 0.15;
+    gain.gain.setValueAtTime(0, startTime);
+    gain.gain.linearRampToValueAtTime(vol, startTime + atk);
+    gain.gain.setValueAtTime(vol * 0.75, startTime + atk + 0.01);
+    gain.gain.setValueAtTime(vol * 0.75, startTime + dur - rel);
+    gain.gain.linearRampToValueAtTime(0, startTime + dur);
+
+    if (voiceDef.type === 'noise' || note === 'kick' || note === 'snare') {
+      this._playPercussion(note, startTime, dur, gain);
+      return;
+    }
+
+    const freq = typeof note === 'number' ? note : NOTE[note];
+    if (!freq) return;
+
+    const osc = ctx.createOscillator();
+
+    if (voiceDef.type === 'pulse') {
+      // Web Audio doesn't have pulse directly — use square + narrow PWM
+      osc.type = 'square';
+    } else {
+      osc.type = voiceDef.type || 'square';
+    }
+
+    osc.frequency.setValueAtTime(freq, startTime);
+
+    // Vibrato for melody voices
+    if (voiceDef.vibrato && dur > 0.2) {
+      const lfo = ctx.createOscillator();
+      const lfoGain = ctx.createGain();
+      lfo.frequency.value = 5.5;
+      lfoGain.gain.value = 0; // start silent
+      lfoGain.gain.setValueAtTime(0, startTime + dur * 0.55);
+      lfoGain.gain.linearRampToValueAtTime(freq * 0.008, startTime + dur * 0.75);
+      lfo.connect(lfoGain);
+      lfoGain.connect(osc.frequency);
+      lfo.start(startTime);
+      lfo.stop(startTime + dur + 0.01);
+    }
+
+    // Arpeggio: rapidly cycle through chord tones
+    if (voiceDef.arp) {
+      const arpRate = 0.06; // seconds per arp step
+      let tf = startTime;
+      let harmFreq = freq * 1.25; // rough major third up
+      while (tf < startTime + dur - arpRate) {
+        osc.frequency.setValueAtTime(freq, tf);
+        osc.frequency.setValueAtTime(harmFreq, tf + arpRate);
+        tf += arpRate * 2;
+      }
+    }
+
+    osc.connect(gain);
+    osc.start(startTime);
+    osc.stop(startTime + dur + 0.01);
+  }
+
+  _playPercussion(type, startTime, dur, gainNode) {
+    const ctx = this._ctx;
+
+    const bufLen = Math.floor(ctx.sampleRate * Math.min(dur, 0.18));
+    const buf    = ctx.createBuffer(1, bufLen, ctx.sampleRate);
+    const data   = buf.getChannelData(0);
+
+    if (type === 'kick') {
+      // Kick: pitched noise sweep down
+      for (let i = 0; i < bufLen; i++) {
+        const t   = i / ctx.sampleRate;
+        const env = Math.exp(-t * 30);
+        data[i]   = (Math.random() * 2 - 1) * env * 0.6 +
+                    Math.sin(2 * Math.PI * 80 * Math.exp(-t * 40) * t) * env * 0.4;
+      }
+    } else if (type === 'snare') {
+      // Snare: noise burst with ring
+      for (let i = 0; i < bufLen; i++) {
+        const t   = i / ctx.sampleRate;
+        const env = Math.exp(-t * 18);
+        data[i]   = (Math.random() * 2 - 1) * env * 0.7 +
+                    Math.sin(2 * Math.PI * 220 * t) * env * 0.3;
+      }
+    } else {
+      // Generic noise
+      for (let i = 0; i < bufLen; i++) {
+        data[i] = (Math.random() * 2 - 1) * Math.exp(-i / bufLen * 8);
+      }
+    }
+
+    // High-pass filter for snare crispness
+    const filter = ctx.createBiquadFilter();
+    filter.type = type === 'kick' ? 'lowpass' : 'highpass';
+    filter.frequency.value = type === 'kick' ? 200 : 1200;
+
+    const src = ctx.createBufferSource();
+    src.buffer = buf;
+    src.connect(filter);
+    filter.connect(gainNode);
+    src.start(startTime);
+  }
+
+  // ── SFX ──────────────────────────────────────────────────
+
+  _ensureCtxAndPlay(fn) {
     this._ensureCtx();
-    [523,659,784,1047].forEach((f, i) => {
-      setTimeout(() => this._playNote(f, 0.3, 'sine', 0.15), i * 80);
+    if (this._muted) return;
+    fn(this._ctx, this._master);
+  }
+
+  _sfxTone(freq, dur, type = 'square', vol = 0.18) {
+    this._ensureCtxAndPlay((ctx, out) => {
+      const osc = ctx.createOscillator();
+      const g   = ctx.createGain();
+      osc.type = type; osc.frequency.value = freq;
+      g.gain.setValueAtTime(vol, ctx.currentTime);
+      g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + dur);
+      osc.connect(g); g.connect(out);
+      osc.start(); osc.stop(ctx.currentTime + dur);
     });
   }
 
-  sfxFishCast() {
-    this._ensureCtx();
-    this._playNoise(0.1, 0.12, 300);
-  }
-
-  sfxFishCaught() {
-    this._ensureCtx();
-    [523,659,784].forEach((f, i) => setTimeout(() => this._playNote(f, 0.1, 'square', 0.18), i * 100));
-  }
-
-  sfxFishMiss() {
-    this._ensureCtx();
-    this._playNote(330, 0.2, 'sine', 0.15);
-    setTimeout(() => this._playNote(262, 0.2, 'sine', 0.1), 150);
-  }
-
-  sfxDialog() {
-    this._ensureCtx();
-    this._playNoise(0.06, 0.05, 2000);
-  }
-
-  sfxEraUnlock() {
-    this._ensureCtx();
-    [523,659,784,1047].forEach((f, i) => setTimeout(() => this._playNote(f, 0.2, 'square', 0.2), i * 120));
-  }
-
-  sfxQuestComplete() {
-    this._ensureCtx();
-    this._playNote(523, 0.5, 'sine', 0.18);
-    setTimeout(() => this._playNote(784, 0.5, 'sine', 0.18), 30);
-  }
-
-  sfxHurt() {
-    this._ensureCtx();
-    this._playNote(880, 0.1, 'square', 0.25);
-  }
-
-  _playNoise(vol, dur, freq = 1000) {
-    if (!this._ctx) return;
-    const buf  = this._ctx.createBuffer(1, this._ctx.sampleRate * dur, this._ctx.sampleRate);
-    const data = buf.getChannelData(0);
-    for (let i = 0; i < data.length; i++) data[i] = Math.random() * 2 - 1;
-    const src    = this._ctx.createBufferSource();
-    const filter = this._ctx.createBiquadFilter();
-    const gain   = this._ctx.createGain();
-    filter.type = 'highpass'; filter.frequency.value = freq;
-    gain.gain.setValueAtTime(vol, this._ctx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.001, this._ctx.currentTime + dur);
-    src.buffer = buf;
-    src.connect(filter); filter.connect(gain); gain.connect(this._master);
-    src.start();
-  }
+  sfxHit()          { this._sfxTone(180, 0.08, 'square', 0.22); setTimeout(() => this._sfxTone(120, 0.06, 'square', 0.15), 40); }
+  sfxCollect()      { [523,659,784].forEach((f,i) => setTimeout(() => this._sfxTone(f, 0.1, 'square', 0.18), i*70)); }
+  sfxPortal()       { [523,659,784,1047].forEach((f,i) => setTimeout(() => this._sfxTone(f, 0.28, 'sine', 0.14), i*80)); }
+  sfxFishCast()     { this._sfxTone(300, 0.12, 'square', 0.12); }
+  sfxFishCaught()   { [523,659,784,1047].forEach((f,i) => setTimeout(() => this._sfxTone(f, 0.1, 'square', 0.18), i*100)); }
+  sfxFishMiss()     { this._sfxTone(330, 0.2, 'sine', 0.14); setTimeout(() => this._sfxTone(262, 0.2, 'sine', 0.10), 150); }
+  sfxDialog()       { this._sfxTone(880, 0.04, 'square', 0.12); }
+  sfxEraUnlock()    { [523,659,784,1047,1318].forEach((f,i) => setTimeout(() => this._sfxTone(f, 0.2, 'square', 0.18), i*100)); }
+  sfxQuestComplete(){ this._sfxTone(523, 0.4, 'sine', 0.16); setTimeout(() => this._sfxTone(784, 0.4, 'sine', 0.16), 30); }
+  sfxHurt()         { this._sfxTone(880, 0.09, 'square', 0.24); }
 }
