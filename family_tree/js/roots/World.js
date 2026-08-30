@@ -293,12 +293,15 @@ export class World {
   }
 
   entryPosition(dir) {
-    const margin = TILE;
+    // Place player safely clear of any border tiles (trees, walls).
+    // Use the screen's spawn column/row as the passage alignment point.
+    const spawnR = this.screen?.spawn?.r ?? 7;
+    const spawnC = this.screen?.spawn?.c ?? 10;
     switch (dir) {
-      case 'right': return { x: margin,                          y: this.screen?.spawn?.r * TILE || TILE * 7 };
-      case 'left':  return { x: SCREEN_COLS * TILE - TILE * 2,  y: this.screen?.spawn?.r * TILE || TILE * 7 };
-      case 'down':  return { x: this.screen?.spawn?.c * TILE || TILE * 10, y: margin };
-      case 'up':    return { x: this.screen?.spawn?.c * TILE || TILE * 10, y: SCREEN_ROWS * TILE - TILE * 2 };
+      case 'right': return { x: TILE,                          y: spawnR * TILE };
+      case 'left':  return { x: SCREEN_COLS * TILE - TILE * 2, y: spawnR * TILE };
+      case 'down':  return { x: spawnC * TILE,  y: TILE * 3 };  // row 3 — past border trees
+      case 'up':    return { x: spawnC * TILE,  y: SCREEN_ROWS * TILE - TILE * 3 }; // 3 rows from bottom
     }
     return { x: TILE * 10, y: TILE * 7 };
   }

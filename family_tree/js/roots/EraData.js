@@ -1433,13 +1433,15 @@ function _buildHaarlemWorld() {
 
   // [3,1] Forest park south — meadow with pond
   { const m = blank(T.GRASS);
-    fill(m, 0, 0, 3, W-1, T.TREE);
-    fill(m, 4, 0, H-1, W-1, T.GRASS);
+    fill(m, 0, 0, 2, W-1, T.TREE);   // trees only rows 0-2 (was 0-3)
+    fill(m, 3, 0, H-1, W-1, T.GRASS); // row 3+ is clear grass — entry from north lands here
     fill(m, 5, 5, 9, 13, T.WATER);   // fishing lake
     set(m, 7, 5, T.BRIDGE); set(m, 7, 6, T.BRIDGE);
-    // Benches (rock placeholders)
+    // Clear a wide safe corridor at the top for the 'up' entry passage
+    fill(m, 3, 8, 4, 12, T.GRASS);
+    // Benches
     set(m, 10, 4, T.ROCK); set(m, 10, 14, T.ROCK);
-    grid[3][1] = makeScreen(m, {left:{pos:HP},right:{pos:HP},up:{pos:VP}}, '2026 · Park Fishing Pond', {r:HP,c:4}); }
+    grid[3][1] = makeScreen(m, {left:{pos:HP},right:{pos:HP},up:{pos:VP}}, '2026 · Park Fishing Pond', {r:9,c:10}); }
 
   // [3,2] GROTE MARKT — the main town square
   { const m = blank(T.COBBLE);
