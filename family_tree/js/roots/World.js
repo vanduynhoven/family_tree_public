@@ -10,14 +10,17 @@ import { DroppedItem } from './DroppedItem.js';
 
 export class World {
   constructor() {
-    this.screens    = null;   // 2D array [row][col] of screen objects
+    this.screens    = null;
     this.screenRow  = 1;
     this.screenCol  = 1;
-    this.transition = null;   // { dir, fromR, fromC, toR, toC, progress }
+    this.transition = null;
     this._visited   = new Set();
-    this._drops     = [];     // DroppedItem[]
-    this._npcs      = [];     // NPC[] for current screen
-    this._enemies   = [];     // Enemy[]
+    this._drops     = [];
+    this._npcs      = [];
+    this._enemies   = [];
+    // Tracks which ambient NPC types have been placed anywhere in the current era
+    // so the same named type doesn't appear on multiple screens simultaneously
+    this._ambientNPCsUsed = new Set();
   }
 
   get screen()       { return this.screens?.[this.screenRow]?.[this.screenCol]; }
@@ -33,6 +36,7 @@ export class World {
     this._location    = location;
     this._friendshipMap  = friendshipMap;
     this._talkCountMap   = talkCountMap;
+    this._ambientNPCsUsed = new Set(); // reset for new era
     this.screenRow = startRow;
     this.screenCol = startCol;
     this._visited.clear();
@@ -87,12 +91,14 @@ export class World {
       });
     }
 
-    // Forage drops
+    // Forage drops — check full drop footprint before placing
     for (let i = 0; i < 3; i++) {
-      const item = _randomForage(eraId);
-      const fx   = (2 + Math.floor(Math.random() * (SCREEN_COLS - 4))) * TILE;
-      const fy   = (2 + Math.floor(Math.random() * (SCREEN_ROWS - 4))) * TILE;
-      if (!this.solidAt(fx + 12, fy + 12)) {
+      const fc = 3 + Math.floor(Math.random() * (SCREEN_COLS - 6));
+      const fr = 3 + Math.floor(Math.random() * (SCREEN_ROWS - 6));
+      const fx = fc * TILE + 4;
+      const fy = fr * TILE + 4;
+      if (!this.solidAt(fx, fy) && !this.solidAt(fx + 20, fy + 20)) {
+        const item = _randomForage(eraId);
         this._drops.push(new DroppedItem(item, fx, fy));
       }
     }
@@ -108,39 +114,60 @@ export class World {
     const pools = _ambientNPCPool(era, location);
     if (!pools.length) return;
 
-    const counts = { 0:1, 1:4, 2:3, 3:2 };
-    const count = Math.min(counts[this.screenRow] ?? 2, pools.length);
+    // Reduce ambient density slightly: max 2 per screen (was 4)
+    // This prevents overcrowding and makes each NPC feel special
+    const counts = { 0:1, 1:2, 2:2, 3:1 };
+    const count = Math.min(counts[this.screenRow] ?? 1, pools.length);
 
-    // Shuffle pool (Fisher-Yates) so each screen gets different NPCs without repeats
+    // Shuffle pool (Fisher-Yates) for variety
     const shuffled = [...pools];
     for (let i = shuffled.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
       [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
     }
 
+    const NPC_W = Math.floor(TILE * 0.52);
+    const NPC_H = Math.floor(TILE * 0.72);
+    const pad   = 4;
+
     let spawned = 0;
     for (const template of shuffled) {
       if (spawned >= count) break;
 
-      // Skip if this NPC's given name or full name already exists on the screen
+      // Skip if this NPC type already appears anywhere in the current era world
+      if (this._ambientNPCsUsed.has(template.name)) continue;
+      // Also skip if already on this specific screen
       if (existingNames.has(template.name) || existingNames.has(template.given)) continue;
 
+      // Find a walkable spawn position — check full NPC footprint, not just centre
       let tx = 0, ty = 0;
-      for (let attempt = 0; attempt < 20; attempt++) {
-        const tc = 2 + Math.floor(Math.random() * (SCREEN_COLS - 4));
-        const tr = 2 + Math.floor(Math.random() * (SCREEN_ROWS - 4));
-        if (!this.solidAt(tc * TILE + 12, tr * TILE + 12)) {
-          tx = tc * TILE + 4; ty = tr * TILE + 4; break;
-        }
+      for (let attempt = 0; attempt < 30; attempt++) {
+        const tc = 3 + Math.floor(Math.random() * (SCREEN_COLS - 6));
+        const tr = 3 + Math.floor(Math.random() * (SCREEN_ROWS - 6));
+        const wx = tc * TILE + pad;
+        const wy = tr * TILE + pad;
+        // Check all 4 corners of the NPC's bounding box
+        const clear = !this.solidAt(wx,            wy           ) &&
+                      !this.solidAt(wx + NPC_W - pad, wy        ) &&
+                      !this.solidAt(wx,            wy + NPC_H - pad) &&
+                      !this.solidAt(wx + NPC_W - pad, wy + NPC_H - pad);
+        if (clear) { tx = wx; ty = wy; break; }
       }
-      if (!tx && !ty) continue;
+      if (!tx && !ty) continue; // no clear spot found
 
       const npcDef = { ...template, era, wanderRadius: 2 + Math.floor(Math.random() * 2) };
       const npc = new NPC(npcDef, tx, ty);
       npc.homeX = tx; npc.homeY = ty;
       npc.wanderTimer = Math.random() * 3;
 
-      // Mark this name as used so subsequent iterations don't duplicate it
+      // Restore persistent friendship hearts and talk count
+      const npcKey = template.name;
+      if (this._friendshipMap?.has(npcKey)) npc.friendship = this._friendshipMap.get(npcKey);
+      if (this._talkCountMap?.has(npcKey))  npc.talkCount  = this._talkCountMap.get(npcKey);
+      if (npc.talkCount > 0) npc.talked = true;
+
+      // Mark as used world-wide and on this screen
+      this._ambientNPCsUsed.add(template.name);
       existingNames.add(template.name);
       if (template.given) existingNames.add(template.given);
 
