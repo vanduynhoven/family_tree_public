@@ -469,73 +469,88 @@
     // ── Auto-wiring: make browsing count ─────────────────────
     var autoScanWired = false;      // one-time DOM wiring (click listeners, gedcom event)
     function autoScan() {
-        // Only track achievements when Kid Mode is enabled
-        if (!isKidModeOn()) return;
-        
+        var kidModeOn = isKidModeOn();
         var path = global.location.pathname;
         
-        // Track page type visits
-        if (path.indexOf('/visualizations/tree') !== -1) {
-            trackTreeVisit();
-        }
-        if (path.indexOf('/visualizations/family_chart') !== -1 || path.indexOf('/family_chart') !== -1) {
-            trackChartVisit();
-        }
-        if (path.indexOf('/timeline') !== -1) {
-            trackTimelineVisit();
-        }
-        
-        // Track generation page visits
-        var genMatch = path.match(/generation_(\d+)/);
-        if (genMatch) {
-            trackGenerationVisit(genMatch[1]);
-        }
-        // Also track gen 0 (ancestors)
-        if (path.indexOf('generation_0') !== -1 || path.indexOf('early_ancestors') !== -1) {
-            trackGenerationVisit('0');
-        }
-        
-        // Track stories page interactions (wire click listeners once)
-        if (!autoScanWired && path.indexOf('/stories') !== -1) {
-            // Wire up story card clicks
-            setTimeout(function() {
-                var storyCards = document.querySelectorAll('.story-card');
-                storyCards.forEach(function(card, i) {
-                    card.addEventListener('click', function() {
-                        var title = card.querySelector('h3');
-                        var storyId = title ? title.textContent.trim() : ('story-' + i);
-                        trackStoryRead(storyId);
-                        // Check for ship story
-                        if (storyId.toLowerCase().indexOf('ocean') !== -1 || 
-                            storyId.toLowerCase().indexOf('ship') !== -1 ||
-                            storyId.toLowerCase().indexOf('crossing') !== -1) {
-                            trackShipStory();
-                        }
-                    });
-                });
-            }, 100);
+        // Track page type visits (only when Kid Mode is on)
+        if (kidModeOn) {
+            if (path.indexOf('/visualizations/tree') !== -1) {
+                trackTreeVisit();
+            }
+            if (path.indexOf('/visualizations/family_chart') !== -1 || path.indexOf('/family_chart') !== -1) {
+                trackChartVisit();
+            }
+            if (path.indexOf('/timeline') !== -1) {
+                trackTimelineVisit();
+            }
+            
+            // Track generation page visits
+            var genMatch = path.match(/generation_(\d+)/);
+            if (genMatch) {
+                trackGenerationVisit(genMatch[1]);
+            }
+            // Also track gen 0 (ancestors)
+            if (path.indexOf('generation_0') !== -1 || path.indexOf('early_ancestors') !== -1) {
+                trackGenerationVisit('0');
+            }
         }
         
-        // 1) Person badges — clicking (or their presence) counts as viewing a person.
-        //    On the index, .badge / .people-list span elements represent people.
-        //    Attach click listeners only once to avoid double-counting on re-scan.
+        // Wire up click listeners ONCE (they check Kid Mode at click time)
         if (!autoScanWired) {
+            // Track stories page interactions
+            if (path.indexOf('/stories') !== -1) {
+                setTimeout(function() {
+                    var storyCards = document.querySelectorAll('.story-card');
+                    storyCards.forEach(function(card, i) {
+                        card.addEventListener('click', function() {
+                            if (!isKidModeOn()) return; // Check at click time
+                            var title = card.querySelector('h3');
+                            var storyId = title ? title.textContent.trim() : ('story-' + i);
+                            trackStoryRead(storyId);
+                            // Check for ship story
+                            if (storyId.toLowerCase().indexOf('ocean') !== -1 || 
+                                storyId.toLowerCase().indexOf('ship') !== -1 ||
+                                storyId.toLowerCase().indexOf('crossing') !== -1) {
+                                trackShipStory();
+                            }
+                        });
+                    });
+                }, 100);
+            }
+            
+            // Person badges — clicking counts as viewing a person
             var personEls = document.querySelectorAll('.people-list .badge, [data-person-id]');
             personEls.forEach(function (node, i) {
                 var id = node.getAttribute('data-person-id') || ('badge:' + (node.textContent || '').trim() || 'p' + i);
                 node.style.cursor = node.style.cursor || 'pointer';
-                node.addEventListener('click', function () { trackPersonView(id); });
+                node.addEventListener('click', function () { 
+                    if (!isKidModeOn()) return; // Check at click time
+                    trackPersonView(id); 
+                });
             });
+            
+            // When live GEDCOM stats arrive, fold in earliest year too
+            document.addEventListener('gedcom-stats-loaded', function (ev) {
+                if (!isKidModeOn()) return; // Check at event time
+                if (ev.detail && ev.detail.earliestYear && ev.detail.earliestYear < 9999) {
+                    trackYear(ev.detail.earliestYear);
+                }
+            });
+            
+            autoScanWired = true;
         }
 
-        // 2) Country flags anywhere on the page.
+        // Only track countries and years when Kid Mode is on
+        if (!kidModeOn) return;
+
+        // Country flags anywhere on the page.
         var flags = Object.keys(FLAG_COUNTRIES);
         var bodyText = document.body ? document.body.innerText : '';
         flags.forEach(function (flag) {
             if (bodyText.indexOf(flag) !== -1) { trackCountry(FLAG_COUNTRIES[flag]); }
         });
 
-        // 3) Years — scan visible year mentions (4-digit 1400–2099).
+        // Years — scan visible year mentions (4-digit 1400–2099).
         var yearRe = /\b(1[4-9]\d{2}|20\d{2})\b/g;
         var m;
         var seen = {};
@@ -544,16 +559,6 @@
             if (!seen[y]) { seen[y] = true; state.years.indexOf(y) === -1 && state.years.push(y); }
         }
 
-        // 4) When live GEDCOM stats arrive, fold in earliest year too. (register once)
-        if (!autoScanWired) {
-            document.addEventListener('gedcom-stats-loaded', function (ev) {
-                if (ev.detail && ev.detail.earliestYear && ev.detail.earliestYear < 9999) {
-                    trackYear(ev.detail.earliestYear);
-                }
-            });
-        }
-
-        autoScanWired = true;
         evaluate();
     }
 

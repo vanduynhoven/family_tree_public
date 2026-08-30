@@ -1275,16 +1275,18 @@ body.kid-mode .kid-term:focus::before { opacity: 1; }
  */
 :root { --bottom-nav-clearance: 58px; }
 
+/* ═══════════════════════════════════════════════════════════════════════════
+   Bottom Navigation Bar — Left-aligned with Home + Kid Mode always visible
+   ═══════════════════════════════════════════════════════════════════════════ */
 .bottom-nav {
     position: fixed;
-    left: 50%;
-    bottom: 52px;
-    transform: translateX(-50%);
+    left: 16px;
+    bottom: 16px;
     z-index: 300;
     display: flex;
     align-items: center;
     gap: 4px;
-    max-width: calc(100vw - 20px);
+    max-width: calc(100vw - 32px);
     padding: 6px;
     border: 1px solid var(--glass-border, rgba(255,255,255,0.12));
     border-radius: 30px;
@@ -1294,70 +1296,238 @@ body.kid-mode .kid-term:focus::before { opacity: 1; }
     box-shadow: 0 6px 24px rgba(0, 0, 0, 0.5);
     font-family: inherit;
     transition: max-width 0.32s cubic-bezier(0.4, 0, 0.2, 1),
-                padding 0.32s cubic-bezier(0.4, 0, 0.2, 1),
-                border-radius 0.32s ease;
-    overflow: hidden;
+                padding 0.32s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow: visible;
 }
 
-/* Split button container */
-.bottom-nav .bn-split {
+/* Fixed buttons container (Home, Kid Mode, Expand) */
+.bottom-nav .bn-fixed {
     display: flex;
     align-items: stretch;
+    gap: 2px;
     flex: 0 0 auto;
 }
 
-/* Home link (left side of split - navigates to home) */
+/* Home link button */
 .bottom-nav .bn-home-link {
     display: inline-flex;
     align-items: center;
-    gap: 6px;
-    padding: 9px 14px;
+    justify-content: center;
+    width: 42px;
+    height: 42px;
     border: none;
-    border-radius: 22px 0 0 22px;
+    border-radius: 50%;
     background: linear-gradient(135deg, var(--accent, #f39c12), var(--accent-red, #e74c3c));
     color: #fff;
-    font-size: 0.92em;
-    font-weight: 700;
+    font-size: 1.15em;
     text-decoration: none;
-    white-space: nowrap;
     transition: transform 0.15s, box-shadow 0.15s, filter 0.15s;
 }
 .bottom-nav .bn-home-link:hover { 
     filter: brightness(1.1);
-    box-shadow: 0 4px 14px rgba(0,0,0,0.4); 
+    box-shadow: 0 4px 14px rgba(0,0,0,0.4);
+    transform: scale(1.05);
 }
 .bottom-nav .bn-home-link.active {
     background: linear-gradient(135deg, #27ae60, #2ecc71);
 }
 .bottom-nav .bn-home-link:focus-visible { outline: 2px solid #ffd479; outline-offset: 2px; }
-.bottom-nav .bn-home-text { display: inline; }
 
-/* Expand button (right side of split - toggles expansion) */
+/* Kid Mode toggle button */
+.bottom-nav .bn-kid-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    min-width: 42px;
+    height: 42px;
+    padding: 0 12px;
+    border: none;
+    border-radius: 21px;
+    background: rgba(255, 255, 255, 0.08);
+    color: #aaa;
+    font-size: 1em;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background 0.2s, color 0.2s, transform 0.15s;
+}
+.bottom-nav .bn-kid-btn:hover {
+    background: rgba(255, 255, 255, 0.15);
+    color: #fff;
+    transform: scale(1.03);
+}
+.bottom-nav .bn-kid-btn.on {
+    background: linear-gradient(135deg, #9b59b6, #8e44ad);
+    color: #fff;
+    box-shadow: 0 4px 16px rgba(155, 89, 182, 0.4);
+}
+.bottom-nav .bn-kid-btn.on:hover {
+    filter: brightness(1.1);
+}
+
+/* Achievements button (shown when Kid Mode is ON) */
+.bottom-nav .bn-ach-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 42px;
+    height: 42px;
+    border: none;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #f39c12, #e67e22);
+    color: #fff;
+    font-size: 1.15em;
+    cursor: pointer;
+    transition: transform 0.15s, box-shadow 0.15s, filter 0.15s;
+}
+.bottom-nav .bn-ach-btn:hover {
+    transform: scale(1.1);
+    filter: brightness(1.1);
+    box-shadow: 0 4px 16px rgba(243, 156, 18, 0.5);
+}
+
+/* Info button */
+.bottom-nav .bn-info-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 42px;
+    border: none;
+    border-radius: 20px;
+    background: rgba(255, 255, 255, 0.08);
+    color: #aaa;
+    font-size: 1em;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s, transform 0.15s;
+}
+.bottom-nav .bn-info-btn:hover {
+    background: rgba(52, 152, 219, 0.25);
+    color: #5dade2;
+    transform: scale(1.05);
+}
+
+/* Info popup (footer content) */
+.bn-info-popup {
+    position: fixed;
+    bottom: 70px;
+    left: 16px;
+    width: 320px;
+    max-width: calc(100vw - 32px);
+    background: rgba(20, 20, 40, 0.96);
+    border: 1px solid var(--glass-border, rgba(255,255,255,0.15));
+    border-radius: 16px;
+    box-shadow: 0 8px 40px rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    z-index: 400;
+    opacity: 0;
+    transform: translateY(10px) scale(0.95);
+    pointer-events: none;
+    transition: opacity 0.25s ease, transform 0.25s ease;
+}
+.bn-info-popup.open {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    pointer-events: auto;
+}
+
+.bn-popup-close {
+    position: absolute;
+    top: 8px;
+    right: 10px;
+    width: 28px;
+    height: 28px;
+    border: none;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+    color: #888;
+    font-size: 1.2em;
+    line-height: 1;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+}
+.bn-popup-close:hover {
+    background: rgba(231, 76, 60, 0.3);
+    color: #e74c3c;
+}
+
+.bn-info-content {
+    padding: 16px 18px 18px;
+}
+.bn-info-content h3 {
+    margin: 0 0 12px;
+    font-size: 1.1em;
+    color: #fff;
+}
+.bn-info-sources {
+    font-size: 0.82em;
+    color: #aaa;
+    margin: 0 0 10px;
+    line-height: 1.5;
+}
+.bn-info-stats {
+    font-size: 0.88em;
+    color: #cfcfe0;
+    margin: 0 0 6px;
+}
+.bn-info-updated {
+    font-size: 0.78em;
+    color: #777;
+    margin: 0 0 14px;
+}
+.bn-info-links {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+.bn-info-links a {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 8px 14px;
+    border-radius: 20px;
+    background: rgba(255, 255, 255, 0.08);
+    color: #cfcfe0;
+    text-decoration: none;
+    font-size: 0.85em;
+    font-weight: 600;
+    transition: background 0.15s, color 0.15s;
+}
+.bn-info-links a:hover {
+    background: rgba(52, 152, 219, 0.25);
+    color: #5dade2;
+}
+
+/* Expand toggle button */
 .bottom-nav .bn-expand {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    padding: 9px 12px;
+    width: 36px;
+    height: 42px;
     border: none;
-    border-left: 1px solid rgba(255,255,255,0.25);
-    border-radius: 0 22px 22px 0;
-    background: linear-gradient(135deg, #e74c3c, #c0392b);
-    color: #fff;
+    border-radius: 20px;
+    background: rgba(255, 255, 255, 0.08);
+    color: #aaa;
     font-size: 0.85em;
     cursor: pointer;
-    transition: transform 0.15s, background 0.15s;
+    transition: background 0.15s, color 0.15s, transform 0.15s;
 }
 .bottom-nav .bn-expand:hover {
-    background: linear-gradient(135deg, #c0392b, #a93226);
+    background: rgba(255, 255, 255, 0.15);
+    color: #fff;
 }
 .bottom-nav.expanded .bn-expand {
     background: linear-gradient(135deg, #27ae60, #229954);
+    color: #fff;
 }
 .bottom-nav.expanded .bn-expand:hover {
-    background: linear-gradient(135deg, #229954, #1e8449);
+    filter: brightness(1.1);
 }
 
-/* Chevron that rotates when expanded */
+/* Chevron rotation */
 .bottom-nav .bn-chevron {
     display: inline-block;
     font-size: 0.9em;
@@ -1366,7 +1536,7 @@ body.kid-mode .kid-term:focus::before { opacity: 1; }
 }
 .bottom-nav.expanded .bn-chevron { transform: rotate(180deg); }
 
-/* The scrollable link group */
+/* ─── Expandable items container ─── */
 .bottom-nav .bn-items {
     display: flex;
     align-items: center;
@@ -1383,7 +1553,7 @@ body.kid-mode .kid-term:focus::before { opacity: 1; }
     margin-left: 0;
 }
 .bottom-nav.expanded .bn-items {
-    max-width: 76vw;
+    max-width: 70vw;
     opacity: 1;
     margin-left: 6px;
 }
@@ -1393,7 +1563,8 @@ body.kid-mode .kid-term:focus::before { opacity: 1; }
     border-radius: 3px;
 }
 
-.bottom-nav .bn-items a {
+/* Nav item links */
+.bottom-nav .bn-items > a {
     flex: 0 0 auto;
     display: inline-flex;
     align-items: center;
@@ -1407,60 +1578,88 @@ body.kid-mode .kid-term:focus::before { opacity: 1; }
     white-space: nowrap;
     transition: color 0.15s, background 0.15s;
 }
-.bottom-nav .bn-items a:hover {
+.bottom-nav .bn-items > a:hover {
     color: var(--accent, #f39c12);
     background: rgba(243, 156, 18, 0.15);
 }
-.bottom-nav .bn-items a.active {
+.bottom-nav .bn-items > a.active {
     color: #fff;
     background: rgba(243, 156, 18, 0.28);
 }
 
-/* Generations dropdown container */
-.bottom-nav .bn-gen-container {
+/* ─── Dropdown containers (Generations, Visualizations) ─── */
+.bottom-nav .bn-dropdown-container {
     position: relative;
     flex: 0 0 auto;
 }
 
-.bottom-nav .bn-gen-btn {
+.bottom-nav .bn-dropdown-btn {
     display: inline-flex;
     align-items: center;
     gap: 5px;
     padding: 8px 12px;
     border: none;
     border-radius: 18px;
-    background: rgba(142, 68, 173, 0.25);
-    color: #ce93d8;
+    background: rgba(255, 255, 255, 0.08);
+    color: #cfcfe0;
     font-size: 0.86em;
     font-weight: 600;
     cursor: pointer;
     white-space: nowrap;
     transition: background 0.15s, color 0.15s;
 }
-.bottom-nav .bn-gen-btn:hover {
+.bottom-nav .bn-dropdown-btn:hover {
+    background: rgba(255, 255, 255, 0.15);
+    color: #fff;
+}
+.bottom-nav .bn-dropdown-container.open .bn-dropdown-btn {
+    color: #fff;
+}
+
+/* Purple theme for Generations */
+.bottom-nav .bn-purple .bn-dropdown-btn {
+    background: rgba(142, 68, 173, 0.25);
+    color: #ce93d8;
+}
+.bottom-nav .bn-purple .bn-dropdown-btn:hover {
     background: rgba(142, 68, 173, 0.4);
     color: #e1bee7;
 }
-.bottom-nav .bn-gen-container.open .bn-gen-btn {
+.bottom-nav .bn-purple.open .bn-dropdown-btn {
     background: rgba(142, 68, 173, 0.5);
     color: #fff;
 }
 
-.bottom-nav .bn-gen-arrow {
+/* Cyan theme for Visualizations */
+.bottom-nav .bn-cyan .bn-dropdown-btn {
+    background: rgba(0, 188, 212, 0.2);
+    color: #4dd0e1;
+}
+.bottom-nav .bn-cyan .bn-dropdown-btn:hover {
+    background: rgba(0, 188, 212, 0.35);
+    color: #80deea;
+}
+.bottom-nav .bn-cyan.open .bn-dropdown-btn {
+    background: rgba(0, 188, 212, 0.45);
+    color: #fff;
+}
+
+/* Dropdown arrow */
+.bottom-nav .bn-dd-arrow {
     font-size: 0.75em;
     transition: transform 0.25s ease;
 }
-.bottom-nav .bn-gen-container.open .bn-gen-arrow {
+.bottom-nav .bn-dropdown-container.open .bn-dd-arrow {
     transform: rotate(180deg);
 }
 
-/* Dropdown panel - expands vertically */
-.bottom-nav .bn-gen-dropdown {
+/* ─── Dropdown panel (expands UPWARD) ─── */
+.bottom-nav .bn-dropdown {
     position: absolute;
-    bottom: calc(100% + 8px);
+    bottom: calc(100% + 10px);
     left: 50%;
     transform: translateX(-50%) scale(0.95);
-    min-width: 160px;
+    min-width: 180px;
     max-height: 0;
     overflow: hidden;
     opacity: 0;
@@ -1473,14 +1672,15 @@ body.kid-mode .kid-term:focus::before { opacity: 1; }
     transition: max-height 0.3s ease, opacity 0.2s ease, transform 0.2s ease;
     z-index: 10;
 }
-.bottom-nav .bn-gen-container.open .bn-gen-dropdown {
-    max-height: 400px;
+.bottom-nav .bn-dropdown-container.open .bn-dropdown {
+    max-height: 450px;
     opacity: 1;
     transform: translateX(-50%) scale(1);
     padding: 8px 0;
 }
 
-.bottom-nav .bn-gen-item {
+/* Dropdown items */
+.bottom-nav .bn-dropdown-item {
     display: flex;
     align-items: center;
     gap: 10px;
@@ -1490,52 +1690,67 @@ body.kid-mode .kid-term:focus::before { opacity: 1; }
     font-size: 0.9em;
     transition: background 0.15s, color 0.15s;
 }
-.bottom-nav .bn-gen-item:hover {
+.bottom-nav .bn-dropdown-item:hover {
+    background: rgba(255, 255, 255, 0.08);
+    color: #fff;
+}
+.bottom-nav .bn-dropdown-item.active {
+    background: rgba(243, 156, 18, 0.25);
+    color: #fff;
+}
+
+/* Purple dropdown items (Generations) */
+.bottom-nav .bn-purple .bn-dropdown-item:hover {
     background: rgba(142, 68, 173, 0.2);
     color: #e1bee7;
 }
-.bottom-nav .bn-gen-item.active {
+.bottom-nav .bn-purple .bn-dropdown-item.active {
     background: rgba(142, 68, 173, 0.35);
     color: #fff;
 }
 
-.bottom-nav .bn-gen-icon {
+/* Cyan dropdown items (Visualizations) */
+.bottom-nav .bn-cyan .bn-dropdown-item:hover {
+    background: rgba(0, 188, 212, 0.2);
+    color: #80deea;
+}
+.bottom-nav .bn-cyan .bn-dropdown-item.active {
+    background: rgba(0, 188, 212, 0.35);
+    color: #fff;
+}
+
+.bottom-nav .bn-dd-icon {
     font-size: 1.1em;
     width: 24px;
     text-align: center;
 }
-.bottom-nav .bn-gen-label {
+.bottom-nav .bn-dd-label {
     font-weight: 600;
     flex: 1;
 }
-.bottom-nav .bn-gen-desc {
+.bottom-nav .bn-dd-desc {
     font-size: 0.8em;
     color: #888;
 }
 
-/* Desktop: keep it compact and never full width */
+/* ─── Desktop: keep on left ─── */
 @media (min-width: 720px) {
-    .bottom-nav { left: auto; right: 16px; transform: none; }
-    .bottom-nav.expanded .bn-items { max-width: 640px; }
+    .bottom-nav.expanded .bn-items { max-width: 600px; }
 }
 
-/* Mobile: full width so all items are reachable */
+/* ─── Mobile: allow more width ─── */
 @media (max-width: 719px) {
     .bottom-nav {
         left: 10px;
-        right: 10px;
-        transform: none;
-        max-width: none;
-        justify-content: flex-start;
+        right: auto;
+        max-width: calc(100vw - 20px);
     }
-    .bottom-nav.expanded .bn-items { max-width: 100%; }
-    .bottom-nav .bn-home-text { display: none; }
-    .bottom-nav .bn-gen-dropdown {
-        left: auto;
-        right: 0;
+    .bottom-nav.expanded .bn-items { max-width: calc(100vw - 200px); }
+    .bottom-nav .bn-dropdown {
+        left: 0;
         transform: scale(0.95);
     }
-    .bottom-nav .bn-gen-container.open .bn-gen-dropdown {
+    .bottom-nav .bn-dropdown-container.open .bn-dropdown {
         transform: scale(1);
     }
 }

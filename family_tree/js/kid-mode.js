@@ -160,8 +160,12 @@
     try { localStorage.setItem(KID_MODE_KEY, on ? '1' : '0'); } catch (e) { /* private mode */ }
   }
 
-  /* Build the toggle button and drop it in a fixed corner. */
+  /* Build the toggle button and drop it in a fixed corner.
+     Now skipped if bottom-nav handles Kid Mode. */
   function makeButton() {
+    // If bottom-nav already provides Kid Mode, don't create a duplicate
+    if (document.getElementById('bottom-nav')) return null;
+    
     // Create container for the split button
     var container = document.createElement('div');
     container.id = 'kidModeContainer';
@@ -196,6 +200,7 @@
   }
 
   function syncButton(btn) {
+    if (!btn) return;
     var on = document.body.classList.contains('kid-mode');
     btn.setAttribute('aria-pressed', on ? 'true' : 'false');
     btn.classList.toggle('on', on);
@@ -294,16 +299,20 @@
       /* Tooltips are left in the DOM (harmless) but hidden by CSS when off. */
     }
     // Notify other modules (e.g. Achievements) that Kid Mode changed.
-    // Using an event decouples us from script load order: whether achievements.js
-    // has run yet or not, it either handles this now or reads state on its own init.
-    try {
-      document.dispatchEvent(new CustomEvent('kid-mode-changed', { detail: { on: on } }));
-    } catch (e) { /* CustomEvent unsupported — ignore */ }
+    // Skip if bottom-nav already fired the event (to avoid double-firing).
+    if (!document.getElementById('bottom-nav')) {
+      try {
+        document.dispatchEvent(new CustomEvent('kid-mode-changed', { detail: { on: on } }));
+      } catch (e) { /* CustomEvent unsupported — ignore */ }
+    }
 
     // Also refresh directly if Achievements is already present (belt and braces).
     if (window.Achievements) {
       var panel = document.getElementById('achievements-panel');
       if (panel) window.Achievements.renderPanel(panel);
+      // Also refresh popup panel if open
+      var popupPanel = document.getElementById('kid-achievements-content');
+      if (popupPanel) window.Achievements.renderPanel(popupPanel);
     }
   }
 
@@ -395,11 +404,31 @@
 
   function init() {
     makeButton();
+    // Apply current state (for glossary/emojis)
     apply(isOn());
+    
+    // Listen for kid-mode-changed events from bottom-nav
+    document.addEventListener('kid-mode-changed', function(e) {
+      var on = e.detail && (e.detail.enabled || e.detail.on);
+      // Apply the visual changes (glossary, emojis)
+      if (on) {
+        annotateGlossary();
+        addHeadingEmojis();
+      } else {
+        removeHeadingEmojis();
+      }
+      // Refresh achievements panel if open
+      if (window.Achievements) {
+        var popupPanel = document.getElementById('kid-achievements-content');
+        if (popupPanel) window.Achievements.renderPanel(popupPanel);
+      }
+    });
   }
 
   // Export badge update function globally so achievements.js can call it
   window.updateAchievementsBadge = updateAchievementsBadge;
+  // Export showAchievementsPopup so bottom-nav can use it
+  window.showAchievementsPopup = showAchievementsPopup;
 
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', init);
