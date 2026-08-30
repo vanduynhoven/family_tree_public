@@ -419,9 +419,6 @@
     function paint(el) {
         var earnedCount = state.earned.length;
         var total = DEFINITIONS.length;
-        
-        // Check if already collapsed (preserve state on refresh)
-        var wasOpen = el.classList.contains('vdh-ach-open');
 
         var cards = DEFINITIONS.map(function (def) {
             var res = def.check(state);
@@ -441,24 +438,15 @@
             );
         }).join('');
 
+        // Simple non-collapsible layout
         el.innerHTML =
-            '<div class="vdh-ach-header" onclick="Achievements.togglePanel(this.parentElement)">' +
-            '<div class="vdh-ach-header-left">' +
-            '<span class="vdh-ach-toggle-icon">▶</span>' +
-            '<h2 class="section-title" style="color:#f39c12; margin:0; display:inline;">🏅 Discovery Achievements</h2>' +
-            '</div>' +
+            '<div class="vdh-ach-title-row">' +
+            '<h2 class="section-title" style="color:#f39c12; margin:0;">🏅 Discovery Achievements</h2>' +
             '<span class="vdh-ach-count">' + earnedCount + ' / ' + total + ' unlocked</span>' +
             '</div>' +
-            '<div class="vdh-ach-content">' +
             '<p class="vdh-ach-sub">Explore the family tree to earn badges — progress is saved on this device.</p>' +
             '<div class="vdh-ach-grid">' + cards + '</div>' +
-            '<button type="button" class="vdh-ach-reset">Reset progress</button>' +
-            '</div>';
-        
-        // Restore open state if it was open before refresh
-        if (wasOpen) {
-            el.classList.add('vdh-ach-open');
-        }
+            '<button type="button" class="vdh-ach-reset">Reset progress</button>';
 
         var resetBtn = el.querySelector('.vdh-ach-reset');
         if (resetBtn) {
