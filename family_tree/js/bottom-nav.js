@@ -95,7 +95,7 @@
     nav.className = 'bottom-nav';
     nav.setAttribute('aria-label', 'Site navigation');
 
-    /* ─── Fixed buttons (always visible): Home + Kid Mode + Achievements + Info ─── */
+    /* ─── Fixed buttons (always visible): Home + Info ─── */
     var fixedBtns = document.createElement('div');
     fixedBtns.className = 'bn-fixed';
 
@@ -106,26 +106,6 @@
     homeLink.innerHTML = '\uD83C\uDFE0';
     homeLink.setAttribute('title', 'Home');
     if (here === 'index.html') homeLink.classList.add('active');
-
-    /* Kid Mode toggle */
-    var kidBtn = document.createElement('button');
-    kidBtn.type = 'button';
-    kidBtn.className = 'bn-kid-btn';
-    kidBtn.setAttribute('title', 'Toggle Kid Mode');
-    
-    /* Achievements button (only visible when Kid Mode is ON) */
-    var achBtn = document.createElement('button');
-    achBtn.type = 'button';
-    achBtn.className = 'bn-ach-btn';
-    achBtn.setAttribute('title', 'View Achievements');
-    achBtn.innerHTML = '\uD83C\uDFC5';
-    achBtn.style.display = 'none';
-    achBtn.addEventListener('click', function(e) {
-      e.stopPropagation();
-      if (window.showAchievementsPopup) {
-        window.showAchievementsPopup();
-      }
-    });
     
     /* Info/Footer button */
     var infoBtn = document.createElement('button');
@@ -176,11 +156,50 @@
         if (e.target === popup) popup.classList.remove('open');
       });
     }
+
+    /* Expand toggle */
+    var expandBtn = document.createElement('button');
+    expandBtn.type = 'button';
+    expandBtn.className = 'bn-expand';
+    expandBtn.setAttribute('aria-controls', 'bn-items');
+    expandBtn.innerHTML = '<span class="bn-chevron" aria-hidden="true">\u25B6</span>';
+
+    fixedBtns.appendChild(homeLink);
+    fixedBtns.appendChild(infoBtn);
+    fixedBtns.appendChild(expandBtn);
+
+    /* ═══════════════════════════════════════════════════════════════════
+       Kid Mode widget (separate, bottom-right)
+       ═══════════════════════════════════════════════════════════════════ */
+    var kidWidget = document.createElement('div');
+    kidWidget.id = 'kid-mode-widget';
+    kidWidget.className = 'kid-mode-widget';
+    
+    /* Kid Mode toggle */
+    var kidBtn = document.createElement('button');
+    kidBtn.type = 'button';
+    kidBtn.className = 'kmw-toggle';
+    kidBtn.setAttribute('title', 'Toggle Kid Mode');
+    
+    /* Achievements button (only visible when Kid Mode is ON) */
+    var achBtn = document.createElement('button');
+    achBtn.type = 'button';
+    achBtn.className = 'kmw-ach';
+    achBtn.setAttribute('title', 'View Achievements');
+    achBtn.innerHTML = '\uD83C\uDFC5';
+    achBtn.style.display = 'none';
+    achBtn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      if (window.showAchievementsPopup) {
+        window.showAchievementsPopup();
+      }
+    });
     
     function syncKidMode() {
       var on = isKidModeOn();
       kidBtn.classList.toggle('on', on);
       kidBtn.innerHTML = on ? '\uD83D\uDC76 ON' : '\uD83D\uDC76';
+      kidWidget.classList.toggle('active', on);
       document.body.classList.toggle('kid-mode', on);
       achBtn.style.display = on ? 'inline-flex' : 'none';
       // Fire event for achievements and other listeners
@@ -192,19 +211,10 @@
       setKidModeStorage(!isKidModeOn());
       syncKidMode();
     });
-
-    /* Expand toggle */
-    var expandBtn = document.createElement('button');
-    expandBtn.type = 'button';
-    expandBtn.className = 'bn-expand';
-    expandBtn.setAttribute('aria-controls', 'bn-items');
-    expandBtn.innerHTML = '<span class="bn-chevron" aria-hidden="true">\u25B6</span>';
-
-    fixedBtns.appendChild(homeLink);
-    fixedBtns.appendChild(kidBtn);
-    fixedBtns.appendChild(achBtn);
-    fixedBtns.appendChild(infoBtn);
-    fixedBtns.appendChild(expandBtn);
+    
+    kidWidget.appendChild(kidBtn);
+    kidWidget.appendChild(achBtn);
+    document.body.appendChild(kidWidget);
 
     /* ─── Items group (shown when expanded) ─── */
     var group = document.createElement('div');

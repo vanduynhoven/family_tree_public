@@ -1333,60 +1333,6 @@ body.kid-mode .kid-term:focus::before { opacity: 1; }
 }
 .bottom-nav .bn-home-link:focus-visible { outline: 2px solid #ffd479; outline-offset: 2px; }
 
-/* Kid Mode toggle button */
-.bottom-nav .bn-kid-btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 4px;
-    min-width: 42px;
-    height: 42px;
-    padding: 0 12px;
-    border: none;
-    border-radius: 21px;
-    background: rgba(255, 255, 255, 0.08);
-    color: #aaa;
-    font-size: 1em;
-    font-weight: 600;
-    cursor: pointer;
-    white-space: nowrap;
-    transition: background 0.2s, color 0.2s, transform 0.15s;
-}
-.bottom-nav .bn-kid-btn:hover {
-    background: rgba(255, 255, 255, 0.15);
-    color: #fff;
-    transform: scale(1.03);
-}
-.bottom-nav .bn-kid-btn.on {
-    background: linear-gradient(135deg, #9b59b6, #8e44ad);
-    color: #fff;
-    box-shadow: 0 4px 16px rgba(155, 89, 182, 0.4);
-}
-.bottom-nav .bn-kid-btn.on:hover {
-    filter: brightness(1.1);
-}
-
-/* Achievements button (shown when Kid Mode is ON) */
-.bottom-nav .bn-ach-btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 42px;
-    height: 42px;
-    border: none;
-    border-radius: 50%;
-    background: linear-gradient(135deg, #f39c12, #e67e22);
-    color: #fff;
-    font-size: 1.15em;
-    cursor: pointer;
-    transition: transform 0.15s, box-shadow 0.15s, filter 0.15s;
-}
-.bottom-nav .bn-ach-btn:hover {
-    transform: scale(1.1);
-    filter: brightness(1.1);
-    box-shadow: 0 4px 16px rgba(243, 156, 18, 0.5);
-}
-
 /* Info button */
 .bottom-nav .bn-info-btn {
     display: inline-flex;
@@ -1406,6 +1352,92 @@ body.kid-mode .kid-term:focus::before { opacity: 1; }
     background: rgba(52, 152, 219, 0.25);
     color: #5dade2;
     transform: scale(1.05);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   Kid Mode Widget — Separate bottom-right widget
+   ═══════════════════════════════════════════════════════════════════════════ */
+.kid-mode-widget {
+    position: fixed;
+    right: 16px;
+    bottom: 16px;
+    z-index: 300;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px;
+    border: 1px solid var(--glass-border, rgba(255,255,255,0.12));
+    border-radius: 30px;
+    background: rgba(20, 20, 36, 0.92);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.5);
+    transition: padding 0.2s, box-shadow 0.2s;
+}
+.kid-mode-widget.active {
+    border-color: rgba(155, 89, 182, 0.4);
+    box-shadow: 0 6px 30px rgba(155, 89, 182, 0.3);
+}
+
+/* Kid Mode toggle button */
+.kid-mode-widget .kmw-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    min-width: 42px;
+    height: 42px;
+    padding: 0 14px;
+    border: none;
+    border-radius: 21px;
+    background: rgba(255, 255, 255, 0.08);
+    color: #aaa;
+    font-size: 1em;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background 0.2s, color 0.2s, transform 0.15s;
+}
+.kid-mode-widget .kmw-toggle:hover {
+    background: rgba(255, 255, 255, 0.15);
+    color: #fff;
+    transform: scale(1.03);
+}
+.kid-mode-widget .kmw-toggle.on {
+    background: linear-gradient(135deg, #9b59b6, #8e44ad);
+    color: #fff;
+    box-shadow: 0 4px 16px rgba(155, 89, 182, 0.4);
+}
+.kid-mode-widget .kmw-toggle.on:hover {
+    filter: brightness(1.1);
+}
+
+/* Achievements button */
+.kid-mode-widget .kmw-ach {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 42px;
+    height: 42px;
+    border: none;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #f39c12, #e67e22);
+    color: #fff;
+    font-size: 1.2em;
+    cursor: pointer;
+    transition: transform 0.15s, box-shadow 0.15s, filter 0.15s;
+}
+.kid-mode-widget .kmw-ach:hover {
+    transform: scale(1.1);
+    filter: brightness(1.1);
+    box-shadow: 0 4px 16px rgba(243, 156, 18, 0.5);
+}
+
+@media (max-width: 719px) {
+    .kid-mode-widget {
+        right: 10px;
+        bottom: 10px;
+    }
 }
 
 /* Info popup (footer content) */
