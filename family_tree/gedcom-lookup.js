@@ -353,3 +353,32 @@
         document.body.appendChild(nav);
     }
 })();
+
+// ── Global Collapsible Bottom Nav loader ─────────────────────────────
+// Injects js/bottom-nav.js on every page that includes this script, using
+// the same depth-derived root so the path resolves from any subdirectory.
+(function loadBottomNav() {
+    if (document.getElementById('bottom-nav-loader')) return;
+
+    let depth = 0;
+    if (window.GEDCOM_PATH) {
+        depth = String(window.GEDCOM_PATH).split('/').filter(p => p === '..').length;
+    } else {
+        const m = window.location.pathname.match(/\/family_tree\/(.+)/);
+        if (m) depth = (m[1].match(/\//g) || []).length;
+    }
+    const root = depth === 0 ? './' : '../'.repeat(depth);
+
+    // Avoid double-loading if a page already has its own <script src>.
+    const already = Array.prototype.some.call(
+        document.querySelectorAll('script[src]'),
+        s => /js\/bottom-nav\.js(\?|$)/.test(s.getAttribute('src') || '')
+    );
+    if (already) return;
+
+    const s = document.createElement('script');
+    s.id = 'bottom-nav-loader';
+    s.src = root + 'js/bottom-nav.js';
+    s.defer = true;
+    document.head.appendChild(s);
+})();

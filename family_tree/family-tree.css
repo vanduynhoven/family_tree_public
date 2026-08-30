@@ -1065,11 +1065,13 @@ footer.page-footer {
 body { padding-bottom: 48px !important; }
 
 /* ─── 👶 Kid Mode ─────────────────────────────────────────────────── */
-/* Floating toggle button (bottom-right, above the footer nav) */
+/* Floating toggle button (bottom-right, kept clear of the collapsed
+   bottom-nav which occupies the lower area). Position is driven by the
+   --bottom-nav-clearance custom prop so it tracks the nav's height. */
 .kid-mode-toggle {
     position: fixed;
     right: 16px;
-    bottom: 58px;
+    bottom: calc(var(--bottom-nav-clearance, 58px) + 8px);
     z-index: 200;
     padding: 10px 16px;
     border: 2px solid #f39c12;
@@ -1161,3 +1163,137 @@ body.kid-mode .kid-term:hover::after,
 body.kid-mode .kid-term:focus::after { opacity: 1; transform: translateX(-50%) scale(1); }
 body.kid-mode .kid-term:hover::before,
 body.kid-mode .kid-term:focus::before { opacity: 1; }
+
+/* ─── 🧭 Collapsible Bottom Navigation Bar ────────────────────────── */
+/*
+ * Fixed bottom-centre pill. Collapsed = just a 🏠 Home button with an
+ * expand chevron. Expanded = the full set of quick links.
+ * Built dynamically by js/bottom-nav.js. Preference kept in localStorage.
+ * z-index 300 sits ABOVE .kid-mode-toggle (200) and the footer nav.
+ *
+ * The nav sets --bottom-nav-clearance on :root at runtime so the
+ * kid-mode toggle floats just above whatever height the nav currently is.
+ */
+:root { --bottom-nav-clearance: 58px; }
+
+.bottom-nav {
+    position: fixed;
+    left: 50%;
+    bottom: 52px;
+    transform: translateX(-50%);
+    z-index: 300;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    max-width: calc(100vw - 20px);
+    padding: 6px;
+    border: 1px solid var(--glass-border, rgba(255,255,255,0.12));
+    border-radius: 30px;
+    background: rgba(20, 20, 36, 0.92);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.5);
+    font-family: inherit;
+    /* Smoothly grow/shrink between states */
+    transition: max-width 0.32s cubic-bezier(0.4, 0, 0.2, 1),
+                padding 0.32s cubic-bezier(0.4, 0, 0.2, 1),
+                border-radius 0.32s ease;
+    overflow: hidden;
+}
+
+/* Home / toggle button — always visible */
+.bottom-nav .bn-home {
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 9px 14px;
+    border: none;
+    border-radius: 22px;
+    background: linear-gradient(135deg, var(--accent, #f39c12), var(--accent-red, #e74c3c));
+    color: #fff;
+    font-size: 0.92em;
+    font-weight: 700;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: transform 0.15s, box-shadow 0.15s;
+}
+.bottom-nav .bn-home:hover { transform: translateY(-1px); box-shadow: 0 4px 14px rgba(0,0,0,0.4); }
+.bottom-nav .bn-home:focus-visible { outline: 2px solid #ffd479; outline-offset: 2px; }
+
+/* Chevron that rotates when expanded */
+.bottom-nav .bn-chevron {
+    display: inline-block;
+    font-size: 0.85em;
+    line-height: 1;
+    transition: transform 0.3s ease;
+}
+.bottom-nav.expanded .bn-chevron { transform: rotate(180deg); }
+
+/* The scrollable link group */
+.bottom-nav .bn-items {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    max-width: 0;
+    opacity: 0;
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+    transition: max-width 0.32s cubic-bezier(0.4, 0, 0.2, 1),
+                opacity 0.25s ease 0.05s,
+                margin-left 0.32s ease;
+    margin-left: 0;
+}
+.bottom-nav.expanded .bn-items {
+    max-width: 76vw;
+    opacity: 1;
+    margin-left: 4px;
+}
+.bottom-nav .bn-items::-webkit-scrollbar { height: 5px; }
+.bottom-nav .bn-items::-webkit-scrollbar-thumb {
+    background: rgba(255,255,255,0.25);
+    border-radius: 3px;
+}
+
+.bottom-nav .bn-items a {
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 8px 12px;
+    border-radius: 18px;
+    color: var(--subtle, #cfcfe0);
+    text-decoration: none;
+    font-size: 0.86em;
+    font-weight: 600;
+    white-space: nowrap;
+    transition: color 0.15s, background 0.15s;
+}
+.bottom-nav .bn-items a:hover {
+    color: var(--accent, #f39c12);
+    background: rgba(243, 156, 18, 0.15);
+}
+.bottom-nav .bn-items a.active {
+    color: #fff;
+    background: rgba(243, 156, 18, 0.28);
+}
+
+/* Desktop: keep it compact and never full width */
+@media (min-width: 720px) {
+    .bottom-nav { left: auto; right: 16px; transform: none; }
+    .bottom-nav.expanded .bn-items { max-width: 640px; }
+}
+
+/* Mobile: full width so all items are reachable */
+@media (max-width: 719px) {
+    .bottom-nav {
+        left: 10px;
+        right: 10px;
+        transform: none;
+        max-width: none;
+        justify-content: flex-start;
+    }
+    .bottom-nav.expanded .bn-items { max-width: 100%; }
+}

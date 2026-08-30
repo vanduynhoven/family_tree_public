@@ -40,7 +40,113 @@
     'spouse':         'a husband or wife',
     'spouses':        'husbands and wives',
     'archives':       'places that keep very old records safe',
-    'vital records':  'official papers about births, marriages and deaths'
+    'vital records':  'official papers about births, marriages and deaths',
+
+    /* ── More genealogy & record words ── */
+    'immigrant':      'someone who comes to live in a new country',
+    'immigrants':     'people who come to live in a new country',
+    'census':         'a count of all the people living somewhere',
+    'parish':         'a local church area',
+    'parishes':       'local church areas',
+    'christening':    'a ceremony where a baby is given their name',
+    'christened':     'given a name in a church ceremony as a baby',
+    'burial':         'when someone who has died is put in the ground',
+    'buried':         'put in the ground after they have died',
+    'ship manifest':  'a list of everyone on a ship',
+    'ship manifests': 'lists of everyone on a ship',
+    'patron saint':   'a special saint that watches over a place or family',
+    'baptized':       'welcomed into the church as a baby',
+    'baptised':       'welcomed into the church as a baby',
+    'marriage':       'when two people join together as husband and wife',
+    'wedlock':        'being married',
+    'widow':          'a woman whose husband has died',
+    'widower':        'a man whose wife has died',
+    'orphan':         'a child whose parents have died',
+    'godparent':      'a grown-up who promises to help raise a child',
+    'godparents':     'grown-ups who promise to help raise a child',
+    'sponsor':        'a person who stands up for a baby at their christening',
+    'sponsors':       'people who stand up for a baby at their christening',
+    'patronymic':     'a name made from your father\u2019s first name',
+    'surname':        'a family\u2019s last name',
+    'maiden name':    'the last name a woman had before she married',
+    'homestead':      'a family\u2019s house and land',
+    'parochial':      'to do with a local church',
+    'sacrament':      'a special church ceremony',
+    'confirmation':   'a church ceremony for older children',
+    'catholic':       'a member of the Catholic Christian church',
+    'protestant':     'a member of a Christian church that is not Catholic',
+    'passenger list': 'a list of everyone travelling on a ship',
+    'steamship':      'a big ship powered by steam',
+    'port':           'a place where ships come in to land',
+    'voyage':         'a long trip by ship',
+    'settler':        'someone who moves to a new place to live and work',
+    'settlers':       'people who move to a new place to live and work',
+    'farmstead':      'a farm and its buildings',
+
+    /* ── Dutch places ── */
+    'Noord-Brabant':  'a province in the southern Netherlands',
+    'Brabant':        'a region in the southern Netherlands',
+    'Netherlands':    'a country in Europe, also called Holland',
+    'Holland':        'another name for the Netherlands',
+    'Uden':           'a town in the Netherlands where the family lived',
+    'Aarle-Rixtel':   'a village in the Netherlands',
+    'Boekel':         'a village in the Netherlands',
+    'Gemert':         'a town in the Netherlands',
+    'Beek en Donk':   'a village in the Netherlands',
+    'Bakel':          'a village in the Netherlands',
+    'Deurne':         'a town in the Netherlands',
+    'Helmond':        'a city in the Netherlands',
+    'Eindhoven':      'a big city in the Netherlands',
+    'Volkel':         'a small place in the Netherlands near Uden',
+    'Zeeland':        'a village in the Netherlands (also a Dutch province)',
+    'Sint-Oedenrode': 'a town in the Netherlands',
+    'Veghel':         'a town in the Netherlands',
+    'Erp':            'a village in the Netherlands',
+    'Mierlo':         'a village in the Netherlands',
+    'Lieshout':       'a village in the Netherlands',
+    'Nuenen':         'a village in the Netherlands (where the painter Van Gogh once lived)',
+    'Asten':          'a village in the Netherlands',
+    'Someren':        'a village in the Netherlands',
+    'Rotterdam':      'a big Dutch city with a harbour where ships sailed to America',
+    'Antwerp':        'a port city in Belgium where some ships to America left from',
+    'province':       'a big area of a country, a bit like a state',
+
+    /* ── US places ── */
+    'Minnesota':      'a state in the northern United States',
+    'Wisconsin':      'a state in the northern United States',
+    'New York':       'a state and a big city in the United States',
+    'America':        'the United States of America',
+    'Iowa':           'a farming state in the middle of the United States',
+    'Michigan':       'a state in the northern United States',
+    'Illinois':       'a state in the middle of the United States',
+    'Ohio':           'a state in the middle of the United States',
+    'Nebraska':       'a farming state in the middle of the United States',
+    'South Dakota':   'a state in the northern middle of the United States',
+    'Grand Rapids':   'a city in Michigan in the United States',
+    'Hoboken':        'a city in New Jersey where ships from Europe arrived',
+    'Pella':          'a town in Iowa first settled by Dutch families',
+    'Ellis Island':   'the place in New York where ships full of newcomers arrived',
+
+    /* ── Records & institutions ── */
+    'BHIC':           'Brabants Historisch Informatie Centrum \u2014 a place that keeps old Dutch records',
+    'SS Volendam':    'the ship that brought some of the family to America',
+    'Volendam':       'the ship that brought some of the family to America',
+
+    /* ── Time & history words ── */
+    'century':        'one hundred years',
+    'decade':         'ten years',
+    'era':            'a long stretch of time in history',
+    'World War':      'a huge war that many countries fought in',
+    'Great Depression':'a time long ago when many people had very little money',
+    'famine':         'a time when there is not enough food',
+    'plague':         'a very bad sickness that spreads to many people',
+    'inheritance':    'money or things passed down when someone dies',
+    'estate':         'all the land and money a person owns',
+    'occupation':     'the job someone does',
+    'trade':          'a job you learn to do with your hands, like carpentry',
+    'farmer':         'a person who grows crops and raises animals',
+    'laborer':        'a person who does hard work with their hands',
+    'labourer':       'a person who does hard work with their hands'
   };
 
   /* ── Extra emojis to prepend to headings while Kid Mode is on ── */
@@ -92,7 +198,14 @@
       removeHeadingEmojis();
       /* Tooltips are left in the DOM (harmless) but hidden by CSS when off. */
     }
-    // Refresh achievements panel visibility (achievements only work in Kid Mode)
+    // Notify other modules (e.g. Achievements) that Kid Mode changed.
+    // Using an event decouples us from script load order: whether achievements.js
+    // has run yet or not, it either handles this now or reads state on its own init.
+    try {
+      document.dispatchEvent(new CustomEvent('kid-mode-changed', { detail: { on: on } }));
+    } catch (e) { /* CustomEvent unsupported — ignore */ }
+
+    // Also refresh directly if Achievements is already present (belt and braces).
     if (window.Achievements) {
       var panel = document.getElementById('achievements-panel');
       if (panel) window.Achievements.renderPanel(panel);

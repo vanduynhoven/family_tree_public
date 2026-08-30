@@ -463,6 +463,7 @@
     }
 
     // ── Auto-wiring: make browsing count ─────────────────────
+    var autoScanWired = false;      // one-time DOM wiring (click listeners, gedcom event)
     function autoScan() {
         // Only track achievements when Kid Mode is enabled
         if (!isKidModeOn()) return;
@@ -490,8 +491,8 @@
             trackGenerationVisit('0');
         }
         
-        // Track stories page interactions
-        if (path.indexOf('/stories') !== -1) {
+        // Track stories page interactions (wire click listeners once)
+        if (!autoScanWired && path.indexOf('/stories') !== -1) {
             // Wire up story card clicks
             setTimeout(function() {
                 var storyCards = document.querySelectorAll('.story-card');
@@ -513,12 +514,15 @@
         
         // 1) Person badges — clicking (or their presence) counts as viewing a person.
         //    On the index, .badge / .people-list span elements represent people.
-        var personEls = document.querySelectorAll('.people-list .badge, [data-person-id]');
-        personEls.forEach(function (node, i) {
-            var id = node.getAttribute('data-person-id') || ('badge:' + (node.textContent || '').trim() || 'p' + i);
-            node.style.cursor = node.style.cursor || 'pointer';
-            node.addEventListener('click', function () { trackPersonView(id); });
-        });
+        //    Attach click listeners only once to avoid double-counting on re-scan.
+        if (!autoScanWired) {
+            var personEls = document.querySelectorAll('.people-list .badge, [data-person-id]');
+            personEls.forEach(function (node, i) {
+                var id = node.getAttribute('data-person-id') || ('badge:' + (node.textContent || '').trim() || 'p' + i);
+                node.style.cursor = node.style.cursor || 'pointer';
+                node.addEventListener('click', function () { trackPersonView(id); });
+            });
+        }
 
         // 2) Country flags anywhere on the page.
         var flags = Object.keys(FLAG_COUNTRIES);
@@ -536,13 +540,16 @@
             if (!seen[y]) { seen[y] = true; state.years.indexOf(y) === -1 && state.years.push(y); }
         }
 
-        // 4) When live GEDCOM stats arrive, fold in earliest year too.
-        document.addEventListener('gedcom-stats-loaded', function (ev) {
-            if (ev.detail && ev.detail.earliestYear && ev.detail.earliestYear < 9999) {
-                trackYear(ev.detail.earliestYear);
-            }
-        });
+        // 4) When live GEDCOM stats arrive, fold in earliest year too. (register once)
+        if (!autoScanWired) {
+            document.addEventListener('gedcom-stats-loaded', function (ev) {
+                if (ev.detail && ev.detail.earliestYear && ev.detail.earliestYear < 9999) {
+                    trackYear(ev.detail.earliestYear);
+                }
+            });
+        }
 
+        autoScanWired = true;
         evaluate();
     }
 
@@ -568,16 +575,26 @@
     };
     global.Achievements = api;
 
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', function () {
-            autoScan();
-            var panel = document.getElementById('achievements-panel');
-            if (panel) renderPanel(panel);
-        });
-    } else {
+    // React to Kid Mode being toggled at runtime. When it flips ON we must both
+    // (re-)scan the page for trackable content AND render the panel — autoScan and
+    // renderPanel each bail out when Kid Mode is off, so nothing happens until now.
+    function onKidModeChange() {
+        autoScan(); // no-op if Kid Mode still off; scans + evaluates when on
+        var panel = document.getElementById('achievements-panel');
+        if (panel) renderPanel(panel);
+    }
+    document.addEventListener('kid-mode-changed', onKidModeChange);
+
+    function init() {
         autoScan();
-        var panel0 = document.getElementById('achievements-panel');
-        if (panel0) renderPanel(panel0);
+        var panel = document.getElementById('achievements-panel');
+        if (panel) renderPanel(panel);
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', init);
+    } else {
+        init();
     }
 
 })(window);
