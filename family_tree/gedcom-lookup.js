@@ -362,3 +362,32 @@
     s.defer = true;
     document.head.appendChild(s);
 })();
+
+// ── Global Kid Mode loader ───────────────────────────────────────────
+// Injects js/kid-mode.js on every page for glossary tooltips, heading emojis,
+// and the achievements popup (showAchievementsPopup function).
+(function loadKidMode() {
+    if (document.getElementById('kid-mode-loader')) return;
+
+    let depth = 0;
+    if (window.GEDCOM_PATH) {
+        depth = String(window.GEDCOM_PATH).split('/').filter(p => p === '..').length;
+    } else {
+        const m = window.location.pathname.match(/\/family_tree\/(.+)/);
+        if (m) depth = (m[1].match(/\//g) || []).length;
+    }
+    const root = depth === 0 ? './' : '../'.repeat(depth);
+
+    // Avoid double-loading if a page already has its own <script src>.
+    const already = Array.prototype.some.call(
+        document.querySelectorAll('script[src]'),
+        s => /js\/kid-mode\.js(\?|$)/.test(s.getAttribute('src') || '')
+    );
+    if (already) return;
+
+    const s = document.createElement('script');
+    s.id = 'kid-mode-loader';
+    s.src = root + 'js/kid-mode.js';
+    s.defer = true;
+    document.head.appendChild(s);
+})();
