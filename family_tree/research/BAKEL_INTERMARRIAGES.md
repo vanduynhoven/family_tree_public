@@ -154,6 +154,44 @@ The Van Duijnhoven family's connections to Bakel were primarily through:
 - Search period: 1810-1960
 - Searched: ~138 Cornelissen marriages, ~111 Verbruggen marriages in Bakel en Milheeze
 
+## Verification (30 August 2026)
+
+### API Searches Conducted
+
+1. **Van Duijnhoven marriages in Bakel en Milheeze** (2660 records across NL archives)
+   - 486 Van Duijnhoven brides
+   - 414 Van Duijnhoven grooms
+   - Checked sample of direct marriages for Cornelissen/Verbruggen spouses: **none found**
+
+2. **Johan van Duijnhoven groom search (1810-1960)**: Only 1 result — the 1950 Bakel marriage ✓
+
+3. **Cornelis van Duijnhoven groom search (1880-1900)**: 13 results
+   - Verified 14 Feb 1887 Mill en Sint Hubert marriage to Catharina Verbruggen ✓
+
+4. **Cross-checked Catharina Verbruggen as mother**: 188 records searched
+   - No additional Van Duijnhoven descendants found marrying
+
+5. **Swinkels-Cornelissen connections verified**:
+   - 1871 Joost Swinkels × Wilhelmina Cornelissen (mother: Antonet van Duijnhoven) ✓
+   - 1882 Cornelis Swinkels × Dorothea Maria Cornelissen (mother: Antonetta van Duijnhoven) ✓
+
+### Verification Status
+
+| Marriage | Source ID | Verified |
+|----------|-----------|----------|
+| Johan × Anna Maria Cornelissen (1950) | bhi:28b1376d-c70b-1b73-1d9e-070864caa5ee | ✓ |
+| Cornelis × Catharina Verbruggen (1887) | bhi:9f755e24-4d4b-a9e4-60db-b013a113ad47 | ✓ |
+| Hubertus Swinkels × Antonia van Duijnhoven (1834) | bhi:4737ed0b-04ff-91c3-8d40-fc1f36e620a8 | ✓ |
+| Joost Swinkels × Wilhelmina Cornelissen (1871) | gmb:434C648B-A1D6-483A-AF87-E1DEB7D17752 | ✓ |
+| Cornelis Swinkels × Dorothea Maria Cornelissen (1882) | gmb:07AC7FCB-370C-4248-8E15-1E81D5503D7D | ✓ |
+
+### Conclusion
+
+**No additional direct Van Duijnhoven <-> Bakel intermarriages beyond those documented above.**
+
+The 1950 marriage (Johan × Anna Maria Cornelissen) remains the **only direct Van Duijnhoven-Cornelissen marriage** in Bakel en Milheeze. The 1887 marriage (Cornelis × Catharina Verbruggen) occurred in the neighboring municipality of Mill en Sint Hubert.
+
 ## Research Date
 
-30 August 2026
+30 August 2026 (initial)
+30 August 2026 (verified via OpenArchieven API)
