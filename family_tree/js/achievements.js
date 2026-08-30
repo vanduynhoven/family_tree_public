@@ -21,6 +21,12 @@
     'use strict';
 
     var STORAGE_KEY = 'vdh_achievements_v1';
+    var KID_MODE_KEY = 'vdh-kid-mode';
+
+    // Check if Kid Mode is enabled - achievements only work in Kid Mode
+    function isKidModeOn() {
+        try { return global.localStorage.getItem(KID_MODE_KEY) === '1'; } catch (e) { return false; }
+    }
 
     // Map flag emoji -> country name (used when auto-scanning pages for flags)
     var FLAG_COUNTRIES = {
@@ -362,6 +368,9 @@
     }
 
     function showToast(def) {
+        // Only show toasts when Kid Mode is enabled
+        if (!isKidModeOn()) return;
+        
         var host = ensureToastHost();
         var el = document.createElement('div');
         el.className = 'vdh-ach-toast';
@@ -389,6 +398,13 @@
         if (typeof el === 'string') el = document.querySelector(el);
         if (!el) return;
         if (panels.indexOf(el) === -1) panels.push(el);
+        
+        // Hide panel entirely when Kid Mode is off
+        if (!isKidModeOn()) {
+            el.style.display = 'none';
+            return;
+        }
+        el.style.display = '';
         paint(el);
     }
 
@@ -448,6 +464,9 @@
 
     // ── Auto-wiring: make browsing count ─────────────────────
     function autoScan() {
+        // Only track achievements when Kid Mode is enabled
+        if (!isKidModeOn()) return;
+        
         var path = global.location.pathname;
         
         // Track page type visits

@@ -92,6 +92,11 @@
       removeHeadingEmojis();
       /* Tooltips are left in the DOM (harmless) but hidden by CSS when off. */
     }
+    // Refresh achievements panel visibility (achievements only work in Kid Mode)
+    if (window.Achievements) {
+      var panel = document.getElementById('achievements-panel');
+      if (panel) window.Achievements.renderPanel(panel);
+    }
   }
 
   /* Prepend a friendly emoji to headings/section titles (idempotent). */
