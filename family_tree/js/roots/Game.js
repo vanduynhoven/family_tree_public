@@ -13,7 +13,7 @@ import { CHARACTERS, getCharacter } from './CharacterData.js';
 import { NPC_DATA, CROP_ITEMS }     from './NpcData.js';
 import { ERAS, FISH_TABLES, SCREEN_COLS, SCREEN_ROWS } from './EraData.js';
 import {
-  TILE, T, setEra,
+  TILE, T, setEra, loadSprites,
   drawSky, drawTiles, drawBobber,
 } from './Renderer.js';
 
@@ -77,36 +77,36 @@ export class Game {
 
   _afterIntro(char) {
     const startEra = char.startEra ?? 0;
-    this.loadEra(startEra);
-    this._state = STATE.PLAYING;
 
-    // Canvas click → navigate or act
-    this._clickTarget  = null;
-    this._clickArrived = false;
-    this.engine.canvas.addEventListener('click', e => {
-      const rect = this.engine.canvas.getBoundingClientRect();
-      const sx = e.clientX - rect.left;
-      const sy = e.clientY - rect.top;
-      this.handleCanvasClick(sx, sy);
-    });
-    // Touch tap (single finger, no drag)
-    let _touchStart = null;
-    this.engine.canvas.addEventListener('touchstart', e => {
-      if (e.touches.length === 1) _touchStart = { x: e.touches[0].clientX, y: e.touches[0].clientY };
-    }, { passive: true });
-    this.engine.canvas.addEventListener('touchend', e => {
-      if (!_touchStart) return;
-      const t = e.changedTouches[0];
-      const dx = t.clientX - _touchStart.x, dy = t.clientY - _touchStart.y;
-      if (Math.hypot(dx, dy) < 10) { // tap, not drag
+    // Load sprite sheets first, then start the game
+    loadSprites('./assets/sprites/').then(() => {
+      this.loadEra(startEra);
+      this._state = STATE.PLAYING;
+
+      // Canvas click → navigate or act
+      this._clickTarget  = null;
+      this._clickArrived = false;
+      this.engine.canvas.addEventListener('click', e => {
         const rect = this.engine.canvas.getBoundingClientRect();
-        this.handleCanvasClick(t.clientX - rect.left, t.clientY - rect.top);
-      }
-      _touchStart = null;
-    }, { passive: true });
+        this.handleCanvasClick(e.clientX - rect.left, e.clientY - rect.top);
+      });
+      let _touchStart = null;
+      this.engine.canvas.addEventListener('touchstart', e => {
+        if (e.touches.length === 1) _touchStart = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+      }, { passive: true });
+      this.engine.canvas.addEventListener('touchend', e => {
+        if (!_touchStart) return;
+        const t = e.changedTouches[0];
+        if (Math.hypot(t.clientX - _touchStart.x, t.clientY - _touchStart.y) < 10) {
+          const rect = this.engine.canvas.getBoundingClientRect();
+          this.handleCanvasClick(t.clientX - rect.left, t.clientY - rect.top);
+        }
+        _touchStart = null;
+      }, { passive: true });
 
-    this.engine.start((dt, frame) => this._tick(dt, frame));
-    this.ui.showToast(`⏰ ${ERAS[startEra]?.year} — Find your ancestors!`);
+      this.engine.start((dt, frame) => this._tick(dt, frame));
+      this.ui.showToast(`⏰ ${ERAS[startEra]?.year} — Find your ancestors!`);
+    });
   }
 
   // ── Era management ───────────────────────────────────
