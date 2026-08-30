@@ -40,9 +40,10 @@ export class Game {
     this._eraId = idx;
     setEra(idx);
     this.world.loadEra(idx, NPC_DATA);
-    // Reset player position
-    this.player.x = (SCREEN_COLS/2)*TILE;
-    this.player.y = (SCREEN_ROWS-3)*TILE;
+    // Use the first screen's defined spawn point
+    const spawnPos = this.world.screen?.spawn;
+    this.player.x = (spawnPos ? spawnPos.c : Math.floor(SCREEN_COLS/2)) * TILE + 4;
+    this.player.y = (spawnPos ? spawnPos.r : SCREEN_ROWS - 3)           * TILE + 4;
     this.engine.cameraX = 0; this.engine.cameraY = 0;
     this._dialogNPC = null;
     document.getElementById('dialog').style.display='none';
@@ -126,7 +127,15 @@ export class Game {
     if(this.world.transition) {
       const done = this.world.updateTransition(dt);
       this._drawTransition(frame);
-      if(done) this.ui.showScreenTitle(this.world.screen?.title || '');
+    if(done) {
+      // Position player at new screen's spawn point
+      const sp = this.world.screen?.spawn;
+      if(sp) {
+        this.player.x = sp.c * TILE + 4;
+        this.player.y = sp.r * TILE + 4;
+      }
+      this.ui.showScreenTitle(this.world.screen?.title || '');
+    }
       return;
     }
 

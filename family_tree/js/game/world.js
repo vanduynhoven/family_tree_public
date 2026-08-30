@@ -155,7 +155,7 @@ export class World {
       this.currentScreenIdx = this.transition.toIdx;
       this.transition = null;
       this._spawnEnemiesForScreen(this.currentScreenIdx);
-      return true; // completed
+      return true; // completed — caller repositions player
     }
     return false;
   }

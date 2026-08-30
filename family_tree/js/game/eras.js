@@ -131,6 +131,14 @@ function house(m,r,c,w,h,wall=T.HOUSE_WALL,roof=T.HOUSE_ROOF,door=T.DOOR) {
 function tree(m,r,c){ if(r>=0&&r<H&&c>=0&&c<W) m[r][c]=T.TREE; }
 function rock(m,r,c){ if(r>=0&&r<H&&c>=0&&c<W) m[r][c]=T.ROCK; }
 
+// Clear a safe 3×3 walkable area at the spawn point
+function clearSpawn(m, sr, sc) {
+  for(let dr=-1;dr<=1;dr++) for(let dc=-1;dc<=1;dc++) {
+    const r=sr+dr, c=sc+dc;
+    if(r>=0&&r<H&&c>=0&&c<W) m[r][c]=T.GRASS;
+  }
+}
+
 // Open a passage through a border tile for screen transitions
 function openExit(m,side,size=3) {
   const mid=side==='left'||side==='right'?~~(H/2):~~(W/2);
@@ -138,6 +146,17 @@ function openExit(m,side,size=3) {
   if(side==='left')  for(let r=mid-size;r<=mid+size;r++) m[r][0]=T.GRASS;
   if(side==='down')  for(let c=mid-size;c<=mid+size;c++) m[H-1][c]=T.GRASS;
   if(side==='up')    for(let c=mid-size;c<=mid+size;c++) m[0][c]=T.GRASS;
+}
+
+// Draw a clear path between two points (ensures connectivity)
+function clearPath(m, r1, c1, r2, c2) {
+  let r=r1, c=c1;
+  while(r!==r2||c!==c2) {
+    m[r][c]=T.ROAD;
+    if(r<r2) r++; else if(r>r2) r--;
+    else if(c<c2) c++; else if(c>c2) c--;
+  }
+  m[r2][c2]=T.ROAD;
 }
 
 // ── WORLD DEFINITION ──────────────────────────────────────────
@@ -171,7 +190,11 @@ export function buildEraWorld(eraId) {
     // Portal at bottom center
     s0[H-2][10]=T.PORTAL; s0[H-2][11]=T.PORTAL;
     openExit(s0,'right'); openExit(s0,'up');
-    screens.push({map:s0,exits:{right:1,up:2},title:'Aarle-Rixtel Village'});
+    // Spawn at bottom-center, path to NPCs and portal
+    const spawn0 = {r:11,c:11};
+    clearSpawn(s0,11,11);
+    clearPath(s0,11,11,12,11); // path to portal
+    screens.push({map:s0,exits:{right:1,up:2},title:'Aarle-Rixtel Village',spawn:spawn0});
 
     // Screen 1: Church interior + fields
     const s1=blank(T.COBBLE);
@@ -185,7 +208,9 @@ export function buildEraWorld(eraId) {
     [3,5,15,17].forEach(c=>{s1[7][c]=T.ROCK;s1[9][c]=T.ROCK;});
     s1[H-2][10]=T.PORTAL;
     openExit(s1,'left');
-    screens.push({map:s1,exits:{left:0},title:'Village East — Farms'});
+    clearSpawn(s1,10,10);
+  clearPath(s1,10,10,11,10);
+  screens.push({map:s1,exits:{left:0},title:'Village East — Farms',spawn:{r:10,c:10}}) ;
 
     // Screen 2: Heathland + ancient stones
     const s2=blank();
@@ -198,7 +223,9 @@ export function buildEraWorld(eraId) {
     for(let c=7;c<15;c++) s2[H-2][c]=T.WHEAT;
     s2[H-2][10]=T.PORTAL;
     openExit(s2,'down');
-    screens.push({map:s2,exits:{down:0},title:'Ancient Heathlands'});
+    clearSpawn(s2,10,10);
+  clearPath(s2,10,10,12,10);
+  screens.push({map:s2,exits:{down:0},title:'Ancient Heathlands',spawn:{r:10,c:10}}) ;
   }
 
   else if(eraId===1) { // ── DUTCH GOLDEN AGE 1660 ──
@@ -219,7 +246,9 @@ export function buildEraWorld(eraId) {
     [3,5,15,17].forEach(c=>s0[9][c]=T.ROCK);
     s0[H-2][10]=T.PORTAL; s0[H-2][11]=T.PORTAL;
     openExit(s0,'right');
-    screens.push({map:s0,exits:{right:1},title:'Golden Age Village'});
+    clearSpawn(s0,10,10);
+  clearPath(s0,10,10,12,10);
+  screens.push({map:s0,exits:{right:1},title:'Golden Age Village',spawn:{r:10,c:10}}) ;
 
     const s1=blank(T.WATER);
     fill(s1,0,0,H-1,W-1,T.WATER);
@@ -234,7 +263,9 @@ export function buildEraWorld(eraId) {
     fill(s1,4,5,7,7,T.FLOWER);
     s1[H-2][10]=T.PORTAL;
     openExit(s1,'left');
-    screens.push({map:s1,exits:{left:0},title:'Canal District'});
+    clearSpawn(s1,10,10);
+  clearPath(s1,10,10,12,10);
+  screens.push({map:s1,exits:{left:0},title:'Canal District',spawn:{r:6,c:5}}) ;
   }
 
   else if(eraId===2) { // ── NAPOLEONIC 1799 ──
@@ -252,7 +283,9 @@ export function buildEraWorld(eraId) {
     for(let r=1;r<H-1;r++){s0[r][10]=T.ROAD;s0[r][11]=T.ROAD;}
     s0[H-2][10]=T.PORTAL; s0[H-2][11]=T.PORTAL;
     openExit(s0,'up');
-    screens.push({map:s0,exits:{up:1},title:'Napoleonic Town Square'});
+    clearSpawn(s0,10,10);
+  clearPath(s0,10,10,12,10);
+  screens.push({map:s0,exits:{up:1},title:'Napoleonic Town Square',spawn:{r:10,c:10}}) ;
 
     const s1=blank();
     border(s1,T.TREE);
@@ -260,7 +293,9 @@ export function buildEraWorld(eraId) {
     [4,6,8,13,15,17].forEach(c=>{s1[4][c]=T.ROCK;s1[9][c]=T.ROCK;});
     s1[H-2][10]=T.PORTAL;
     openExit(s1,'down');
-    screens.push({map:s1,exits:{down:0},title:'Occupied Farmland'});
+    clearSpawn(s1,10,10);
+  clearPath(s1,10,10,12,10);
+  screens.push({map:s1,exits:{down:0},title:'Occupied Farmland',spawn:{r:7,c:10}}) ;
   }
 
   else if(eraId===3) { // ── INDUSTRIAL 1872 ──
@@ -280,7 +315,9 @@ export function buildEraWorld(eraId) {
     fill(s0,10,8,H-2,14,T.FLOWER);
     s0[H-2][10]=T.PORTAL;
     openExit(s0,'right');
-    screens.push({map:s0,exits:{right:1},title:'Steam Factory'});
+    clearSpawn(s0,10,10);
+  clearPath(s0,10,10,12,10);
+  screens.push({map:s0,exits:{right:1},title:'Steam Factory',spawn:{r:11,c:11}}) ;
 
     const s1=blank();
     border(s1,T.TREE);
@@ -291,7 +328,9 @@ export function buildEraWorld(eraId) {
     [8,11,14].forEach(c=>{s1[5][c]=T.ROCK;s1[11][c]=T.ROCK;});
     s1[H-2][10]=T.PORTAL;
     openExit(s1,'left'); openExit(s1,'right');
-    screens.push({map:s1,exits:{left:0,right:2},title:'Industrial Town'});
+    clearSpawn(s1,10,10);
+  clearPath(s1,10,10,12,10);
+  screens.push({map:s1,exits:{left:0,right:2},title:'Industrial Town',spawn:{r:10,c:10}}) ;
 
     const s2=blank();
     border(s2,T.TREE);
@@ -300,7 +339,9 @@ export function buildEraWorld(eraId) {
     [4,8,12,16].forEach(c=>{s2[4][c]=T.ROCK;s2[10][c]=T.ROCK;});
     s2[H-2][10]=T.PORTAL;
     openExit(s2,'left');
-    screens.push({map:s2,exits:{left:1},title:'Farm Fields'});
+    clearSpawn(s2,10,10);
+  clearPath(s2,10,10,12,10);
+  screens.push({map:s2,exits:{left:1},title:'Farm Fields',spawn:{r:7,c:10}}) ;
   }
 
   else if(eraId===4) { // ── EMIGRANT SHIP 1950 ──
@@ -320,7 +361,9 @@ export function buildEraWorld(eraId) {
     [[3,3],[3,17],[10,3],[10,17],[5,6],[5,15]].forEach(([r,c])=>rock(s0,r,c));
     s0[H-2][10]=T.PORTAL;
     openExit(s0,'down');
-    screens.push({map:s0,exits:{down:1},title:'SS Volendam — Main Deck'});
+    clearSpawn(s0,10,10);
+  clearPath(s0,10,10,12,10);
+  screens.push({map:s0,exits:{down:1},title:'SS Volendam — Main Deck',spawn:{r:10,c:6}}) ;
 
     const s1=blank(T.SHIP);
     fill(s1,0,0,H-1,W-1,T.SHIP);
@@ -330,7 +373,9 @@ export function buildEraWorld(eraId) {
     fill(s1,9,9,11,12,T.PLANK);
     s1[H-2][10]=T.PORTAL;
     openExit(s1,'up');
-    screens.push({map:s1,exits:{up:0},title:'Ship Hold'});
+    clearSpawn(s1,10,10);
+  clearPath(s1,10,10,12,10);
+  screens.push({map:s1,exits:{up:0},title:'Ship Hold',spawn:{r:10,c:10}}) ;
   }
 
   else if(eraId===5) { // ── MINNESOTA 1955 ──
@@ -348,7 +393,9 @@ export function buildEraWorld(eraId) {
     [5,7,9].forEach(c=>{s0[8][c]=T.ROCK;s0[10][c]=T.ROCK;});
     s0[H-2][10]=T.PORTAL;
     openExit(s0,'right');
-    screens.push({map:s0,exits:{right:1},title:'Van Duynhoven Farm'});
+    clearSpawn(s0,10,10);
+  clearPath(s0,10,10,12,10);
+  screens.push({map:s0,exits:{right:1},title:'Van Duynhoven Farm',spawn:{r:10,c:12}}) ;
 
     const s1=blank();
     border(s1,T.TREE);
@@ -359,7 +406,9 @@ export function buildEraWorld(eraId) {
     house(s1,1,9,5,4,T.HOUSE_WALL,T.HOUSE_ROOF);
     s1[H-2][10]=T.PORTAL;
     openExit(s1,'left'); openExit(s1,'right');
-    screens.push({map:s1,exits:{left:0,right:2},title:'Minnesota Prairie'});
+    clearSpawn(s1,10,10);
+  clearPath(s1,10,10,12,10);
+  screens.push({map:s1,exits:{left:0,right:2},title:'Minnesota Prairie',spawn:{r:6,c:11}}) ;
 
     const s2=blank(T.COBBLE);
     fill(s2,0,0,H-1,W-1,T.COBBLE);
@@ -371,7 +420,9 @@ export function buildEraWorld(eraId) {
     for(let c=0;c<W;c++){s2[6][c]=T.ROAD;}
     s2[H-2][10]=T.PORTAL;
     openExit(s2,'left');
-    screens.push({map:s2,exits:{left:1},title:'Small Minnesota Town'});
+    clearSpawn(s2,10,10);
+  clearPath(s2,10,10,12,10);
+  screens.push({map:s2,exits:{left:1},title:'Small Minnesota Town',spawn:{r:10,c:10}}) ;
   }
 
   else if(eraId===6) { // ── SUBURBAN 1984 ──
@@ -388,7 +439,9 @@ export function buildEraWorld(eraId) {
     for(let r=1;r<8;r++) s0[r][12]=T.STEEL; // TV antenna
     s0[H-2][10]=T.PORTAL;
     openExit(s0,'right');
-    screens.push({map:s0,exits:{right:1},title:'Suburban Wisconsin'});
+    clearSpawn(s0,10,10);
+  clearPath(s0,10,10,12,10);
+  screens.push({map:s0,exits:{right:1},title:'Suburban Wisconsin',spawn:{r:10,c:12}}) ;
 
     const s1=blank();
     border(s1,T.TREE);
@@ -399,7 +452,9 @@ export function buildEraWorld(eraId) {
     [3,6,15,18].forEach(c=>{s1[4][c]=T.ROCK;s1[10][c]=T.ROCK;});
     s1[H-2][10]=T.PORTAL;
     openExit(s1,'left');
-    screens.push({map:s1,exits:{left:0},title:'Haarlem Street'});
+    clearSpawn(s1,10,10);
+  clearPath(s1,10,10,12,10);
+  screens.push({map:s1,exits:{left:0},title:'Haarlem Street',spawn:{r:10,c:11}}) ;
   }
 
   else { // eraId===7  ── MODERN 2020 ──
@@ -420,7 +475,9 @@ export function buildEraWorld(eraId) {
     [T.TREE,T.PINE].forEach((t,i)=>{[3,5,8,12,16,19].forEach(c=>{if(s0[H-2][c]===0) s0[H-3][c]=(i%2===0)?T.TREE:T.PINE;});});
     s0[H-2][10]=T.PORTAL;
     openExit(s0,'right');
-    screens.push({map:s0,exits:{right:1},title:'St. Paul, Minnesota'});
+    clearSpawn(s0,10,10);
+  clearPath(s0,10,10,12,10);
+  screens.push({map:s0,exits:{right:1},title:'St. Paul, Minnesota',spawn:{r:10,c:12}}) ;
 
     const s1=blank(T.COBBLE);
     fill(s1,0,0,H-1,W-1,T.COBBLE);
@@ -431,7 +488,9 @@ export function buildEraWorld(eraId) {
     [4,8,12,16].forEach(c=>{s1[5][c]=T.ROCK;s1[10][c]=T.ROCK;});
     s1[H-2][10]=T.PORTAL;
     openExit(s1,'left');
-    screens.push({map:s1,exits:{left:0},title:'Haarlem, Netherlands'});
+    clearSpawn(s1,10,10);
+  clearPath(s1,10,10,12,10);
+  screens.push({map:s1,exits:{left:0},title:'Haarlem, Netherlands',spawn:{r:10,c:10}}) ;
   }
 
   return screens;

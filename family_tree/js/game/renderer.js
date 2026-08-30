@@ -12,8 +12,9 @@ export const T = {
 };
 
 // Tiles that block movement
+// Tiles that block movement — only true obstacles
 export const SOLID_TYPES = new Set([T.WALL,T.WATER,T.TREE,T.ROCK,T.BRICK,
-  T.PLANK,T.COBBLE,T.STEEL,T.CORN,T.SHIP,T.HOUSE_WALL,T.DEEP_WATER,T.CLIFF,T.PINE]);
+  T.CORN,T.HOUSE_WALL,T.DEEP_WATER,T.CLIFF,T.PINE]);
 
 const cache = {};
 let currentEraId = 0;
