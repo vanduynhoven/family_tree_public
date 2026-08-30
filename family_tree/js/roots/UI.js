@@ -2,7 +2,7 @@
 //  UI — HUD, dialog, journal, intro sequence, era select
 //  All DOM-based overlays; canvas minimap/bobber in Game.js
 // ═══════════════════════════════════════════════════════════
-import { TILE, drawMinimap } from './Renderer.js';
+import { drawMinimap } from './Renderer.js';
 import { ERAS } from './EraData.js';
 import { SCREEN_COLS, SCREEN_ROWS, WORLD_COLS, WORLD_ROWS } from './EraData.js';
 
@@ -407,27 +407,29 @@ export class UI {
     const ctx = canvas.getContext('2d');
 
     let panelIdx = 0;
-    let alpha    = 0;
-    let fading   = true;
-    let holdTimer = 0;
-    const HOLD_MS = 2800;
 
-    this._skipIntroFn = () => { overlay.style.display = 'none'; onComplete(); };
-    skip.style.display = 'none'; // hide until panel 2
+    const finish = () => {
+      overlay.style.display = 'none';
+      window.removeEventListener('keydown', _keyHandler);
+      onComplete();
+    };
+
+    this._skipIntroFn = finish;
+    skip.style.display = 'none';
 
     const showPanel = () => {
-      if (panelIdx >= panels.length) { overlay.style.display = 'none'; onComplete(); return; }
+      if (panelIdx >= panels.length) { finish(); return; }
       const p = panels[panelIdx];
-      alpha = 0; fading = true; holdTimer = 0;
-      caption.textContent = p.caption || '';
+      caption.textContent  = p.caption || '';
       progress.textContent = `${panelIdx + 1} / ${panels.length}`;
       if (panelIdx >= 1) skip.style.display = 'block';
       drawIntroPanel(ctx, p, canvas.width, canvas.height);
     };
 
     const advance = () => { panelIdx++; showPanel(); };
-    canvas.addEventListener('click',   advance);
-    overlay.addEventListener('keydown', e => { if (e.code === 'Space') advance(); });
+    const _keyHandler = e => { if (e.code === 'Space' || e.code === 'Enter') advance(); };
+    window.addEventListener('keydown', _keyHandler);
+    canvas.addEventListener('click', advance);
 
     showPanel();
   }

@@ -3,7 +3,7 @@
 //  transitions, active entity lists
 // ═══════════════════════════════════════════════════════════
 import { TILE, SOLID_TYPES, FISHABLE_WATER, T } from './Renderer.js';
-import { SCREEN_COLS, SCREEN_ROWS, WORLD_COLS, WORLD_ROWS, buildEraWorld, ENEMY_DEFS, FISH_TABLES } from './EraData.js';
+import { SCREEN_COLS, SCREEN_ROWS, WORLD_COLS, WORLD_ROWS, buildEraWorld, ENEMY_DEFS } from './EraData.js';
 import { NPC } from './NPC.js';
 import { Enemy } from './Enemy.js';
 import { DroppedItem } from './DroppedItem.js';
@@ -60,7 +60,6 @@ export class World {
 
     // Spawn enemies based on era def (only in row 0, 2, 3 screens)
     if (this.screenRow !== 1) {
-      const era  = { id:eraId, enemies: [] };
       const defs = eraId >= 0 ? [ENEMY_DEFS[_eraEnemies(eraId)[this.screenCol % 2]]] : [];
       defs.filter(Boolean).forEach((def, i) => {
         const ex = (3 + i * 5) * TILE;

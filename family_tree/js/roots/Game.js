@@ -13,8 +13,8 @@ import { CHARACTERS, getCharacter } from './CharacterData.js';
 import { NPC_DATA, CROP_ITEMS }     from './NpcData.js';
 import { ERAS, FISH_TABLES, SCREEN_COLS, SCREEN_ROWS } from './EraData.js';
 import {
-  TILE, T, setEra,
-  drawSky, drawTiles, drawBobber, drawDroppedItem,
+  TILE, setEra,
+  drawSky, drawTiles, drawBobber,
 } from './Renderer.js';
 
 // ── Game states ──────────────────────────────────────────
@@ -323,10 +323,7 @@ export class Game {
       this.world.update(dt, this.player, this);
     }
 
-    // Fishing dip trigger
-    if (this.player.fishTimer > 0 && !this.player.fishDipped) {
-      if (Math.random() < dt * 0.6) this.player.triggerDip?.();
-    }
+    // Fishing dip is handled internally by Player.update() via setTimeout
 
     // ── Time of day ────────────────────────────────────
     this._timeOfDay = (this._timeOfDay + dt / 600) % 1; // full cycle ~10min
