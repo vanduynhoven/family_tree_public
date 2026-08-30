@@ -40,10 +40,9 @@ export class Game {
     this._eraId = idx;
     setEra(idx);
     this.world.loadEra(idx, NPC_DATA);
-    // Use the first screen's defined spawn point
-    const spawnPos = this.world.screen?.spawn;
-    this.player.x = (spawnPos ? spawnPos.c : Math.floor(SCREEN_COLS/2)) * TILE + 4;
-    this.player.y = (spawnPos ? spawnPos.r : SCREEN_ROWS - 3)           * TILE + 4;
+    const sp = this.world.screen?.spawn;
+    this.player.x = (sp?.c ?? 10) * TILE + 4;
+    this.player.y = (sp?.r ?? 7)  * TILE + 4;
     this.engine.cameraX = 0; this.engine.cameraY = 0;
     this._dialogNPC = null;
     document.getElementById('dialog').style.display='none';
@@ -104,6 +103,11 @@ export class Game {
 
   _startDialog(npc) {
     this._dialogNPC = npc;
+    // NPC faces the player
+    const dx = this.player.cx - npc.cx, dy = this.player.cy - npc.cy;
+    if(Math.abs(dx) > Math.abs(dy)) npc.facing = dx > 0 ? 'right' : 'left';
+    else npc.facing = dy > 0 ? 'down' : 'up';
+    npc.wanderDx = 0; npc.wanderDy = 0; // stop wandering
     // Build NPC object for UI
     const uiNPC = {
       name: npc.name,
@@ -127,15 +131,13 @@ export class Game {
     if(this.world.transition) {
       const done = this.world.updateTransition(dt);
       this._drawTransition(frame);
-    if(done) {
-      // Position player at new screen's spawn point
-      const sp = this.world.screen?.spawn;
-      if(sp) {
-        this.player.x = sp.c * TILE + 4;
-        this.player.y = sp.r * TILE + 4;
+      if(done) {
+        // Place player at the matching entry point on the new screen
+        const pos = this.world.entryPosition(done.dir, done.entryPos);
+        this.player.x = pos.x;
+        this.player.y = pos.y;
+        this.ui.showScreenTitle(this.world.screen?.title || '');
       }
-      this.ui.showScreenTitle(this.world.screen?.title || '');
-    }
       return;
     }
 
@@ -146,7 +148,7 @@ export class Game {
 
     // ── Check screen exit ───────────────────────────────────
     const exitDir = this.world.checkScreenExit(this.player);
-    if(exitDir) this.world.startTransition(exitDir);
+    if(exitDir) this.world.startTransition(exitDir, this.player);
 
     // ── Check portal proximity ──────────────────────────────
     if(this.world.atPortal(this.player) && !this._dialogNPC && engine.consumeAction()) {
@@ -156,8 +158,10 @@ export class Game {
     // ── Keyboard interact ───────────────────────────────────
     if(engine.consumeAction()) this.interact();
 
-    // ── World update (NPCs wander, enemies chase) ───────────
-    this.world.update(dt, this.player);
+    // ── World update (NPCs wander, enemies chase) — paused during dialog ──
+    if(!this._dialogNPC) {
+      this.world.update(dt, this.player);
+    }
 
     // ── Camera ──────────────────────────────────────────────
     engine.updateCamera(this.player);

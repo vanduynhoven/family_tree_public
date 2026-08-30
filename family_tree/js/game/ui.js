@@ -166,22 +166,22 @@ export class UI {
                      '#1e5a26','#6a5a4a','#b07840','#5a3010'];
     if(map) for(let r=0;r<SCREEN_ROWS;r++) for(let c=0;c<SCREEN_COLS;c++) {
       const t=map[r]?.[c]??0;
-      ctx.fillStyle=TILE_COLS[t]||'#333';
-      ctx.fillRect(mmX+c*3,mmY+r*3,3,3);
+      ctx.fillStyle=TILE_COLS[t]||'#333'; ctx.fillRect(mmX+c*3,mmY+r*3,3,3);
     }
-    // Player
     ctx.fillStyle='#fff';
     const pc=~~(player.cx/48), pr=~~(player.cy/48);
     ctx.fillRect(mmX+pc*3-1,mmY+pr*3-1,5,5);
-    // NPCs
     ctx.fillStyle='#f39c12';
     for(const n of world.activeNPCs) ctx.fillRect(mmX+~~(n.cx/48)*3,mmY+~~(n.cy/48)*3,3,3);
-    // Enemies
     ctx.fillStyle='#e74c3c';
     for(const e of world.activeEnemies) ctx.fillRect(mmX+~~(e.cx/48)*3,mmY+~~(e.cy/48)*3,3,3);
-    // Portals
     if(map) for(let r=0;r<SCREEN_ROWS;r++) for(let c=0;c<SCREEN_COLS;c++) {
       if(map[r]?.[c]===12){ctx.fillStyle='#c080ff';ctx.fillRect(mmX+c*3,mmY+r*3,4,4);}
     }
+    // Grid position indicator
+    ctx.fillStyle='rgba(0,0,0,0.7)';
+    ctx.fillRect(mmX-2, mmY+mmH+4, mmW+4, 14);
+    ctx.fillStyle='#888'; ctx.font='9px monospace'; ctx.textAlign='center';
+    ctx.fillText(`[${world.gridRow+1},${world.gridCol+1}] of 4×4`, mmX+mmW/2, mmY+mmH+14);
   }
 }
