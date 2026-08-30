@@ -214,3 +214,61 @@ Fairman Campbell (1912-1990) remains partially mysterious. The most promising le
 3. **Father unknown** - needs further research in marriage and census records
 
 The unusual first name "Fairman" may be a key - it could represent his mother's maiden name or another family surname, which would open new research avenues.
+
+---
+
+# ADDENDUM — Research Cycle 2026-08-30 (Father & Scottish/Irish Origins)
+
+## Objective
+Resolve the two open questions: (1) Who was Fairman Campbell's father? (2) Are there Scottish or Irish origins to the Red Wing Campbell family?
+
+## What Was Checked This Cycle
+
+| Source | Query | Result |
+|--------|-------|--------|
+| Web — census index | "Fairman Campbell 1912 ... 1920 census parents Goodhue County" | Only microfilm reel indexes (archive.org 14th census reels 832-839 for Goodhue Co.) and Goodhue County history books surfaced. **No open, name-indexed household record for Fairman Campbell.** |
+| Web — obituary | "Genevieve Campbell Red Wing 1882 1972 obituary husband children" | Only unrelated modern Genevieve Campbells (2018, 2026). **The 1972 Red Wing obituary is not digitized / not openly searchable.** |
+| FindAGrave — Genevieve Campbell ([94460048](https://www.findagrave.com/memorial/94460048/genevieve-campbell)) | Direct fetch of memorial page | Bare memorial: birth 1882, death 1972, Calvary Cemetery. **NO maiden name, NO spouse, NO linked family members, NO bio.** Two grave photos only. Cannot confirm she is Fairman's mother from this record alone. |
+| Web — "Fairman" as surname/maiden name | "'Fairman' Campbell marriage Minnesota ... maiden name given name" | No Campbell–Fairman marriage record found; Minnesota Official Marriage System (moms.mn.gov) is a search portal, not open-indexed here. |
+| Web — Irish origin | "Campbell family Belle Creek ... St Columbkill Irish Catholic ... Ireland" | Confirmed community context (see Origins finding below). No specific Campbell immigrant ancestor named. |
+
+## Finding 1 — Father Remains UNCONFIRMED (evidence: none / dead-end this cycle)
+Fairman Campbell's father could not be identified from any openly available source. The two records that would name him directly — the **1910 & 1920 US Federal Census** (household listing) and **Genevieve Campbell's 1972 obituary** — are either paywalled (Ancestry) or not digitized. The FindAGrave memorial for the candidate mother (Genevieve) carries no spouse or family link. **No father was confirmed, so no individual/family was added to the GEDCOM this cycle** (per the "confirmed findings only" rule).
+
+**Sourced-record leads that require paid/offline access to close:**
+1. Ancestry collection 28685 — *A History of Goodhue County, Minnesota* (Red Wing, 1935) — may contain a Campbell family sketch.
+2. 1920 Federal Census, Goodhue County MN (archive.org microfilm reels 832-839; Family­Search image-only) — would show 8-year-old Fairman in his parents' household.
+3. Minnesota Official Marriage System (moms.mn.gov) — a Genevieve + [?] Campbell marriage ~1905-1912, Goodhue County.
+4. Calvary Cemetery (Red Wing) sexton plot records — family plots are typically contiguous; the male buried beside Genevieve is the prime father candidate.
+
+## Finding 2 — Scottish/Irish Origins: IRISH CATHOLIC context is STRONG; specific origin UNCONFIRMED (evidence: moderate)
+The circumstantial case points **Irish** rather than Scottish, though the surname Campbell is at home in both:
+- **St. Columbkille** (the Red Wing / Belle Creek parish named in the brief) is explicitly an Irish-and-Scottish patron: St. Columb was "born in 521 in Donegal, Ireland ... the first missionary to Scotland" (saintcolumbkille.org; stcolumbkille.net). Parishes were routinely named by the immigrant community that founded them.
+- **Belle Creek Township** appears in Goodhue County Irish-settlement listings alongside Bellechester, Cherry Grove and Pine Island (Goodhue County history PDF), consistent with the established mid-1840s-onward Irish Catholic migration to the area.
+- The family's burial in **Calvary Cemetery (Catholic)** and devout Catholic naming ("Ann Frances Mary") fit the Irish Catholic pattern far better than the predominantly Presbyterian Scots-Campbell profile.
+- **Assessment:** Balance of evidence favors an **Irish Catholic** Campbell origin (plausibly Co. Mayo/Galway/Clare emigration streams that fed the MN Irish colonies), but no specific immigrant ancestor, ship, or county of origin has been documented. This stays **moderate/inferential**, not proven.
+
+## Finding 3 — "Fairman" given-name hypothesis: still UNRESOLVED (evidence: weak)
+No Campbell–Fairman marriage or a Fairman family in Goodhue County was located to confirm that "Fairman" is the mother's maiden name carried as a given name. The hypothesis remains the single most promising key to the paternal/maternal identity but is unproven.
+
+## GEDCOM Status
+No change. `@I117@` (Fairman Campbell) retains birth 1912 Red Wing, death 20 Aug 1990. Genevieve Campbell was **not** added as mother because her relationship is inferential (same cemetery, same contributor "Mookie", fitting age) and unconfirmed by any record naming the relationship. Adding her would introduce an unsourced link into the tree.
+
+## Recommendation
+The paternal line cannot be closed from free online sources. To resolve it, the researcher (Arthur) should pull ONE of these paid/offline records, any of which would likely name the father in a single document:
+1. **1920 US Census, Red Wing/Goodhue Co.** on Ancestry or FamilySearch (login) — highest value, names the whole household.
+2. **Genevieve Campbell's 1972 obituary** via Goodhue County Historical Society / Red Wing Republican Eagle archive — names surviving children (would confirm Fairman as son) and her husband.
+3. **Calvary Cemetery plot map** (Diocese of Winona-Rochester / cemetery office, 651-385-xxxx) — identifies the man buried in Genevieve's plot.
+
+## Verification Against Brief
+- Q "Who is Fairman's father?" → **Unresolved; documented dead-end with sourced next steps.** Honest `new_findings_count` on the father = 0.
+- Q "Scottish/Irish origins?" → **Answered at the community level: Irish Catholic context (moderate); specific origin unconfirmed.**
+
+## Sources Added This Cycle
+- saintcolumbkille.org — "Who is St. Columbkille" (Donegal, Ireland; first missionary to Scotland)
+- stcolumbkille.net/history — St. Columbkille founding
+- Goodhue County history PDF (filesusr.com ugd/3d0a31...) — Belle Creek among Irish-settled townships
+- archive.org — 14th Census of Population 1920, Goodhue Co. reels 832-839 (image microfilm, not name-indexed)
+- ancestry.com/search/collections/28685 — *A History of Goodhue County, Minnesota* (1935)
+- FindAGrave 94460048 (Genevieve Campbell) — confirmed bare memorial, no family links
+- moms.mn.gov — Minnesota Official Marriage System (search portal)
