@@ -104,60 +104,6 @@ export const NPC_DATA = {
     },
   ],
 
-  '0_2_0': [  // River crossing
-    {
-      gedcomId: null,
-      name: 'River Fisherman',
-      given: 'Pieter',
-      era: 0, spawnR: 8, spawnC: 8,
-      bodyColor: '#404a30', hairColor: '#2a2010', skinColor: '#c09050',
-      lines: {
-        generic: [
-          { dutch:'Goedemorgen! [Good morning!]', en:'The perch are biting today.' },
-          'Stand near the water and cast your line. Be patient — the fish come to those who wait.',
-          { dutch:'Vis is goed eten. [Fish is good food.]', en:'Better than tax collector stew!' },
-        ],
-        repeat1: [
-          'Back again? The eel were running last night, just after dusk.',
-          'My father taught me: face downstream and let the line drift. The fish come to you.',
-          { dutch:'Geduld is alles. [Patience is everything.]', en:'In fishing and in life.' },
-        ],
-        repeat2: [
-          'I have fished this river for thirty years. I know every bend and every rock.',
-          'The perch like the shaded spots under the willows. Try there in the afternoon.',
-          'A traveller gave me a Dutch coin last spring. Never saw one before.',
-        ],
-      },
-    },
-  ],
-
-  '0_3_0': [  // Tavern (innkeeper)
-    {
-      gedcomId: null,
-      name: 'Innkeeper',
-      given: 'Marta',
-      era: 0, spawnR: 5, spawnC: 6,
-      bodyColor: '#803020', hairColor: '#3a1a08', skinColor: '#d0a060',
-      isInnkeeper: true,
-      lines: {
-        generic: [
-          { dutch:'Rust een beetje! [Rest a little!]', en:'You look tired, traveller.' },
-          'Give me a herb or a fish and I will give you a bed. Sleep well and wake refreshed.',
-        ],
-        repeat1: [
-          'You again! Sit down, sit down. The fire is warm tonight.',
-          'I had a merchant from Utrecht pass through yesterday. Strange times.',
-          'Do you need a rest? Bring me something from the fields and we will settle the account.',
-        ],
-        repeat2: [
-          { dutch:'Welkom terug, vriend. [Welcome back, friend.]', en:'You are becoming a regular here.' },
-          'The van Duinhoven family? Good people. Quiet, hardworking, honest.',
-          'I\'ve kept this inn for twenty years. Everyone passes through eventually.',
-        ],
-      },
-    },
-  ],
-
   // ── Era 1 · 1660 · Dutch Golden Age ──────────────────
 
   '1_1_1': [
@@ -211,28 +157,6 @@ export const NPC_DATA = {
   ],
 
   // ── Era 3 · 1872 · Industrial Noord-Brabant ─────────
-
-  '3_1_1': [  // Village centre — clue NPC points to south fields
-    {
-      gedcomId: null,
-      name: 'Village Baker',
-      given: 'Dries',
-      era: 3, spawnR: 7, spawnC: 8,
-      bodyColor: '#d0a840', hairColor: '#6a4010', skinColor: '#c89050',
-      lines: {
-        generic: [
-          { dutch:'Versgebakken brood! [Freshly baked bread!]', en:'Best in the village.' },
-          'You\'re looking for Marianus? He tends the south fields every morning until the church bell.',
-          { dutch:'Ga naar de velden in het zuiden. [Go to the fields in the south.]', en:'That is where you\'ll find him.' },
-          'By midday he passes through the village on his way to vespers.',
-        ],
-        repeat1: [
-          'The harvest looks good. Marianus said the same this morning.',
-          { dutch:'Goede grond, goede oogst. [Good soil, good harvest.]', en:'' },
-        ],
-      },
-    },
-  ],
 
   '3_2_1': [  // South fields — Marianus works here mornings
     {
@@ -295,31 +219,6 @@ export const NPC_DATA = {
           { dutch:'Ze is een goede vrouw. [She is a good woman.]', en:'Twelve children and never a complaint.' },
           'She will outlive me by three years. She dies in Uden, December 1952.',
           'Remember her name: Anna Maria van den Elzen. She deserves to be remembered.',
-        ],
-      },
-    },
-  ],
-
-  '3_2_2': [  // Factory area — fishing canal
-    {
-      gedcomId: null,
-      name: 'Factory Worker',
-      given: 'Hendrik',
-      era: 3, spawnR: 9, spawnC: 11,
-      bodyColor: '#2a1a08', hairColor: '#1a0a00', skinColor: '#c08040',
-      lines: {
-        generic: [
-          { dutch:'De fabriek is zwaar werk. [The factory is hard work.]', en:'But the canal here — the eel are fat this time of year.' },
-          'Fish in the canal after your shift. It feeds the family on days the pay falls short.',
-        ],
-        repeat1: [
-          'The overseer cut our lunch break again today. Half an hour. Half!',
-          { dutch:'Maar wat kan je doen? [But what can you do?]', en:'A man must feed his children.' },
-          'The eel were good last night. Cast near the old mill wheel.',
-        ],
-        repeat2: [
-          'I heard talk of a strike in Utrecht. The men there are braver than us.',
-          'Or perhaps just hungrier. Hard to say which is which these days.',
         ],
       },
     },
@@ -407,23 +306,6 @@ export const NPC_DATA = {
           'You are looking for the women of this family.',
           'We do not appear in many records. But we carried this family on our backs across an ocean.',
           { dutch:'Vrouwen maken de wereld. [Women make the world.]', en:'The men get the names. We do the work.' },
-        ],
-      },
-    },
-  ],
-
-  '4_0_2': [  // Deck — fishing spot
-    {
-      gedcomId: null,
-      name: 'Ship Steward',
-      given: 'Thomas',
-      era: 4, spawnR: 5, spawnC: 10,
-      bodyColor: '#1a2a3a', hairColor: '#1a1a1a', skinColor: '#d0b080',
-      lines: {
-        generic: [
-          'The flying fish leap alongside the ship at dawn. Quite a sight.',
-          'You can cast a line from the aft deck railing. The Atlantic is full of surprises.',
-          { dutch:'Vissen van een schip is heel anders dan van de kant. [Fishing from a ship is very different from the shore.]', en:'The sea moves under you.' },
         ],
       },
     },
@@ -582,30 +464,165 @@ export const NPC_DATA = {
 
   // ── Era 8 · 2026 · Haarlem — Grote Markt & Tierney's ─
 
-  '8_3_2': [  // Grote Markt — Tierney's pub + flower market
+  // ── Era 8 · 2026 · Haarlem — Raven's best friend Romijn ──
+  '8_0_1': [
     {
       gedcomId: null,
-      name: 'Tierney\'s Landlord',
-      given: 'Padraig',
+      name: 'Romijn',
+      given: 'Romijn',
+      era: 8, spawnR: 7, spawnC: 12,
+      bodyColor: '#c06040', hairColor: '#d4a020', skinColor: '#d8b890',
+      schedule: [
+        { time: 0.1,  r: 5,  c: 10 },
+        { time: 0.35, r: 7,  c: 14 },
+        { time: 0.55, r: 9,  c: 11 },
+        { time: 0.75, r: 6,  c: 12 },
+        { time: 0.9,  r: 5,  c: 10 },
+      ],
+      lines: {
+        generic: [
+          { dutch:'Hoi! Ben jij een vriend van Raven? [Hi! Are you a friend of Raven\'s?]', en:'' },
+          'We cycle to school together every morning. She\'s always at the bike shed when I arrive.',
+          { dutch:'Raven is mijn beste vriendin. [Raven is my best friend.]', en:'We\'ve been friends since we were four.' },
+          'She always picks the purple tulips at the Saturday market. I go for yellow.',
+        ],
+        repeat1: [
+          { dutch:'Jij weer! [You again!]', en:'How is the journey going?' },
+          'Raven told me about the old journal she found. She showed me some of the photos.',
+          { dutch:'Heel bijzonder, die familie. [Very special, that family.]', en:'Going all the way back to 1539.' },
+        ],
+        repeat2: [
+          'We\'re doing a school project together about Dutch-American history. Raven is obsessed.',
+          { dutch:'Ze wil alles weten. [She wants to know everything.]', en:'I can\'t keep up.' },
+          'But honestly? I learn so much just being her friend.',
+        ],
+        heart2: [
+          'Can I tell you a secret?',
+          'When Raven first got here from America she didn\'t speak any Dutch at all.',
+          { dutch:'Nu spreekt ze beter dan ik! [Now she speaks better than me!]', en:'I\'m a bit jealous.' },
+        ],
+        raven: [
+          { dutch:'RAVEN! Eindelijk! [RAVEN! Finally!]', en:'I\'ve been waiting at the canal for twenty minutes!' },
+          'The tulips are in at the flower stall. She saved the purple ones for you.',
+          { dutch:'We gaan toch naar Tierney\'s na de markt? [We\'re still going to Tierney\'s after the market?]', en:'' },
+        ],
+      },
+    },
+  ],
+
+  // ── Era 8 · 2026 · Haarlem — Starling's best friend Liv ──
+  '8_1_1': [
+    {
+      gedcomId: null,
+      name: 'Liv',
+      given: 'Liv',
+      era: 8, spawnR: 8, spawnC: 11,
+      bodyColor: '#e06080', hairColor: '#c03040', skinColor: '#d8c0a0',
+      schedule: [
+        { time: 0.15, r: 6,  c: 12 },
+        { time: 0.4,  r: 9,  c: 9  },
+        { time: 0.6,  r: 7,  c: 11 },
+        { time: 0.8,  r: 5,  c: 13 },
+      ],
+      lines: {
+        generic: [
+          { dutch:'Hallo! Ken jij Starling? [Hello! Do you know Starling?]', en:'She is my best friend.' },
+          'We play in the courtyard behind her house almost every day.',
+          'She always brings the best snacks. Her dad makes really good boterkoek.',
+          { dutch:'Starling is grappig. [Starling is funny.]', en:'She makes up the best stories.' },
+        ],
+        repeat1: [
+          { dutch:'Jij bent terug! [You\'re back!]', en:'' },
+          'Starling and I found a really cool beetle in the garden yesterday. We let it go after one day.',
+          { dutch:'Starling zei dat het haar "tijdreisboulevard" was. [Starling said it was her "time travel boulevard".]', en:'I don\'t know what that means but it sounded very important.' },
+        ],
+        repeat2: [
+          'Do you know about the old family book? Starling showed me the pictures of the old ships.',
+          { dutch:'Heel oud, die foto\'s. [Very old, those photos.]', en:'From before our grandparents were born.' },
+          'Starling says her great-great-great-great-great-great grandfather lived in a place called Aarle-Rixtel.',
+          { dutch:'Dat klinkt als een sprookje. [That sounds like a fairy tale.]', en:'But she says it\'s real!' },
+        ],
+        heart2: [
+          'Starling told me she wants to go see where her family is from one day.',
+          { dutch:'Ik ga mee! [I\'m coming too!]', en:'She said we can go together when we\'re bigger.' },
+        ],
+        starling: [
+          { dutch:'STARLING! Daar ben je! [STARLING! There you are!]', en:'I\'ve been looking everywhere for you!' },
+          'I found a really shiny stone by the canal. I kept it for you.',
+          { dutch:'Wil je spelen? [Do you want to play?]', en:'We could go to the courtyard!' },
+        ],
+      },
+    },
+  ],
+
+  // ── Era 8 · 2026 · Haarlem — Saturday market sausage & garlic vendor ──
+  // Henk runs a stall on the Grote Markt every Saturday.
+  // Sells dried sausages (worst, salami) and smoked garlic — Arthur is a regular.
+  '8_2_3': [
+    {
+      gedcomId: null,
+      name: 'Henk',
+      given: 'Henk',
+      era: 8, spawnR: 7, spawnC: 9,
+      bodyColor: '#4a3820', hairColor: '#2a1808', skinColor: '#c8a060',
+      lines: {
+        generic: [
+          { dutch:'Verse worst en gerookte knoflook! [Fresh sausage and smoked garlic!]', en:'Best on the whole market — ask anyone.' },
+          'Arthur! Your usual? Two knots of garlic sausage and a head of smoked garlic?',
+          { dutch:'De knoflook komt rechtstreeks van de boer. [The garlic comes straight from the farmer.]', en:'Smoked here in Haarlem, nowhere else.' },
+          'The smoked garlic goes in everything. Once you start, you can\'t stop.',
+        ],
+        repeat1: [
+          { dutch:'Jij weer! Goedemorgen! [You again! Good morning!]', en:'' },
+          'The new batch of chorizo came in this week. Arthur already bought three.',
+          { dutch:'Verse worst is kunst. [Fresh sausage is art.]', en:'That\'s what my grandfather always said.' },
+        ],
+        repeat2: [
+          'I\'ve had this stall for eighteen years. Same spot, every Saturday.',
+          { dutch:'De markt is mijn leven. [The market is my life.]', en:'' },
+          'Arthur brings the girls sometimes. Starling always wants to smell the garlic. Raven pretends it\'s too strong.',
+        ],
+        heart2: [
+          'I\'ll tell you a secret about the smoked garlic.',
+          'We smoke it with applewood for six hours. That\'s the trick.',
+          { dutch:'Vertel het aan niemand. [Don\'t tell anyone.]', en:'Trade secret.' },
+        ],
+        raven: [
+          { dutch:'Raven! Jij vindt het altijd te sterk! [Raven! You always say it\'s too strong!]', en:'' },
+          'Tell your dad the new Ardennes sausage is in. He\'ll want some.',
+          { dutch:'En één gratis worst voor jou. [And one free sausage for you.]', en:'Don\'t tell the others.' },
+        ],
+      },
+      item: { id: 'smoked_garlic', label: 'Smoked Garlic', emoji: '🧄' },
+    },
+  ],
+
+  // Tierney's Irish Pub — Spekstraat 8, Haarlem (real pub, ~30m from Sint-Bavo)
+  // Paul is the owner. Arthur, Raven and Starling go every Saturday after the flower market.
+  '8_3_2': [
+    {
+      gedcomId: null,
+      name: 'Paul — Tierney\'s',
+      given: 'Paul',
       era: 8, spawnR: 11, spawnC: 4,
       bodyColor: '#2a6020', hairColor: '#d03010', skinColor: '#d4a880',
       isInnkeeper: true,
       lines: {
         generic: [
-          'Welcome to Tierney\'s! Best Irish pub in Haarlem — and they know it.',
+          'Welcome! I\'m Paul — I own this place. Tierney\'s Irish Pub, best spot in Haarlem.',
           'Arthur and the girls come in every Saturday after the flower market. Good family.',
-          'Full Irish breakfast, Guinness on tap, and a warm fire in winter.',
-          'Rest here a while — give me a fish or a flower from the market and I\'ll feed you well.',
+          'Full Irish breakfast, Guinness on tap, and a warm fire in winter. What can I get you?',
+          'Rest here a while — bring me a flower from the market and the lunch is on me.',
         ],
         repeat1: [
-          'Back again? Pull up a chair. The stew is on.',
-          'The flower market outside was busy this morning. Raven bought tulips again.',
-          { dutch:'Gezelligheid, dat is het! [Cosy company, that\'s it!]', en:'That\'s what a pub is for.' },
+          'Back again! Pull up a chair. The stew is on.',
+          'Raven was in earlier asking about the purple tulips. She headed to the market first.',
+          { dutch:'Gezelligheid, dat is het! [Cosy company, that\'s it!]', en:'That\'s what a good pub is for.' },
         ],
         repeat2: [
           'You know, Haarlem reminds me of Galway in some ways. All that water.',
-          'Arthur was in here last weekend telling me about his family research.',
-          'Five hundred years of Dutch ancestry. Remarkable.',
+          'Arthur was in last weekend telling me about his family research.',
+          'Five hundred years of Dutch ancestry. Remarkable man.',
         ],
         heart2: [
           'Let me tell you a secret — we do a special Dutch-Irish fusion menu on Sundays.',
@@ -614,62 +631,17 @@ export const NPC_DATA = {
         ],
         raven: [
           { dutch:'Raven! Jouw favoriete tafeltje is vrij! [Raven! Your favourite table is free!]', en:'' },
-          'The usual? Chips and a lemonade?',
-          'Your dad was in earlier asking if you\'d passed through. He\'ll be along.',
+          'The usual? Chips and a lemonade? Your dad will be along.',
+          'Lies from the flower stall saved you the purple tulips again.',
         ],
         starling: [
           'Starling! Look how much you\'ve grown.',
           'I\'ve got your favourite orange juice behind the bar.',
-          'The flower lady outside saved you a little tulip bouquet. She always does.',
+          'Come in, come in — your dad\'s already at the corner table.',
         ],
       },
-    },
-    {
-      gedcomId: null,
-      name: 'Flower Market Vendor',
-      given: 'Lies',
-      era: 8, spawnR: 9, spawnC: 10,
-      bodyColor: '#c06080', hairColor: '#d4a020', skinColor: '#d8b880',
-      lines: {
-        generic: [
-          'Fresh tulips, roses, dahlias — straight from the Bollenstreek, every Saturday!',
-          { dutch:'Verse bloemen voor een mooie dag! [Fresh flowers for a beautiful day!]', en:'' },
-          'Arthur\'s girls always stop here first, before they go into Tierney\'s.',
-          'A bunch of tulips makes a wonderful gift. Only three euros.',
-        ],
-        repeat1: [
-          'The dahlias came in this morning — gorgeous reds and oranges.',
-          { dutch:'De tulpen van vandaag zijn bijzonder mooi. [Today\'s tulips are particularly beautiful.]', en:'' },
-          'Raven always picks the purple ones. Good taste, that child.',
-        ],
-        repeat2: [
-          'I\'ve been selling flowers on this square for twenty-two years.',
-          'Rain or shine, the Saturday market runs. This square has had a market since medieval times.',
-          { dutch:'De Grote Markt is van ons allemaal. [The Grote Markt belongs to all of us.]', en:'' },
-        ],
-        heart2: [
-          'You\'re a regular now! I\'ll set a bunch aside for you each week.',
-          'The bulbs come from just outside Haarlem — the Keukenhof fields. World-famous.',
-          'Did you know Haarlem was the centre of the global tulip trade in the 1600s?',
-          { dutch:'Dat wist je niet, hè? [You didn\'t know that, did you?]', en:'' },
-        ],
-        raven: [
-          'Raven! The purple tulips just arrived — I saved you some.',
-          'Your Dutch is getting so much better every week.',
-          { dutch:'Mag ik de paarse, alstublieft? [May I have the purple ones, please?]', en:'That\'s exactly how you say it.' },
-          'Here — take a bunch. Consider it a Dutch lesson.',
-        ],
-        starling: [
-          'Starling, little one! Look at these sunflowers — as tall as you!',
-          'I saved the little rainbow bouquet. I know you love the colours.',
-          { dutch:'Bloemen zijn vrolijk. [Flowers are cheerful.]', en:'Just like you.' },
-        ],
-      },
-      item: { id:'haarlem_tulips', label:'Haarlem Tulips', emoji:'🌷' },
     },
   ],
-
-  // ── Era 8 · 2026 · Haarlem — Home (Leidsevaart 276) ──
 
   '8_1_0': [  // The family home screen
     {
@@ -698,6 +670,15 @@ export const NPC_DATA = {
       },
     },
   ],
+
+  // ── Era 8 · 2026 · Haarlem — Raven's best friend Romijn ──
+  // Romijn lives nearby on the Leidsevaart — same street, couple of doors down.
+  // She and Raven go to the same school and always cycle to the Grote Markt together.
+
+  // ── Era 8 · 2026 · Haarlem — Starling's best friend Liv ──
+  // Liv is a bit younger than Starling but they are inseparable.
+  // She lives two streets over and comes to play almost every day.
+
 };
 
 // Crop-patch side-quests: simple one-step harvest items per era

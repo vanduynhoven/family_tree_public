@@ -719,12 +719,15 @@ export class Game {
       const text = await fetch('./vanduynhoven_family.ged').then(r => r.ok ? r.text() : null);
       if (!text) return;
       this._gedcom = this._parseGEDCOM(text);
+      this._familyMemberSet = null; // rebuilt on first _buildNpcData call
     } catch { /* GEDCOM load is optional — static NPC_DATA fallback */ }
   }
 
   _parseGEDCOM(text) {
     const individuals = new Map();
+    const families    = new Map();  // famId → { husb, wife, chil[] }
     let cur = null;
+    let curFam = null;
     let inBirt = false, inDeat = false;
 
     for (const rawLine of text.split('\n')) {
@@ -736,14 +739,18 @@ export class Game {
       const lvl = parseInt(level);
 
       if (lvl === 0 && tag.startsWith('@I')) {
+        curFam = null;
         cur = { id:tag, name:'', given:'', surname:'', birthYear:null, birthPlace:'',
                 deathYear:null, occupation:'', sex:'', famc:null, fams:[] };
         individuals.set(tag, cur);
         inBirt = false; inDeat = false;
+      } else if (lvl === 0 && tag.startsWith('@F')) {
+        cur = null;
+        curFam = { id:tag, husb:null, wife:null, chil:[] };
+        families.set(tag, curFam);
       } else if (cur) {
         if (tag === 'NAME') {
           cur.name = value.replace(/\//g, '').trim();
-          // Extract surname from /Surname/ pattern
           const sn = value.match(/\/([^\/]+)\//);
           cur.surname = sn ? sn[1].trim() : '';
           cur.given   = value.replace(/\/[^\/]*\//g, '').trim().split(' ')[0];
@@ -765,17 +772,73 @@ export class Game {
         if (tag === 'PLAC') {
           if (inBirt && !cur.birthPlace) cur.birthPlace = value;
         }
-        // Reset section flags on new level-1 tag
         if (lvl === 1 && tag !== 'BIRT' && tag !== 'DEAT') { inBirt = false; inDeat = false; }
+      } else if (curFam) {
+        if (tag === 'HUSB') curFam.husb = value;
+        if (tag === 'WIFE') curFam.wife = value;
+        if (tag === 'CHIL') curFam.chil.push(value);
       }
     }
-    return { individuals };
+    return { individuals, families };
+  }
+
+  /**
+   * Build the set of GEDCOM IDs eligible to appear as NPCs:
+   * - Anyone whose surname matches a Van Duynhoven variant
+   * - Anyone who is a spouse of such a person (via shared FAM record)
+   */
+  _buildFamilyMemberSet() {
+    if (!this._gedcom) return new Set();
+
+    const { individuals, families } = this._gedcom;
+
+    // All spelling variants of the family surname (case-insensitive match)
+    const SURNAME_VARIANTS = new Set([
+      'van duynhoven','van duijnhoven','van duinhoven',
+      'van dyn hoven','vandynhoven','duynhoven','duijnhoven','duinhoven',
+      // Married-in lines that appear extensively in the GEDCOM
+      'verwegen','van den elzen','cornelissen','van boxtel','van ham',
+      'blaffarts','van grootel','verbruggen','campbell','van der heijden',
+      // Wisconsin branch
+      'van dyn hoven',
+    ]);
+
+    const isVanDuynhoven = (id) => {
+      const p = individuals.get(id);
+      if (!p) return false;
+      return SURNAME_VARIANTS.has((p.surname || '').toLowerCase());
+    };
+
+    // Collect primary family members
+    const eligible = new Set();
+    for (const [id, p] of individuals) {
+      if (SURNAME_VARIANTS.has((p.surname || '').toLowerCase())) {
+        eligible.add(id);
+      }
+    }
+
+    // Add spouses: anyone married to an eligible person via a FAM record
+    for (const [famId, fam] of families) {
+      const husbEligible = fam.husb && eligible.has(fam.husb);
+      const wifeEligible = fam.wife && eligible.has(fam.wife);
+      if (husbEligible && fam.wife) eligible.add(fam.wife);
+      if (wifeEligible && fam.husb) eligible.add(fam.husb);
+    }
+
+    return eligible;
   }
 
   _buildNpcData(eraId) {
     // Start with static NPC_DATA (hand-authored, richer dialog)
     const result = {};
-    const staticKeys = new Set(); // gedcomIds already covered by static data
+    const staticKeys = new Set();
+
+    // Build the set of eligible family members (Van Duynhoven + spouses)
+    // Cache it — this is called on every screen transition
+    if (!this._familyMemberSet && this._gedcom) {
+      this._familyMemberSet = this._buildFamilyMemberSet();
+    }
+    const eligible = this._familyMemberSet || new Set();
 
     for (const [key, arr] of Object.entries(NPC_DATA)) {
       if (!key.startsWith(`${eraId}_`)) continue;
@@ -789,12 +852,16 @@ export class Game {
       });
     }
 
-    // Auto-generate NPC entries for every GEDCOM individual in this era
-    // who isn't already covered by static NPC_DATA
+    // Auto-generate NPC entries for every eligible GEDCOM individual in this era
+    // "Eligible" = Van Duynhoven family member or spouse of one
     if (this._gedcom) {
       for (const [id, gd] of this._gedcom.individuals) {
         if (staticKeys.has(id)) continue;       // hand-authored entry exists
         if (!gd.name || !gd.name.trim()) continue; // unnamed
+
+        // *** FAMILY FILTER: only Van Duynhoven family and their spouses ***
+        if (!eligible.has(id)) continue;
+
         const assignedEra = _gedcomEraId(gd.birthYear);
         if (assignedEra !== eraId) continue;
 
@@ -858,7 +925,9 @@ export class Game {
     if (!this._gedcom) {
       return Object.keys(NPC_DATA).reduce((s, k) => s + (NPC_DATA[k]?.length || 0), 0);
     }
-    return this._gedcom.individuals.size;
+    // Only count eligible family members + spouses
+    if (!this._familyMemberSet) this._familyMemberSet = this._buildFamilyMemberSet();
+    return this._familyMemberSet.size;
   }
 
   _bindQuestEvents() {
