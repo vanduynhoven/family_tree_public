@@ -162,6 +162,12 @@
 
   /* Build the toggle button and drop it in a fixed corner. */
   function makeButton() {
+    // Create container for the split button
+    var container = document.createElement('div');
+    container.id = 'kidModeContainer';
+    container.className = 'kid-mode-container';
+
+    // Main kid mode toggle button
     var btn = document.createElement('button');
     btn.id = 'kidModeToggle';
     btn.type = 'button';
@@ -169,7 +175,22 @@
     btn.setAttribute('aria-pressed', 'false');
     btn.setAttribute('title', 'Kid Mode: bigger text, more emojis, and easy word helpers');
     btn.addEventListener('click', toggle);
-    document.body.appendChild(btn);
+
+    // Achievements badge (only visible when kid mode is ON)
+    var achBtn = document.createElement('button');
+    achBtn.id = 'kidModeAchievements';
+    achBtn.type = 'button';
+    achBtn.className = 'kid-mode-achievements';
+    achBtn.setAttribute('title', 'View your Discovery Achievements');
+    achBtn.innerHTML = '\uD83C\uDFC5';
+    achBtn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      showAchievementsPopup();
+    });
+
+    container.appendChild(btn);
+    container.appendChild(achBtn);
+    document.body.appendChild(container);
     syncButton(btn);
     return btn;
   }
@@ -179,6 +200,80 @@
     btn.setAttribute('aria-pressed', on ? 'true' : 'false');
     btn.classList.toggle('on', on);
     btn.innerHTML = on ? '\uD83D\uDC76 Kid Mode: ON' : '\uD83D\uDC76 Kid Mode';
+    
+    // Show/hide achievements badge based on kid mode state
+    var container = document.getElementById('kidModeContainer');
+    if (container) {
+      container.classList.toggle('kid-mode-active', on);
+    }
+    
+    // Update achievements count if available
+    updateAchievementsBadge();
+  }
+
+  function updateAchievementsBadge() {
+    var achBtn = document.getElementById('kidModeAchievements');
+    if (!achBtn || !window.Achievements) return;
+    
+    var state = window.Achievements.getState ? window.Achievements.getState() : null;
+    var defs = window.Achievements.definitions || [];
+    if (!state) return;
+    
+    var earned = 0;
+    for (var i = 0; i < defs.length; i++) {
+      var result = defs[i].check(state);
+      if (result && result.earned) earned++;
+    }
+    
+    // Show count badge if any earned
+    if (earned > 0) {
+      achBtn.innerHTML = '\uD83C\uDFC5<span class="ach-count">' + earned + '</span>';
+    } else {
+      achBtn.innerHTML = '\uD83C\uDFC5';
+    }
+  }
+
+  function showAchievementsPopup() {
+    // Check if popup already exists
+    var existing = document.getElementById('kid-achievements-popup');
+    if (existing) {
+      existing.classList.toggle('open');
+      return;
+    }
+
+    // Create popup
+    var popup = document.createElement('div');
+    popup.id = 'kid-achievements-popup';
+    popup.className = 'kid-achievements-popup open';
+    
+    var closeBtn = document.createElement('button');
+    closeBtn.className = 'popup-close';
+    closeBtn.innerHTML = '\u00D7';
+    closeBtn.addEventListener('click', function() {
+      popup.classList.remove('open');
+    });
+    
+    var content = document.createElement('div');
+    content.className = 'popup-content';
+    content.id = 'kid-achievements-content';
+    
+    popup.appendChild(closeBtn);
+    popup.appendChild(content);
+    document.body.appendChild(popup);
+    
+    // Render achievements into the popup
+    if (window.Achievements && window.Achievements.renderPanel) {
+      window.Achievements.renderPanel(content);
+    } else {
+      content.innerHTML = '<p style="color:#888;text-align:center;padding:20px;">Achievements loading...</p>';
+    }
+    
+    // Close when clicking outside
+    popup.addEventListener('click', function(e) {
+      if (e.target === popup) {
+        popup.classList.remove('open');
+      }
+    });
   }
 
   function toggle() {
@@ -302,6 +397,9 @@
     makeButton();
     apply(isOn());
   }
+
+  // Export badge update function globally so achievements.js can call it
+  window.updateAchievementsBadge = updateAchievementsBadge;
 
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', init);

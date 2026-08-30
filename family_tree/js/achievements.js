@@ -317,6 +317,10 @@
         save(state);
         newlyEarned.forEach(showToast);
         refreshPanels();
+        // Update the kid-mode achievements badge count
+        if (typeof updateAchievementsBadge === 'function') {
+            updateAchievementsBadge();
+        }
         return newlyEarned;
     }
 

@@ -1068,11 +1068,22 @@ body { padding-bottom: 48px !important; }
 /* Floating toggle button (bottom-right, kept clear of the collapsed
    bottom-nav which occupies the lower area). Position is driven by the
    --bottom-nav-clearance custom prop so it tracks the nav's height. */
-.kid-mode-toggle {
+
+/* Container for the split button */
+.kid-mode-container {
     position: fixed;
     right: 16px;
     bottom: calc(var(--bottom-nav-clearance, 58px) + 8px);
     z-index: 200;
+    display: flex;
+    align-items: stretch;
+    border-radius: 26px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+    transition: box-shadow 0.2s;
+}
+.kid-mode-container:hover { box-shadow: 0 6px 22px rgba(0, 0, 0, 0.55); }
+
+.kid-mode-toggle {
     padding: 10px 16px;
     border: 2px solid #f39c12;
     border-radius: 26px;
@@ -1082,14 +1093,102 @@ body { padding-bottom: 48px !important; }
     font-size: 0.9em;
     font-weight: 700;
     cursor: pointer;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
-    transition: transform 0.2s, background 0.2s, box-shadow 0.2s;
+    transition: transform 0.2s, background 0.2s, border-radius 0.2s;
 }
-.kid-mode-toggle:hover { transform: translateY(-2px); box-shadow: 0 6px 22px rgba(0, 0, 0, 0.55); }
+.kid-mode-toggle:hover { transform: translateY(-2px); }
 .kid-mode-toggle.on {
     background: linear-gradient(135deg, #f39c12, #e74c3c);
     color: #fff;
     border-color: #ffd479;
+}
+
+/* When kid mode is active, adjust border radius for split appearance */
+.kid-mode-container.kid-mode-active .kid-mode-toggle {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    border-right: 1px solid rgba(255,255,255,0.3);
+}
+
+/* Achievements badge button */
+.kid-mode-achievements {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 14px;
+    border: 2px solid #ffd479;
+    border-left: none;
+    border-radius: 0 26px 26px 0;
+    background: linear-gradient(135deg, #e74c3c, #c0392b);
+    color: #fff;
+    font-size: 1.1em;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.2s;
+    position: relative;
+}
+.kid-mode-container.kid-mode-active .kid-mode-achievements {
+    display: flex;
+}
+.kid-mode-achievements:hover {
+    background: linear-gradient(135deg, #c0392b, #a93226);
+    transform: scale(1.05);
+}
+.kid-mode-achievements .ach-count {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    background: #27ae60;
+    color: #fff;
+    font-size: 0.65em;
+    font-weight: 800;
+    min-width: 18px;
+    height: 18px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid #1a1a2e;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+}
+
+/* Achievements popup */
+.kid-achievements-popup {
+    position: fixed;
+    inset: 0;
+    z-index: 10000;
+    background: rgba(0,0,0,0.6);
+    backdrop-filter: blur(4px);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+.kid-achievements-popup.open {
+    display: flex;
+}
+.kid-achievements-popup .popup-close {
+    position: absolute;
+    top: 12px;
+    right: 16px;
+    background: none;
+    border: none;
+    color: #aaa;
+    font-size: 2em;
+    cursor: pointer;
+    line-height: 1;
+    z-index: 2;
+}
+.kid-achievements-popup .popup-close:hover { color: #fff; }
+.kid-achievements-popup .popup-content {
+    background: #16213e;
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 20px;
+    padding: 24px;
+    max-width: 800px;
+    width: 95%;
+    max-height: 85vh;
+    overflow-y: auto;
+    position: relative;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
 }
 
 /* Kid Mode active: bigger, friendlier text */
