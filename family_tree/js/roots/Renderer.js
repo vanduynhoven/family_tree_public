@@ -895,7 +895,7 @@ export function drawBobber(ctx, x, y, dipped, frame, handX, handY) {
 }
 
 // ── Minimap ───────────────────────────────────────────────
-export function drawMinimap(ctx, worldCols, worldRows, visitedSet, currentR, currentC, x, y, cellSize=8) {
+export function drawMinimap(ctx, worldCols, worldRows, visitedSet, currentR, currentC, x, y, cellSize=8, portalSet=null) {
   const W2=worldCols*cellSize+6, H2=worldRows*cellSize+6;
   ctx.fillStyle='rgba(0,0,0,0.7)';
   ctx.beginPath(); ctx.roundRect(x-3,y-3,W2,H2,4); ctx.fill();
@@ -903,8 +903,16 @@ export function drawMinimap(ctx, worldCols, worldRows, visitedSet, currentR, cur
   ctx.beginPath(); ctx.roundRect(x-3,y-3,W2,H2,4); ctx.stroke();
   for (let r=0;r<worldRows;r++) for (let c=0;c<worldCols;c++) {
     const key=`${r},${c}`, cur=r===currentR&&c===currentC;
-    ctx.fillStyle=cur?'#f0c040':visitedSet.has(key)?'#6a9050':'#252525';
+    const hasPortal = portalSet?.has(key);
+    ctx.fillStyle = cur ? '#f0c040' : hasPortal ? '#2a0060' : visitedSet.has(key) ? '#6a9050' : '#252525';
     ctx.beginPath(); ctx.roundRect(x+c*cellSize,y+r*cellSize,cellSize-1,cellSize-1,1); ctx.fill();
+    // Portal star marker
+    if (hasPortal) {
+      ctx.fillStyle = '#c080ff';
+      ctx.font = `bold ${cellSize-1}px sans-serif`;
+      ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.fillText('★', x+c*cellSize+(cellSize-1)/2, y+r*cellSize+(cellSize-1)/2);
+    }
     if (cur) { ctx.strokeStyle='rgba(255,255,255,0.5)'; ctx.lineWidth=1; ctx.beginPath(); ctx.roundRect(x+c*cellSize,y+r*cellSize,cellSize-1,cellSize-1,1); ctx.stroke(); }
   }
 }

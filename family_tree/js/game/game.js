@@ -21,6 +21,8 @@ export class Game {
     this._totalNPCs  = Object.values(NPC_DATA).reduce((a,arr)=>a+arr.length,0);
     this._running    = false;
     this._eraId      = 0;
+    this.visitedScreens = new Set();  // tracks explored grid cells this era
+    this.portalScreens  = new Set();  // tracks cells where player found portal
 
     // Wire up onclick on dialog/prompt to game methods
     document.getElementById('dialog').onclick = () => this.advanceDialog();
@@ -49,6 +51,9 @@ export class Game {
     this.music.playTrack(idx);
     this.ui.showScreenTitle(this.world.screen?.title || ERAS[idx]?.name);
     this.ui.renderInventory(this.player.inventory);
+    // Reset visited/portal map for the new era
+    this.visitedScreens = new Set();
+    this.portalScreens  = new Set();
   }
 
   travelToEra(idx) {
@@ -154,6 +159,11 @@ export class Game {
     if(this.world.atPortal(this.player) && !this._dialogNPC && engine.consumeAction()) {
       this.ui.showEraSel();
     }
+
+    // ── Track visited screens and portal locations for minimap ──
+    const sk = this.world.screenKey;
+    this.visitedScreens.add(sk);
+    if(this.world.atPortal(this.player)) this.portalScreens.add(sk);
 
     // ── Keyboard interact ───────────────────────────────────
     if(engine.consumeAction()) this.interact();

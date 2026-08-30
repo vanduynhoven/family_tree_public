@@ -28,6 +28,7 @@ export class SaveManager {
         collectedFacts:JSON.parse(JSON.stringify(game.player.collectedFacts)),
         questState:    game.quests?.serialize() || {},
         visitedScreens:Array.from(game.world.visitedSet),
+        portalScreens: Array.from(game.world.portalSet),
         // Persistent NPC state — hearts + talk counts
         npcFriendship: Object.fromEntries(game._npcFriendship || []),
         npcTalkCount:  Object.fromEntries(game._npcTalkCount  || []),

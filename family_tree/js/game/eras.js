@@ -70,6 +70,17 @@ function roadToEdge(m,sr,sc,side,pos){
   if(side==='down') {while(r<H-1){m[r][c]=T.ROAD;r++;}}
   if(side==='up')   {while(r>0)  {m[r][c]=T.ROAD;r--;}}
 }
+// Carve an L-shaped walkable corridor from (r1,c1) to (r2,c2).
+// Goes horizontally first then vertically (or vice-versa via the corner).
+// Uses the base tile (T.GRASS by default) so it doesn't look like a road.
+function carvePath(m,r1,c1,r2,c2,tile=T.GRASS){
+  // Horizontal leg: r1, c1→c2
+  const dc=c2>c1?1:-1;
+  for(let c=c1;c!==c2;c+=dc) set(m,r1,c,tile);
+  // Vertical leg: r1→r2, c2
+  const dr=r2>r1?1:-1;
+  for(let r=r1;r!==r2+dr;r+=dr) set(m,r,c2,tile);
+}
 
 // ── SCREEN FACTORY ────────────────────────────────────────────
 // Each screen knows which edges connect (right/left/up/down)
@@ -289,7 +300,29 @@ export function buildEraWorld(eraId) {
         case 'wheat':   border(m,T.TREE); fill(m,1,1,H-3,W-3,T.WHEAT); house(m,3,8,6,5); break;
         case 'portal':  border(m,T.ROCK);  fill(m,2,2,H-3,W-3,th.fill2);
                         [[4,8],[4,11],[6,7],[6,12]].forEach(([r2,c2])=>set(m,r2,c2,T.ROCK));
-                        set(m,H_POS,9,T.PORTAL);set(m,H_POS,10,T.PORTAL);set(m,H_POS,11,T.PORTAL); break;
+                        set(m,H_POS,9,T.PORTAL);set(m,H_POS,10,T.PORTAL);set(m,H_POS,11,T.PORTAL);
+                        // For ship era: clear ROCK decorations near spawn row so path stays open
+                        if(eraId===4){
+                          [[4,8],[4,11],[6,7],[6,12]].forEach(([r2,c2])=>set(m,r2,c2,th.fill2));
+                          // Make walkable corridor from top exits straight down to portal row
+                          for(let r2=1;r2<H-1;r2++){set(m,r2,9,T.PLANK);set(m,r2,10,T.PLANK);}
+                        }
+                        break;
+      }
+
+      // ── Guarantee walkable corridor to all portals ──────────────
+      // Scan the map for portal tiles and carve an L-path from spawn to each one.
+      // Also clear a 2-tile zone around every portal so the player can stand on it.
+      // The walkable tile used is GRASS (or PLANK for the ship era so it looks right).
+      const walkTile = (eraId===4) ? T.PLANK : T.GRASS;
+      // Spawn point (before makeScreen sets it — use the same values we're about to use)
+      const spR=H_POS, spC=V_POS;
+      for(let pr=0;pr<H;pr++) for(let pc=0;pc<W;pc++){
+        if(m[pr][pc]===T.PORTAL){
+          carvePath(m,spR,spC,pr,pc,walkTile);
+          clearZone(m,pr,pc,1); // keep portal tile itself intact
+          set(m,pr,pc,T.PORTAL); // restore portal tile after clearZone overwrote it
+        }
       }
 
       // Determine exits based on grid position
@@ -302,6 +335,11 @@ export function buildEraWorld(eraId) {
       // Spawn in center-bottom area
       const spawn={r:H_POS,c:V_POS};
       clearZone(m,spawn.r,spawn.c,2);
+      // Restore walkable base for ship era spawn area
+      if(eraId===4) for(let dr=-2;dr<=2;dr++) for(let dc=-2;dc<=2;dc++) {
+        const tr=spawn.r+dr, tc=spawn.c+dc;
+        if(tr>0&&tr<H-1&&tc>0&&tc<W-1&&m[tr][tc]===T.GRASS) set(m,tr,tc,T.PLANK);
+      }
       grid[row][col]=makeScreen(m,exits,type,spawn);
     }
   }

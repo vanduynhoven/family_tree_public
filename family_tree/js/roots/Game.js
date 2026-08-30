@@ -132,6 +132,15 @@ export class Game {
     this._startLocation = char.startLocation || 'haarlem';
     this.loadEra(resumeEra);
 
+    // Restore visited screens so minimap shows exploration history
+    if (Array.isArray(savedData.visitedScreens)) {
+      savedData.visitedScreens.forEach(k => this.world._visited.add(k));
+    }
+    // Restore portal screens so ★ markers persist
+    if (Array.isArray(savedData.portalScreens)) {
+      savedData.portalScreens.forEach(k => this.world.portalSet.add(k));
+    }
+
     // Override spawn position with saved player position if available
     if (resumePlayerX != null && resumePlayerY != null) {
       this.player.x = resumePlayerX;
@@ -742,6 +751,11 @@ export class Game {
     const atPortal = this.world.atPortal(this.player);
     const atCrop   = this.world.atCrop(this.player);
     const fishable = this.world.isFishable(this.player);
+
+    // Track portal discovery for minimap ★ marker
+    if (atPortal) {
+      this.world.portalSet.add(`${this.world.screenRow},${this.world.screenCol}`);
+    }
 
     if (nearNPC && !this._dialogNPC) {
       this.ui.showPrompt(`💬 Talk to ${nearNPC.data?.given || nearNPC.name} — E`);

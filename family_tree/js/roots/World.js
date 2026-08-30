@@ -15,6 +15,7 @@ export class World {
     this.screenCol  = 1;
     this.transition = null;
     this._visited   = new Set();
+    this.portalSet  = new Set(); // screens where player found a portal (persists across screens)
     this._drops     = [];
     this._npcs      = [];
     this._enemies   = [];
@@ -41,6 +42,7 @@ export class World {
     this.screenCol = startCol;
     this._visited.clear();
     this._visited.add(`${startRow},${startCol}`);
+    this.portalSet.clear(); // reset portal markers for new era
     this._loadScreen(eraId, npcData);
   }
 

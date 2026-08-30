@@ -154,34 +154,76 @@ export class UI {
     setTimeout(()=>t.remove(),3000);
   }
 
-  // Minimap
+  // Minimap — persistent 4×4 world grid view
   drawMinimap(ctx, world, player) {
-    const mmW=SCREEN_COLS*3, mmH=SCREEN_ROWS*3;
-    const mmX=ctx.canvas.width-mmW-8, mmY=56;
-    ctx.fillStyle='rgba(0,0,0,0.75)'; ctx.fillRect(mmX-2,mmY-2,mmW+4,mmH+4);
-    const map=world.map;
-    const TILE_COLS=['#2d6b3a','#5a4a3a','#1a5a9a','#c8b460','#7a6040','#1a5010',
-                     '#787878','#3a7d44','#c8a830','#7a3020','#b07840','#888888',
-                     '#6020c0','#e8eef0','#708090','#0a2a10','#3a6020','#4a3a2a','#8a7060','#7a3020','#0a1828',
-                     '#1e5a26','#6a5a4a','#b07840','#5a3010'];
-    if(map) for(let r=0;r<SCREEN_ROWS;r++) for(let c=0;c<SCREEN_COLS;c++) {
-      const t=map[r]?.[c]??0;
-      ctx.fillStyle=TILE_COLS[t]||'#333'; ctx.fillRect(mmX+c*3,mmY+r*3,3,3);
+    const game = this.game;
+    const visited  = game.visitedScreens  || new Set();
+    const portals  = game.portalScreens   || new Set();
+    const R = SCREEN_ROWS, C = SCREEN_COLS; // grid dimensions: 4 rows × 4 cols
+    const CELL = 12; // pixel size of each grid cell
+    const PAD  = 3;
+    const mmW  = C * CELL + PAD * 2;
+    const mmH  = R * CELL + PAD * 2 + 16; // +16 for coordinate label
+    const mmX  = ctx.canvas.width  - mmW - 8;
+    const mmY  = 56;
+
+    // Background
+    ctx.fillStyle = 'rgba(0,0,0,0.82)';
+    ctx.fillRect(mmX - 2, mmY - 2, mmW + 4, mmH + 4);
+
+    // Draw each grid cell
+    for(let r = 0; r < R; r++) {
+      for(let c = 0; c < C; c++) {
+        const key = `${r}_${c}`;
+        const cx  = mmX + PAD + c * CELL;
+        const cy  = mmY + PAD + r * CELL;
+        const isCurrent = r === world.gridRow && c === world.gridCol;
+        const isVisited  = visited.has(key);
+        const hasPortal  = portals.has(key);
+
+        // Cell background
+        if(hasPortal) {
+          ctx.fillStyle = '#2a0060';       // deep purple — portal found here
+        } else if(isVisited) {
+          ctx.fillStyle = '#1a3a1a';       // dark green — visited
+        } else {
+          ctx.fillStyle = '#0a0a0a';       // near-black — unknown
+        }
+        ctx.fillRect(cx, cy, CELL - 1, CELL - 1);
+
+        // Portal icon — bright star in the cell
+        if(hasPortal) {
+          ctx.fillStyle = '#c080ff';
+          ctx.font = 'bold 8px sans-serif';
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.fillText('★', cx + (CELL - 1) / 2, cy + (CELL - 1) / 2);
+        }
+
+        // Current screen border — bright white outline
+        if(isCurrent) {
+          ctx.strokeStyle = '#ffffff';
+          ctx.lineWidth = 1.5;
+          ctx.strokeRect(cx - 0.5, cy - 0.5, CELL, CELL);
+        }
+      }
     }
-    ctx.fillStyle='#fff';
-    const pc=~~(player.cx/48), pr=~~(player.cy/48);
-    ctx.fillRect(mmX+pc*3-1,mmY+pr*3-1,5,5);
-    ctx.fillStyle='#f39c12';
-    for(const n of world.activeNPCs) ctx.fillRect(mmX+~~(n.cx/48)*3,mmY+~~(n.cy/48)*3,3,3);
-    ctx.fillStyle='#e74c3c';
-    for(const e of world.activeEnemies) ctx.fillRect(mmX+~~(e.cx/48)*3,mmY+~~(e.cy/48)*3,3,3);
-    if(map) for(let r=0;r<SCREEN_ROWS;r++) for(let c=0;c<SCREEN_COLS;c++) {
-      if(map[r]?.[c]===12){ctx.fillStyle='#c080ff';ctx.fillRect(mmX+c*3,mmY+r*3,4,4);}
+
+    // Player dot on current cell
+    const curX = mmX + PAD + world.gridCol * CELL + (CELL - 1) / 2;
+    const curY = mmY + PAD + world.gridRow * CELL + (CELL - 1) / 2;
+    if(!portals.has(world.screenKey)) { // don't overlap the star
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(curX - 2, curY - 2, 4, 4);
     }
-    // Grid position indicator
-    ctx.fillStyle='rgba(0,0,0,0.7)';
-    ctx.fillRect(mmX-2, mmY+mmH+4, mmW+4, 14);
-    ctx.fillStyle='#888'; ctx.font='9px monospace'; ctx.textAlign='center';
-    ctx.fillText(`[${world.gridRow+1},${world.gridCol+1}] of 4×4`, mmX+mmW/2, mmY+mmH+14);
+
+    // Legend label
+    ctx.fillStyle = 'rgba(0,0,0,0.7)';
+    ctx.fillRect(mmX - 2, mmY + PAD + R * CELL + 2, mmW + 4, 14);
+    ctx.fillStyle = '#888';
+    ctx.font = '9px monospace';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'alphabetic';
+    ctx.fillText(`[${world.gridRow + 1},${world.gridCol + 1}] of 4×4`, mmX + mmW / 2, mmY + PAD + R * CELL + 13);
   }
 }
