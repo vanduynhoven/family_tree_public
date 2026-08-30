@@ -818,15 +818,13 @@ export class Game {
 
     const { individuals, families } = this._gedcom;
 
-    // All spelling variants of the family surname (case-insensitive match)
+    // Only Van Duynhoven name variants qualify as primary family members.
+    // Spouses are added precisely via FAM records (direct spouse only,
+    // not the spouse's extended family).
     const SURNAME_VARIANTS = new Set([
-      'van duynhoven','van duijnhoven','van duinhoven',
-      'van dyn hoven','vandynhoven','duynhoven','duijnhoven','duinhoven',
-      // Married-in lines that appear extensively in the GEDCOM
-      'verwegen','van den elzen','cornelissen','van boxtel','van ham',
-      'blaffarts','van grootel','verbruggen','campbell','van der heijden',
-      // Wisconsin branch
-      'van dyn hoven',
+      'van duynhoven', 'van duijnhoven', 'van duinhoven',
+      'van dyn hoven', 'vandynhoven',
+      'duynhoven', 'duijnhoven', 'duinhoven',
     ]);
 
     const isVanDuynhoven = (id) => {
@@ -859,8 +857,8 @@ export class Game {
     const result = {};
     const staticKeys = new Set();
 
-    // Build the set of eligible family members (Van Duynhoven + spouses)
-    // Cache it — this is called on every screen transition
+    // Build the set of eligible family members (Van Duynhoven + direct spouses)
+    // Rebuild on every era load so it's always fresh
     if (!this._familyMemberSet && this._gedcom) {
       this._familyMemberSet = this._buildFamilyMemberSet();
     }
