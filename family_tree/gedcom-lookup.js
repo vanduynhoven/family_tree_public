@@ -306,54 +306,6 @@
     window.gedcomLookup = { findId, showPopup, individuals: () => individuals };
 })();
 
-// ── Global Footer Quick Nav ──────────────────────────────────────────
-(function injectFooterNav() {
-    if (document.getElementById('site-footer-nav')) return;
-    
-    // Detect page depth from GEDCOM_PATH or current URL path
-    let depth = 0;
-    if (window.GEDCOM_PATH) {
-        depth = (window.GEDCOM_PATH).split('/').filter(p => p === '..').length;
-    } else {
-        // Fallback: detect from URL path (count directories after /family_tree/)
-        const path = window.location.pathname;
-        const match = path.match(/\/family_tree\/(.+)/);
-        if (match) {
-            const subPath = match[1];
-            depth = (subPath.match(/\//g) || []).length;
-        }
-    }
-    const root = depth === 0 ? './' : '../'.repeat(depth);
-    
-    const nav = document.createElement('nav');
-    nav.id = 'site-footer-nav';
-    nav.className = 'site-footer-nav';
-    nav.innerHTML = `
-        <a href="${root}index.html" class="nav-home">🏠 Home</a>
-        <span class="nav-sep">·</span>
-        <a href="${root}generation_0_ancestors/index.html">~1450</a>
-        <a href="${root}generation_1_1799/index.html">Gen 1</a>
-        <a href="${root}generation_2_1829/index.html">Gen 2</a>
-        <a href="${root}generation_3_1872/index.html">Gen 3</a>
-        <a href="${root}generation_4_1915/index.html">Gen 4</a>
-        <a href="${root}generation_5_1951/index.html">Gen 5</a>
-        <a href="${root}generation_6_1980s/index.html">Gen 6</a>
-        <a href="${root}generation_7_2000s/index.html">Gen 7</a>
-        <span class="nav-sep">·</span>
-        <a href="${root}visualizations/tree.html">🌿 Tree</a>
-        <a href="${root}visualizations/family_chart.html">🥧 Chart</a>
-        <a href="${root}timeline.html">📅 Timeline</a>
-        <a href="${root}manifest.html">🗂 Site Map</a>
-        <a href="${root}changelog.html">📋 Changelog</a>
-    `;
-    
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', () => document.body.appendChild(nav));
-    } else {
-        document.body.appendChild(nav);
-    }
-})();
-
 // ── Global Collapsible Bottom Nav loader ─────────────────────────────
 // Injects js/bottom-nav.js on every page that includes this script, using
 // the same depth-derived root so the path resolves from any subdirectory.
