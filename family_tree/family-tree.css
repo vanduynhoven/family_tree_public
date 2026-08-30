@@ -1293,37 +1293,74 @@ body.kid-mode .kid-term:focus::before { opacity: 1; }
     -webkit-backdrop-filter: blur(10px);
     box-shadow: 0 6px 24px rgba(0, 0, 0, 0.5);
     font-family: inherit;
-    /* Smoothly grow/shrink between states */
     transition: max-width 0.32s cubic-bezier(0.4, 0, 0.2, 1),
                 padding 0.32s cubic-bezier(0.4, 0, 0.2, 1),
                 border-radius 0.32s ease;
     overflow: hidden;
 }
 
-/* Home / toggle button — always visible */
-.bottom-nav .bn-home {
+/* Split button container */
+.bottom-nav .bn-split {
+    display: flex;
+    align-items: stretch;
     flex: 0 0 auto;
+}
+
+/* Home link (left side of split - navigates to home) */
+.bottom-nav .bn-home-link {
     display: inline-flex;
     align-items: center;
     gap: 6px;
     padding: 9px 14px;
     border: none;
-    border-radius: 22px;
+    border-radius: 22px 0 0 22px;
     background: linear-gradient(135deg, var(--accent, #f39c12), var(--accent-red, #e74c3c));
     color: #fff;
     font-size: 0.92em;
     font-weight: 700;
-    cursor: pointer;
+    text-decoration: none;
     white-space: nowrap;
-    transition: transform 0.15s, box-shadow 0.15s;
+    transition: transform 0.15s, box-shadow 0.15s, filter 0.15s;
 }
-.bottom-nav .bn-home:hover { transform: translateY(-1px); box-shadow: 0 4px 14px rgba(0,0,0,0.4); }
-.bottom-nav .bn-home:focus-visible { outline: 2px solid #ffd479; outline-offset: 2px; }
+.bottom-nav .bn-home-link:hover { 
+    filter: brightness(1.1);
+    box-shadow: 0 4px 14px rgba(0,0,0,0.4); 
+}
+.bottom-nav .bn-home-link.active {
+    background: linear-gradient(135deg, #27ae60, #2ecc71);
+}
+.bottom-nav .bn-home-link:focus-visible { outline: 2px solid #ffd479; outline-offset: 2px; }
+.bottom-nav .bn-home-text { display: inline; }
+
+/* Expand button (right side of split - toggles expansion) */
+.bottom-nav .bn-expand {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 9px 12px;
+    border: none;
+    border-left: 1px solid rgba(255,255,255,0.25);
+    border-radius: 0 22px 22px 0;
+    background: linear-gradient(135deg, #e74c3c, #c0392b);
+    color: #fff;
+    font-size: 0.85em;
+    cursor: pointer;
+    transition: transform 0.15s, background 0.15s;
+}
+.bottom-nav .bn-expand:hover {
+    background: linear-gradient(135deg, #c0392b, #a93226);
+}
+.bottom-nav.expanded .bn-expand {
+    background: linear-gradient(135deg, #27ae60, #229954);
+}
+.bottom-nav.expanded .bn-expand:hover {
+    background: linear-gradient(135deg, #229954, #1e8449);
+}
 
 /* Chevron that rotates when expanded */
 .bottom-nav .bn-chevron {
     display: inline-block;
-    font-size: 0.85em;
+    font-size: 0.9em;
     line-height: 1;
     transition: transform 0.3s ease;
 }
@@ -1348,7 +1385,7 @@ body.kid-mode .kid-term:focus::before { opacity: 1; }
 .bottom-nav.expanded .bn-items {
     max-width: 76vw;
     opacity: 1;
-    margin-left: 4px;
+    margin-left: 6px;
 }
 .bottom-nav .bn-items::-webkit-scrollbar { height: 5px; }
 .bottom-nav .bn-items::-webkit-scrollbar-thumb {
@@ -1379,6 +1416,103 @@ body.kid-mode .kid-term:focus::before { opacity: 1; }
     background: rgba(243, 156, 18, 0.28);
 }
 
+/* Generations dropdown container */
+.bottom-nav .bn-gen-container {
+    position: relative;
+    flex: 0 0 auto;
+}
+
+.bottom-nav .bn-gen-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 8px 12px;
+    border: none;
+    border-radius: 18px;
+    background: rgba(142, 68, 173, 0.25);
+    color: #ce93d8;
+    font-size: 0.86em;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background 0.15s, color 0.15s;
+}
+.bottom-nav .bn-gen-btn:hover {
+    background: rgba(142, 68, 173, 0.4);
+    color: #e1bee7;
+}
+.bottom-nav .bn-gen-container.open .bn-gen-btn {
+    background: rgba(142, 68, 173, 0.5);
+    color: #fff;
+}
+
+.bottom-nav .bn-gen-arrow {
+    font-size: 0.75em;
+    transition: transform 0.25s ease;
+}
+.bottom-nav .bn-gen-container.open .bn-gen-arrow {
+    transform: rotate(180deg);
+}
+
+/* Dropdown panel - expands vertically */
+.bottom-nav .bn-gen-dropdown {
+    position: absolute;
+    bottom: calc(100% + 8px);
+    left: 50%;
+    transform: translateX(-50%) scale(0.95);
+    min-width: 160px;
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    background: rgba(20, 20, 40, 0.96);
+    border: 1px solid var(--glass-border, rgba(255,255,255,0.15));
+    border-radius: 16px;
+    box-shadow: 0 -8px 30px rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    transition: max-height 0.3s ease, opacity 0.2s ease, transform 0.2s ease;
+    z-index: 10;
+}
+.bottom-nav .bn-gen-container.open .bn-gen-dropdown {
+    max-height: 400px;
+    opacity: 1;
+    transform: translateX(-50%) scale(1);
+    padding: 8px 0;
+}
+
+.bottom-nav .bn-gen-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 16px;
+    color: #cfcfe0;
+    text-decoration: none;
+    font-size: 0.9em;
+    transition: background 0.15s, color 0.15s;
+}
+.bottom-nav .bn-gen-item:hover {
+    background: rgba(142, 68, 173, 0.2);
+    color: #e1bee7;
+}
+.bottom-nav .bn-gen-item.active {
+    background: rgba(142, 68, 173, 0.35);
+    color: #fff;
+}
+
+.bottom-nav .bn-gen-icon {
+    font-size: 1.1em;
+    width: 24px;
+    text-align: center;
+}
+.bottom-nav .bn-gen-label {
+    font-weight: 600;
+    flex: 1;
+}
+.bottom-nav .bn-gen-desc {
+    font-size: 0.8em;
+    color: #888;
+}
+
 /* Desktop: keep it compact and never full width */
 @media (min-width: 720px) {
     .bottom-nav { left: auto; right: 16px; transform: none; }
@@ -1395,4 +1529,13 @@ body.kid-mode .kid-term:focus::before { opacity: 1; }
         justify-content: flex-start;
     }
     .bottom-nav.expanded .bn-items { max-width: 100%; }
+    .bottom-nav .bn-home-text { display: none; }
+    .bottom-nav .bn-gen-dropdown {
+        left: auto;
+        right: 0;
+        transform: scale(0.95);
+    }
+    .bottom-nav .bn-gen-container.open .bn-gen-dropdown {
+        transform: scale(1);
+    }
 }
