@@ -160,7 +160,40 @@ function makeScreen(map, exits = {}, title = '', spawn = {r:7, c:10}) {
   Object.entries(exits).forEach(([side, {pos}]) =>
     carvePathToExit(map, spawn.r, spawn.c, side, pos)
   );
-  return { map, exits, title, spawn };
+  // 4. Derive a representative minimap color from the screen title
+  const color = _screenColor(title);
+  return { map, exits, title, spawn, color };
+}
+
+// ── Minimap color by screen type (derived from title keywords) ──
+function _screenColor(title) {
+  const t = title.toLowerCase();
+  // Indoor / special
+  if (/church|kerk|chapel|monastery|cathedral|shrine|temple/.test(t)) return '#5a3a80'; // purple
+  if (/tavern|inn|café|pub|bar/.test(t))                                return '#7a3a10'; // dark amber
+  if (/warehouse|dock|port|wharf|harbour|harbor|cargo|ship/.test(t))   return '#1a4060'; // navy
+  if (/market|square|plein|town.*green|village.*centre|centre/.test(t))return '#c8b060'; // gold
+  if (/castle|fort|citadel|fortress|wall|gate/.test(t))                return '#606060'; // grey
+  if (/farm|field|wheat|polder|crop|harvest/.test(t))                   return '#5a7a20'; // field green
+  if (/forest|wood|tree|pine/.test(t))                                  return '#2a5a18'; // dark green
+  if (/river|canal|stream|bridge|water|harbour|wharf/.test(t))          return '#1a5a8a'; // blue
+  if (/road|path|street|highway|south.*road/.test(t))                   return '#8a7a50'; // tan
+  if (/marsh|bog|swamp|fen|peat/.test(t))                               return '#3a5a30'; // murky
+  if (/heath|moor|heather|heathland/.test(t))                           return '#8a6a40'; // heath brown
+  if (/house|home|dwelling|cottage|neighbourhood/.test(t))              return '#c07040'; // warm brown
+  if (/wind.*mill|windmill/.test(t))                                    return '#c8c090'; // pale yellow
+  if (/prison|jail|dungeon/.test(t))                                    return '#303030'; // very dark
+  if (/portal|shrine|standing.*stone/.test(t))                          return '#4020a0'; // deep purple
+  if (/station|railway|factory|industrial|mill/.test(t))               return '#505868'; // steel grey
+  if (/office|apartment|flat|building/.test(t))                         return '#6a7880'; // blue-grey
+  if (/park|garden|grass|meadow/.test(t))                               return '#4a9040'; // medium green
+  if (/beach|shore|sand|coast/.test(t))                                 return '#c8a860'; // sand
+  // Era-specific fallbacks
+  if (/1950|ship|atlantic|ocean|sea/.test(t))                           return '#1a4a6a'; // deep ocean
+  if (/1539|1660|1799|1872/.test(t))                                    return '#5a6a40'; // historic green
+  if (/minnesota|wisconsin|prairie|midwest/.test(t))                    return '#7a9040'; // prairie
+  if (/haarlem|amsterdam|netherlands|dutch/.test(t))                    return '#4a6a90'; // dutch blue
+  return '#4a5a40'; // default: muted olive
 }
 
 // ── World builder ─────────────────────────────────────────

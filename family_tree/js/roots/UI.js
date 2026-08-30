@@ -372,7 +372,7 @@ export class UI {
     const x = w - WORLD_COLS * cellSize - 12;
     const y = 10;
     drawMinimap(ctx, WORLD_COLS, WORLD_ROWS, world.visitedSet,
-                world.screenRow, world.screenCol, x, y, cellSize, world.portalSet);
+                world.screenRow, world.screenCol, x, y, cellSize, world.portalSet, world.screens);
   }
 
   // ── Character Select ─────────────────────────────────

@@ -895,7 +895,7 @@ export function drawBobber(ctx, x, y, dipped, frame, handX, handY) {
 }
 
 // ── Minimap ───────────────────────────────────────────────
-export function drawMinimap(ctx, worldCols, worldRows, visitedSet, currentR, currentC, x, y, cellSize=8, portalSet=null) {
+export function drawMinimap(ctx, worldCols, worldRows, visitedSet, currentR, currentC, x, y, cellSize=8, portalSet=null, screens=null) {
   const W2=worldCols*cellSize+6, H2=worldRows*cellSize+6;
   ctx.fillStyle='rgba(0,0,0,0.7)';
   ctx.beginPath(); ctx.roundRect(x-3,y-3,W2,H2,4); ctx.fill();
@@ -904,7 +904,16 @@ export function drawMinimap(ctx, worldCols, worldRows, visitedSet, currentR, cur
   for (let r=0;r<worldRows;r++) for (let c=0;c<worldCols;c++) {
     const key=`${r},${c}`, cur=r===currentR&&c===currentC;
     const hasPortal = portalSet?.has(key);
-    ctx.fillStyle = cur ? '#f0c040' : hasPortal ? '#2a0060' : visitedSet.has(key) ? '#6a9050' : '#252525';
+    const visited   = visitedSet.has(key);
+    // Use the screen's semantic color if visited, otherwise dark unknown
+    const screenColor = screens?.[r]?.[c]?.color;
+    let fill;
+    if (cur)        fill = '#f0c040';
+    else if (hasPortal) fill = '#2a0060';
+    else if (visited && screenColor) fill = screenColor;
+    else if (visited) fill = '#6a9050';
+    else fill = '#252525';
+    ctx.fillStyle = fill;
     ctx.beginPath(); ctx.roundRect(x+c*cellSize,y+r*cellSize,cellSize-1,cellSize-1,1); ctx.fill();
     // Portal star marker
     if (hasPortal) {
