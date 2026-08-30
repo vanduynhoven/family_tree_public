@@ -248,7 +248,7 @@ const GedcomStats = {
             case 'maxGeneration':
                 return this.data.maxGeneration;
             default:
-                // Support generation-specific counts like 'gen3' or 'generation-3'
+                // Support generation-specific counts like 'gen3', 'gen_3', 'generation-3', 'generation_3'
                 const genMatch = key.match(/gen(?:eration)?[_-]?(-?\d+)/i);
                 if (genMatch) {
                     const gen = parseInt(genMatch[1]);
