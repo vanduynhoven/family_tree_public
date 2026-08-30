@@ -636,32 +636,31 @@ export function drawPlayer(ctx, x, y, opts = {}) {
 
   // ── Layer 4: Head ─────────────────────────────────────
   // Head sprite: 32×32 per cell, 3 cols × 4 rows
-  // Use col 1 (middle — natural pose) for idle, col 0 for walk frame variation
+  // The LPC head occupies the top ~50% of the 64px body frame.
+  // At renderH=52px the head region is ~26px tall, centred in renderW.
   if (head) {
     const headRow = HEAD_DIR_ROW[facing] ?? 2;
-    const headCol = frameIdx > 0 ? (frameIdx % 2) : 1; // alternate slightly during walk
+    const headCol = frameIdx > 0 ? (frameIdx % 2) : 1;
     const hsx = headCol * HEAD_FRAME;
     const hsy = headRow * HEAD_FRAME;
-    // Head render size: 32px source → scale to ~38% of renderW
-    const headRenderW = renderW * 0.55;
-    const headRenderH = renderH * 0.40;
+    const headRenderW = renderW * 0.60;            // 60% of body width
+    const headRenderH = renderH * 0.48;            // 48% of body height (matches LPC proportion)
     const headRx = rx + (renderW - headRenderW) / 2;
-    const headRy = ry; // head sits at very top of sprite
+    const headRy = ry + renderH * 0.02;            // 2% down — aligns neck to body shoulder
     ctx.drawImage(head, hsx, hsy, HEAD_FRAME, HEAD_FRAME, headRx, headRy, headRenderW, headRenderH);
   }
 
   // ── Layer 5: Hair ─────────────────────────────────────
   // Hair sprite: 48×48 per cell, 1 col × 6 rows
+  // Hair overlaps the head, extending slightly above and to the sides.
   if (hair) {
     const hairRow = HAIR_DIR_ROW[facing] ?? 2;
-    const hrsx = 0;
     const hrsy = hairRow * HAIR_FRAME;
-    // Hair is slightly larger than head — centre it, slight upward offset
-    const hairRenderW = renderW * 0.65;
-    const hairRenderH = renderH * 0.44;
+    const hairRenderW = renderW * 0.72;            // slightly wider than head
+    const hairRenderH = renderH * 0.52;            // covers head + a little above
     const hairRx = rx + (renderW - hairRenderW) / 2;
-    const hairRy = ry - renderH * 0.02;
-    ctx.drawImage(hair, hrsx, hrsy, HAIR_FRAME, HAIR_FRAME, hairRx, hairRy, hairRenderW, hairRenderH);
+    const hairRy = ry - renderH * 0.01;            // 1% above head for hair crown
+    ctx.drawImage(hair, 0, hrsy, HAIR_FRAME, HAIR_FRAME, hairRx, hairRy, hairRenderW, hairRenderH);
   }
 
   // ── Hurt tint ─────────────────────────────────────────

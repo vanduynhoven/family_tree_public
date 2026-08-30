@@ -877,16 +877,34 @@ export class Game {
     }
 
     // Auto-generate NPC entries for every eligible GEDCOM individual in this era
-    // "Eligible" = Van Duynhoven family member or spouse of one
     if (this._gedcom) {
-      for (const [id, gd] of this._gedcom.individuals) {
-        if (staticKeys.has(id)) continue;       // hand-authored entry exists
-        if (!gd.name || !gd.name.trim()) continue; // unnamed
+      const { individuals, families } = this._gedcom;
+
+      // Build spouse→era lookup for people with no birth year:
+      // use their spouse's birth year to infer their era
+      const spouseEra = new Map();
+      for (const [famId, fam] of families) {
+        const husbYear = fam.husb ? individuals.get(fam.husb)?.birthYear : null;
+        const wifeYear = fam.wife ? individuals.get(fam.wife)?.birthYear : null;
+        if (fam.husb && !individuals.get(fam.husb)?.birthYear && wifeYear) {
+          spouseEra.set(fam.husb, _gedcomEraId(wifeYear));
+        }
+        if (fam.wife && !individuals.get(fam.wife)?.birthYear && husbYear) {
+          spouseEra.set(fam.wife, _gedcomEraId(husbYear));
+        }
+      }
+
+      for (const [id, gd] of individuals) {
+        if (staticKeys.has(id)) continue;
+        if (!gd.name || !gd.name.trim()) continue;
 
         // *** FAMILY FILTER: only Van Duynhoven family and their spouses ***
         if (!eligible.has(id)) continue;
 
-        const assignedEra = _gedcomEraId(gd.birthYear);
+        // Assign era: use own birth year, or spouse's era if unknown
+        const ownEra    = _gedcomEraId(gd.birthYear);
+        const inferEra  = spouseEra.get(id) ?? ownEra;
+        const assignedEra = gd.birthYear ? ownEra : inferEra;
         if (assignedEra !== eraId) continue;
 
         // Deterministic screen assignment — spread people across the 4×4 grid
@@ -967,9 +985,10 @@ export class Game {
 
 // ── Module-level helpers for GEDCOM NPC generation ───────
 
-/** Assign a GEDCOM individual to an era by birth year */
+/** Assign a GEDCOM individual to an era by birth year.
+ *  Unknown birth year defaults to era 7 (2020 — most recent, for living people). */
 function _gedcomEraId(birthYear) {
-  if (!birthYear) return 0;
+  if (!birthYear) return 7;  // unknown birth = living person, default to modern era
   if (birthYear <= 1600) return 0;
   if (birthYear <= 1780) return 1;
   if (birthYear <= 1850) return 2;
