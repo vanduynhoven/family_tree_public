@@ -40,7 +40,8 @@
   var VISUALIZATIONS = [
     { href: 'timeline.html',                    label: 'Timeline',  icon: '📅', desc: 'Events over time' },
     { href: 'visualizations/tree.html',         label: 'Tree',      icon: '🌿', desc: 'Collapsible tree' },
-    { href: 'visualizations/family_chart.html', label: 'Fan Chart', icon: '🥧', desc: 'Radial view' }
+    { href: 'visualizations/family_chart.html', label: 'Fan Chart', icon: '🥧', desc: 'Radial view' },
+    { href: 'game.html',                        label: 'Chronicles', icon: '🎮', desc: 'Time-travel adventure' }
   ];
 
   function isExpanded() {
