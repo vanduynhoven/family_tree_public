@@ -1367,14 +1367,18 @@ function _buildHaarlemWorld() {
 
   // [1,3] Narrow old-town alleys
   { const m = blank(T.COBBLE);
-    // Narrow street — close brick walls
+    // Narrow street — close brick walls on left and right
     fill(m, 0, 0, H-1, 5, T.BRICK);
     fill(m, 0, 14, H-1, W-1, T.BRICK);
     fill(m, 0, 6, H-1, 13, T.ROAD);
     // Small alley canal
     fill(m, 5, 0, 7, 5, T.WATER);
-    // Arch / gateway at bottom leading to Grote Markt
-    fill(m, H-3, 7, H-1, 12, T.BRICK);
+    // Arch / gateway at bottom — only the gateposts are solid, centre is walkable
+    // (was: fill whole row with BRICK trapping players entering from south)
+    set(m, H-3, 7, T.BRICK); set(m, H-3, 12, T.BRICK); // gatepost pillars
+    set(m, H-2, 7, T.BRICK); set(m, H-2, 12, T.BRICK); // gatepost pillars
+    set(m, H-1, 7, T.BRICK); set(m, H-1, 12, T.BRICK);
+    // Centre of arch is open (DOOR tiles = walkable visual)
     set(m, H-2, 9, T.DOOR); set(m, H-2, 10, T.DOOR);
     grid[1][3] = makeScreen(m, {left:{pos:HP},up:{pos:VP},down:{pos:VP}}, '2026 · Oude Binnenstad Alleys', {r:HP,c:9}); }
 
