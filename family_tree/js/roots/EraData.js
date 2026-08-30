@@ -289,8 +289,11 @@ export function buildEraWorld(eraId, location = 'haarlem') {
       // [3,2] Old shrine — rocky outcrop
       { const m=blank(T.GRASS); border(m,T.ROCK);
         fill(m,2,2,H-3,W-3,T.FLOWER);
-        [[3,5],[3,14],[5,3],[5,16],[7,4],[7,15],[9,5],[9,14]].forEach(([r,c])=>set(m,r,c,T.ROCK));
-        set(m,6,9,T.ROCK); set(m,6,10,T.ROCK); // altar stone
+        [[3,5],[3,14],[5,3],[5,16],[7,4],[7,15]].forEach(([r,c])=>set(m,r,c,T.ROCK));
+        // Altar stones moved off the central path (was blocking col 9-10)
+        set(m,5,9,T.ROCK); set(m,5,10,T.ROCK);  // altar on row 5, clear of path
+        // Wide clear corridor up the centre so player can always move
+        fill(m,7,8,H-3,11,T.GRASS);
         grid[3][2]=makeScreen(m,{left:{pos:7},up:{pos:10}},'1539 · Old Shrine',{r:10,c:10}); }
 
       break; }

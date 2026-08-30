@@ -61,17 +61,46 @@ export class World {
     const screenKey = `${eraId}_${this.screenRow}_${this.screenCol}`;
     const npcsHere  = (npcData[screenKey] || []);
     npcsHere.forEach(d => {
-      // Deduplicate: skip if a named NPC with this gedcomId or name already exists
+      // Deduplicate: skip if a named NPC with this key already exists
       const npcKey = d.gedcomId || d.name;
       if (namedNpcKeys.has(npcKey)) return;
       namedNpcKeys.add(npcKey);
-      if (d.name) namedNpcKeys.add(d.name);
+      if (d.name)  namedNpcKeys.add(d.name);
       if (d.given) namedNpcKeys.add(d.given);
 
-      const nx = (d.spawnC ?? spawn.c + Math.floor(Math.random()*4) - 2) * TILE + 4;
-      const ny = (d.spawnR ?? spawn.r + Math.floor(Math.random()*4) - 2) * TILE + 4;
+      // Initial spawn position from data
+      let nx = (d.spawnC ?? spawn.c + Math.floor(Math.random()*4) - 2) * TILE + 4;
+      let ny = (d.spawnR ?? spawn.r + Math.floor(Math.random()*4) - 2) * TILE + 4;
+
+      // If the initial position is solid, search outward for a clear tile
+      const NPC_PAD = 4;
+      const isWalkable = (wx, wy) =>
+        !this.solidAt(wx + NPC_PAD, wy + NPC_PAD) &&
+        !this.solidAt(wx + Math.floor(TILE * 0.5), wy + Math.floor(TILE * 0.7));
+
+      if (!isWalkable(nx, ny)) {
+        let found = false;
+        // Spiral search outward from the intended spawn point
+        for (let radius = 1; radius <= 4 && !found; radius++) {
+          for (let dr = -radius; dr <= radius && !found; dr++) {
+            for (let dc = -radius; dc <= radius && !found; dc++) {
+              if (Math.abs(dr) !== radius && Math.abs(dc) !== radius) continue;
+              const tr = Math.floor(ny / TILE) + dr;
+              const tc = Math.floor(nx / TILE) + dc;
+              if (tr < 1 || tr >= SCREEN_ROWS-1 || tc < 1 || tc >= SCREEN_COLS-1) continue;
+              const cx = tc * TILE + 4, cy = tr * TILE + 4;
+              if (isWalkable(cx, cy)) {
+                nx = cx; ny = cy; found = true;
+              }
+            }
+          }
+        }
+        // If still not found, fall back to spawn point
+        if (!found) { nx = spawn.c * TILE + 4; ny = spawn.r * TILE + 4; }
+      }
+
       const npc = new NPC(d, nx, ny);
-      // Restore persistent friendship hearts and talk count
+      // Restore persistent friendship hearts and talk count (reuse npcKey from dedup above)
       if (this._friendshipMap?.has(npcKey)) npc.friendship = this._friendshipMap.get(npcKey);
       if (this._talkCountMap?.has(npcKey))  npc.talkCount  = this._talkCountMap.get(npcKey);
       if (npc.talkCount > 0) npc.talked = true;
@@ -85,8 +114,29 @@ export class World {
     if (this.screenRow !== 1) {
       const defs = eraId >= 0 ? [ENEMY_DEFS[_eraEnemies(eraId)[this.screenCol % 2]]] : [];
       defs.filter(Boolean).forEach((def, i) => {
-        const ex = (3 + i * 5) * TILE;
-        const ey = (3 + i * 2) * TILE;
+        // Find a walkable spawn position — try initial position, then random search
+        let ex = 0, ey = 0;
+        const initialX = (3 + i * 5) * TILE;
+        const initialY = (3 + i * 2) * TILE;
+        const pad = 4;
+        const walkable = (wx, wy) =>
+          !this.solidAt(wx + pad, wy + pad) &&
+          !this.solidAt(wx + TILE - pad, wy + TILE - pad);
+
+        if (walkable(initialX, initialY)) {
+          ex = initialX; ey = initialY;
+        } else {
+          // Random search for a clear tile (up to 30 attempts)
+          let found = false;
+          for (let attempt = 0; attempt < 30 && !found; attempt++) {
+            const tc = 2 + Math.floor(Math.random() * (SCREEN_COLS - 4));
+            const tr = 2 + Math.floor(Math.random() * (SCREEN_ROWS - 4));
+            const wx = tc * TILE + pad;
+            const wy = tr * TILE + pad;
+            if (walkable(wx, wy)) { ex = wx; ey = wy; found = true; }
+          }
+          if (!found) return; // skip this enemy if no clear spot found
+        }
         this._enemies.push(new Enemy(def, ex, ey));
       });
     }

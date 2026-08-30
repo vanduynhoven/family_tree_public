@@ -749,6 +749,7 @@ export class Game {
       this.player.collectedFacts.length,
       this._totalNpcCount(),
       fishable,
+      this.world.screen?.title || '',
     );
 
     // ── Death check ────────────────────────────────────

@@ -34,6 +34,7 @@ export class UI {
         <span id="rt-hp">❤️ 100</span>
         <span id="rt-stamina">⚡ 100</span>
         <span id="rt-era">⏰ 1539</span>
+        <span id="rt-location" style="color:#aad4ff;border-color:#224466"></span>
         <span id="rt-stories">📖 0</span>
         <span id="rt-mute" class="rt-btn">🔊</span>
         <a id="rt-exit" class="rt-btn" href="index.html">🏠</a>
@@ -156,14 +157,19 @@ export class UI {
 
   // ── HUD ─────────────────────────────────────────────
 
-  updateHUD(eraId, hp, maxHp, stamina, maxStamina, storiesCount, totalNpcs, isFishable) {
+  updateHUD(eraId, hp, maxHp, stamina, maxStamina, storiesCount, totalNpcs, isFishable, screenTitle) {
     const hpHearts = Math.ceil(hp / 20);
     document.getElementById('rt-hp').textContent = '❤️'.repeat(Math.max(0,hpHearts)) + (hp <= 0 ? ' 💀' : '');
     document.getElementById('rt-stamina').textContent = `⚡ ${Math.floor(stamina)}`;
     const era = ERAS[eraId];
     document.getElementById('rt-era').textContent = era ? `⏰ ${era.year}` : '';
+    // Screen title — strip the year prefix (e.g. "1539 · Church" → "Church")
+    const locEl = document.getElementById('rt-location');
+    if (locEl && screenTitle) {
+      const short = screenTitle.replace(/^\d{4}\s*[··]\s*/, '').replace(/^2026\s*[··]\s*/, '');
+      locEl.textContent = short ? `📍 ${short}` : '';
+    }
     document.getElementById('rt-stories').textContent = `📖 ${storiesCount}/${totalNpcs}`;
-    // Show fish button only when near water
     const fishBtn = document.getElementById('ab-fish');
     if (fishBtn) fishBtn.style.display = isFishable ? 'flex' : 'none';
   }
