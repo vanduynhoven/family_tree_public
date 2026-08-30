@@ -444,54 +444,390 @@ export class UI {
 function drawIntroPanel(ctx, panel, w, h) {
   ctx.clearRect(0, 0, w, h);
 
-  // Background by setting
+  // Background gradients keyed by setting
   const bgs = {
-    library:        ['#3a2a10','#1a1008'],
-    haarlem_bedroom:['#3060a0','#102040'],
-    haarlem_living: ['#2040a0','#102040'],
-    mn_bedroom:     ['#608040','#204010'],
-    mn_attic:       ['#4a3a20','#2a1a08'],
-    mn_kitchen:     ['#c0a060','#806030'],
-    mn_office:      ['#304060','#102040'],
-    mn_home:        ['#608040','#204010'],
-    mn_bbq:         ['#80a040','#406020'],
-    classroom:      ['#c0b080','#806040'],
-    closeup:        ['#1a1208','#0a0804'],
-    reading:        ['#3a2a10','#1a1008'],
-    sleep:          ['#050518','#000000'],
+    library:          ['#3a2a10','#1a1008'],
+    haarlem_bedroom:  ['#1a3060','#0a1830'],
+    haarlem_living:   ['#1a2850','#080f28'],
+    mn_bedroom:       ['#3a5020','#1a2a08'],
+    mn_attic:         ['#2a2010','#120e04'],
+    mn_kitchen:       ['#7a5830','#3a2810'],
+    mn_office:        ['#1a2840','#080e1a'],
+    mn_home:          ['#3a5020','#1a2808'],
+    mn_bbq:           ['#4a6020','#1a2808'],
+    classroom:        ['#7a6840','#3a3018'],
+    closeup:          ['#100c06','#050302'],
+    reading:          ['#2a1e0a','#100a02'],
+    sleep:            ['#050518','#000000'],
   };
   const [c1, c2] = bgs[panel.bg] || ['#202020','#050505'];
   const g = ctx.createLinearGradient(0, 0, 0, h);
   g.addColorStop(0, c1); g.addColorStop(1, c2);
-  ctx.fillStyle = g; ctx.fillRect(0, 0, w, h);
+  ctx.fillStyle = g;
+  ctx.fillRect(0, 0, w, h);
 
-  // Simple atmospheric elements by background type
+  // ── Atmospheric scene drawing per background ──────────
+
   if (panel.bg === 'library' || panel.bg === 'reading') {
-    // Bookshelves
-    ctx.fillStyle = 'rgba(100,70,20,0.4)';
-    for (let i = 0; i < 8; i++) {
-      ctx.fillRect(w*0.05 + i*w*0.11, h*0.1, w*0.09, h*0.7);
+    // Bookshelves left and right
+    ctx.fillStyle = 'rgba(80,50,10,0.6)';
+    for (let i = 0; i < 4; i++) {
+      ctx.fillRect(w*0.03 + i*w*0.07, h*0.05, w*0.055, h*0.75);
+      ctx.fillRect(w*0.72 + i*w*0.07, h*0.05, w*0.055, h*0.75);
     }
-    // Warm lamp glow
-    ctx.fillStyle = 'rgba(255,180,60,0.15)';
-    ctx.beginPath(); ctx.arc(w*0.7, h*0.25, w*0.2, 0, Math.PI*2); ctx.fill();
+    // Book spines
+    const bookColors = ['#8b2020','#206040','#204080','#806020','#602080','#204040'];
+    for (let i = 0; i < 20; i++) {
+      ctx.fillStyle = bookColors[i % bookColors.length];
+      const bx = w*0.03 + (i % 4)*w*0.07 + 3;
+      const by = h*0.07 + Math.floor(i/4) * (h*0.13);
+      ctx.fillRect(bx, by, w*0.045, h*0.11);
+    }
+    // Warm desk lamp glow (right side)
+    const lg = ctx.createRadialGradient(w*0.72, h*0.35, 0, w*0.72, h*0.35, w*0.28);
+    lg.addColorStop(0, 'rgba(255,200,80,0.22)');
+    lg.addColorStop(1, 'rgba(255,200,80,0)');
+    ctx.fillStyle = lg; ctx.fillRect(0, 0, w, h);
+    // Armchair silhouette (centre)
+    ctx.fillStyle = 'rgba(60,35,10,0.7)';
+    ctx.fillRect(w*0.35, h*0.55, w*0.30, h*0.25);
+    ctx.fillRect(w*0.32, h*0.45, w*0.07, h*0.35);
+    ctx.fillRect(w*0.61, h*0.45, w*0.07, h*0.35);
+    // Journal on lap
+    ctx.fillStyle = 'rgba(160,110,50,0.8)';
+    ctx.fillRect(w*0.38, h*0.62, w*0.24, h*0.14);
+    ctx.strokeStyle = 'rgba(100,70,20,0.9)'; ctx.lineWidth = 2;
+    ctx.strokeRect(w*0.38, h*0.62, w*0.24, h*0.14);
+    // Window with light
+    ctx.fillStyle = 'rgba(80,120,200,0.15)';
+    ctx.fillRect(w*0.43, h*0.12, w*0.14, h*0.22);
+    ctx.strokeStyle = 'rgba(150,180,255,0.3)'; ctx.lineWidth = 2;
+    ctx.strokeRect(w*0.43, h*0.12, w*0.14, h*0.22);
+
+  } else if (panel.bg === 'haarlem_bedroom') {
+    // Canal window view
+    ctx.fillStyle = 'rgba(40,80,160,0.25)';
+    ctx.fillRect(w*0.6, h*0.1, w*0.32, h*0.35);
+    ctx.strokeStyle = 'rgba(180,200,255,0.4)'; ctx.lineWidth = 3;
+    ctx.strokeRect(w*0.6, h*0.1, w*0.32, h*0.35);
+    // Dutch rooftops in window
+    ctx.fillStyle = 'rgba(30,20,60,0.6)';
+    ctx.fillRect(w*0.62, h*0.22, w*0.08, h*0.22);
+    ctx.fillRect(w*0.74, h*0.18, w*0.10, h*0.26);
+    ctx.fillRect(w*0.86, h*0.25, w*0.06, h*0.19);
+    // Canal reflection glow
+    const cg = ctx.createLinearGradient(0, h*0.38, 0, h*0.45);
+    cg.addColorStop(0, 'rgba(40,80,180,0.2)');
+    cg.addColorStop(1, 'rgba(40,80,180,0)');
+    ctx.fillStyle = cg; ctx.fillRect(w*0.6, h*0.38, w*0.32, h*0.08);
+    // Desk with Dutch homework
+    ctx.fillStyle = 'rgba(100,70,30,0.55)';
+    ctx.fillRect(w*0.05, h*0.5, w*0.45, h*0.25);
+    // Papers on desk
+    ctx.fillStyle = 'rgba(240,235,210,0.7)';
+    ctx.fillRect(w*0.08, h*0.45, w*0.18, h*0.24);
+    ctx.fillRect(w*0.20, h*0.47, w*0.18, h*0.24);
+    // Dutch word lines on paper
+    ctx.fillStyle = 'rgba(40,40,120,0.5)';
+    for (let i = 0; i < 5; i++) ctx.fillRect(w*0.09, h*0.48 + i*h*0.03, w*0.12, h*0.008);
+    // Bed
+    ctx.fillStyle = 'rgba(60,80,120,0.4)';
+    ctx.fillRect(w*0.55, h*0.55, w*0.40, h*0.30);
+
+  } else if (panel.bg === 'haarlem_living') {
+    // Big living room — tall ceilings, light from left
+    const rg = ctx.createRadialGradient(w*0.15, h*0.4, 0, w*0.15, h*0.4, w*0.55);
+    rg.addColorStop(0, 'rgba(200,180,120,0.18)');
+    rg.addColorStop(1, 'rgba(200,180,120,0)');
+    ctx.fillStyle = rg; ctx.fillRect(0, 0, w, h);
+    // Tall bookshelves
+    ctx.fillStyle = 'rgba(80,55,20,0.5)';
+    ctx.fillRect(w*0.75, h*0.05, w*0.22, h*0.75);
+    // Couch
+    ctx.fillStyle = 'rgba(80,60,100,0.5)';
+    ctx.fillRect(w*0.20, h*0.60, w*0.50, h*0.22);
+    ctx.fillRect(w*0.18, h*0.52, w*0.08, h*0.30);
+    ctx.fillRect(w*0.70, h*0.52, w*0.08, h*0.30);
+    // Small Starling sprite (tiny figure)
+    ctx.fillStyle = 'rgba(210,190,140,0.7)'; // skin
+    ctx.beginPath(); ctx.arc(w*0.42, h*0.72, h*0.04, 0, Math.PI*2); ctx.fill();
+    ctx.fillStyle = 'rgba(212,192,64,0.75)'; // yellow dress
+    ctx.fillRect(w*0.405, h*0.76, w*0.03, h*0.10);
+    // Wooden box on floor
+    ctx.fillStyle = 'rgba(140,90,30,0.7)';
+    ctx.fillRect(w*0.44, h*0.76, w*0.08, h*0.06);
+    ctx.strokeStyle = 'rgba(180,120,40,0.6)'; ctx.lineWidth = 1;
+    ctx.strokeRect(w*0.44, h*0.76, w*0.08, h*0.06);
+
+  } else if (panel.bg === 'mn_bedroom') {
+    // Minnesota teen bedroom
+    ctx.fillStyle = 'rgba(60,80,40,0.35)';
+    ctx.fillRect(w*0.05, h*0.05, w*0.22, h*0.30); // poster
+    ctx.fillStyle = 'rgba(200,60,60,0.3)';
+    ctx.fillRect(w*0.72, h*0.05, w*0.20, h*0.28); // poster 2
+    // Bed
+    ctx.fillStyle = 'rgba(60,80,120,0.45)';
+    ctx.fillRect(w*0.55, h*0.50, w*0.40, h*0.32);
+    // Desk + phone glow
+    ctx.fillStyle = 'rgba(80,60,30,0.55)';
+    ctx.fillRect(w*0.05, h*0.52, w*0.42, h*0.22);
+    const pg = ctx.createRadialGradient(w*0.15, h*0.5, 0, w*0.15, h*0.5, w*0.12);
+    pg.addColorStop(0, 'rgba(180,220,255,0.25)'); pg.addColorStop(1, 'rgba(180,220,255,0)');
+    ctx.fillStyle = pg; ctx.fillRect(0, 0, w, h);
+    // Attic hatch / stairs entrance silhouette
+    ctx.fillStyle = 'rgba(20,15,5,0.6)';
+    ctx.fillRect(w*0.30, h*0.0, w*0.40, h*0.06);
+
+  } else if (panel.bg === 'mn_attic') {
+    // Dark attic, cardboard boxes
+    ctx.fillStyle = 'rgba(100,75,30,0.55)';
+    ctx.fillRect(w*0.05, h*0.50, w*0.22, h*0.28);
+    ctx.fillRect(w*0.30, h*0.45, w*0.20, h*0.33);
+    ctx.fillRect(w*0.55, h*0.52, w*0.18, h*0.26);
+    ctx.fillRect(w*0.76, h*0.48, w*0.17, h*0.30);
+    // Box labels
+    ctx.fillStyle = 'rgba(240,220,180,0.6)';
+    ctx.font = `${Math.floor(w*0.018)}px monospace`;
+    ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
+    ctx.fillText('FAMILY PAPERS', w*0.32, h*0.58);
+    ctx.fillText('DO NOT THROW', w*0.32, h*0.62);
+    ctx.textAlign = 'center'; ctx.textBaseline = 'alphabetic';
+    // Dusty light from small window
+    const al = ctx.createRadialGradient(w*0.85, h*0.15, 0, w*0.85, h*0.15, w*0.3);
+    al.addColorStop(0, 'rgba(255,220,120,0.12)'); al.addColorStop(1, 'rgba(255,220,120,0)');
+    ctx.fillStyle = al; ctx.fillRect(0, 0, w, h);
+    // Journal + map spread
+    ctx.fillStyle = 'rgba(220,190,130,0.7)';
+    ctx.fillRect(w*0.30, h*0.28, w*0.22, h*0.16); // journal
+    ctx.fillStyle = 'rgba(200,180,120,0.6)';
+    ctx.fillRect(w*0.54, h*0.26, w*0.28, h*0.18); // old map
+    // Map circle
+    ctx.strokeStyle = 'rgba(120,40,20,0.8)'; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.arc(w*0.68, h*0.35, w*0.06, 0, Math.PI*2); ctx.stroke();
+
+  } else if (panel.bg === 'mn_kitchen') {
+    // Kitchen table with photos spread
+    ctx.fillStyle = 'rgba(160,120,60,0.5)';
+    ctx.fillRect(w*0.10, h*0.45, w*0.80, h*0.35); // table
+    // Photos on table
+    const photoPos = [[0.15,0.30],[0.30,0.32],[0.50,0.28],[0.65,0.33],[0.78,0.30]];
+    photoPos.forEach(([px,py]) => {
+      ctx.fillStyle = 'rgba(240,235,220,0.85)';
+      ctx.fillRect(w*px, h*py, w*0.11, h*0.15);
+      ctx.strokeStyle = 'rgba(150,120,60,0.6)'; ctx.lineWidth = 1;
+      ctx.strokeRect(w*px, h*py, w*0.11, h*0.15);
+      // Sepia portrait placeholder
+      ctx.fillStyle = 'rgba(160,120,60,0.35)';
+      ctx.fillRect(w*px+4, h*py+4, w*0.11-8, h*0.15-8);
+    });
+    // Journal open
+    ctx.fillStyle = 'rgba(180,140,70,0.75)';
+    ctx.fillRect(w*0.35, h*0.50, w*0.30, h*0.20);
+    ctx.strokeStyle = 'rgba(100,70,20,0.7)'; ctx.lineWidth = 2;
+    ctx.strokeRect(w*0.35, h*0.50, w*0.30, h*0.20);
+    // Text lines in journal
+    ctx.fillStyle = 'rgba(40,30,10,0.5)';
+    for (let i = 0; i < 4; i++) ctx.fillRect(w*0.37, h*0.54 + i*h*0.03, w*0.12, h*0.008);
+    for (let i = 0; i < 4; i++) ctx.fillRect(w*0.52, h*0.54 + i*h*0.03, w*0.11, h*0.008);
+
+  } else if (panel.bg === 'mn_office') {
+    // Home office, computer screen showing family tree
+    const sg = ctx.createRadialGradient(w*0.45, h*0.38, 0, w*0.45, h*0.38, w*0.35);
+    sg.addColorStop(0, 'rgba(80,140,220,0.25)'); sg.addColorStop(1, 'rgba(80,140,220,0)');
+    ctx.fillStyle = sg; ctx.fillRect(0, 0, w, h);
+    // Monitor
+    ctx.fillStyle = 'rgba(20,20,30,0.8)';
+    ctx.fillRect(w*0.25, h*0.12, w*0.50, h*0.38);
+    ctx.fillStyle = 'rgba(40,80,180,0.6)';
+    ctx.fillRect(w*0.27, h*0.14, w*0.46, h*0.34);
+    // Family tree fan-chart on screen
+    ctx.strokeStyle = 'rgba(180,220,255,0.5)'; ctx.lineWidth = 1;
+    for (let i = 0; i < 6; i++) {
+      ctx.beginPath();
+      ctx.arc(w*0.50, h*0.46, w*(0.04 + i*0.04), Math.PI*1.1, Math.PI*1.9);
+      ctx.stroke();
+    }
+    // Monitor stand
+    ctx.fillStyle = 'rgba(30,30,40,0.8)';
+    ctx.fillRect(w*0.46, h*0.50, w*0.08, h*0.06);
+    ctx.fillRect(w*0.38, h*0.55, w*0.24, h*0.03);
+    // Desk
+    ctx.fillStyle = 'rgba(60,50,30,0.6)';
+    ctx.fillRect(w*0.05, h*0.57, w*0.90, h*0.18);
+    // Box on desk
+    ctx.fillStyle = 'rgba(120,90,40,0.65)';
+    ctx.fillRect(w*0.08, h*0.48, w*0.14, h*0.10);
+    ctx.fillStyle = 'rgba(240,220,180,0.6)';
+    ctx.font = `${Math.floor(w*0.014)}px monospace`;
+    ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
+    ctx.fillText('FAMILY', w*0.09, h*0.51);
+    ctx.fillText('PAPERS', w*0.09, h*0.54);
+    ctx.textAlign = 'center'; ctx.textBaseline = 'alphabetic';
+
+  } else if (panel.bg === 'mn_home') {
+    // Living room / home interior
+    ctx.fillStyle = 'rgba(80,100,50,0.3)';
+    ctx.fillRect(0, 0, w, h);
+    // Couch
+    ctx.fillStyle = 'rgba(100,80,50,0.55)';
+    ctx.fillRect(w*0.15, h*0.55, w*0.55, h*0.25);
+    ctx.fillRect(w*0.12, h*0.46, w*0.09, h*0.34);
+    ctx.fillRect(w*0.68, h*0.46, w*0.09, h*0.34);
+    // Box with Johan's things
+    ctx.fillStyle = 'rgba(160,120,60,0.7)';
+    ctx.fillRect(w*0.28, h*0.42, w*0.24, h*0.16);
+    ctx.strokeStyle = 'rgba(100,70,20,0.8)'; ctx.lineWidth = 2;
+    ctx.strokeRect(w*0.28, h*0.42, w*0.24, h*0.16);
+    ctx.fillStyle = 'rgba(240,220,180,0.7)';
+    ctx.font = `${Math.floor(w*0.015)}px monospace`;
+    ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
+    ctx.fillText('Grandpa Johan', w*0.30, h*0.49);
+    ctx.fillText('Netherlands', w*0.30, h*0.52);
+    ctx.textAlign = 'center'; ctx.textBaseline = 'alphabetic';
+    // Ship ticket
+    ctx.fillStyle = 'rgba(240,235,200,0.8)';
+    ctx.fillRect(w*0.56, h*0.40, w*0.20, h*0.10);
+    ctx.fillStyle = 'rgba(40,40,80,0.6)';
+    ctx.font = `${Math.floor(w*0.012)}px monospace`;
+    ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
+    ctx.fillText('Johan v. Duijnhoven', w*0.57, h*0.43);
+    ctx.fillText('Southampton → New York', w*0.57, h*0.46);
+    ctx.fillText('Nov 1950', w*0.57, h*0.47);
+    ctx.textAlign = 'center'; ctx.textBaseline = 'alphabetic';
+
+  } else if (panel.bg === 'mn_bbq') {
+    // Outdoor BBQ, party lights, people silhouettes
+    ctx.fillStyle = 'rgba(60,100,20,0.3)';
+    ctx.fillRect(0, h*0.7, w, h*0.3); // grass
+    // String lights
+    ctx.strokeStyle = 'rgba(255,220,100,0.5)'; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(0, h*0.18); ctx.lineTo(w, h*0.22); ctx.stroke();
+    for (let i = 0; i < 15; i++) {
+      const lx = (i / 14) * w;
+      const ly = h*0.18 + (lx/w)*(h*0.04);
+      const lg2 = ctx.createRadialGradient(lx, ly, 0, lx, ly, 12);
+      lg2.addColorStop(0, 'rgba(255,220,80,0.5)'); lg2.addColorStop(1, 'rgba(255,220,80,0)');
+      ctx.fillStyle = lg2; ctx.beginPath(); ctx.arc(lx, ly, 12, 0, Math.PI*2); ctx.fill();
+    }
+    // People silhouettes
+    const silhouettes = [0.12, 0.22, 0.38, 0.52, 0.62, 0.73, 0.85];
+    silhouettes.forEach(sx2 => {
+      const sh = h*(0.15 + Math.sin(sx2*17)*0.06);
+      ctx.fillStyle = 'rgba(20,20,20,0.6)';
+      ctx.beginPath(); ctx.arc(w*sx2, h*0.62 - sh, sh*0.22, 0, Math.PI*2); ctx.fill();
+      ctx.fillRect(w*sx2 - sh*0.12, h*0.62 - sh, sh*0.24, sh*0.7);
+    });
+    // BBQ counter top-right
+    ctx.fillStyle = 'rgba(40,30,15,0.65)';
+    ctx.fillRect(w*0.72, h*0.55, w*0.24, h*0.20);
+    // Counter badge
+    ctx.fillStyle = 'rgba(255,220,80,0.85)';
+    ctx.font = `bold ${Math.floor(w*0.028)}px sans-serif`;
+    ctx.textAlign = 'right'; ctx.textBaseline = 'middle';
+    ctx.fillText('47 people', w*0.95, h*0.30);
+    ctx.fillText('today', w*0.95, h*0.36);
+    ctx.textAlign = 'center'; ctx.textBaseline = 'alphabetic';
+
+  } else if (panel.bg === 'classroom') {
+    // School classroom, whiteboard at front
+    ctx.fillStyle = 'rgba(220,210,180,0.3)';
+    ctx.fillRect(0, 0, w, h);
+    // Whiteboard
+    ctx.fillStyle = 'rgba(240,240,230,0.7)';
+    ctx.fillRect(w*0.10, h*0.05, w*0.80, h*0.35);
+    ctx.strokeStyle = 'rgba(100,100,80,0.5)'; ctx.lineWidth = 3;
+    ctx.strokeRect(w*0.10, h*0.05, w*0.80, h*0.35);
+    // Board text
+    ctx.fillStyle = 'rgba(30,30,60,0.65)';
+    ctx.font = `${Math.floor(w*0.022)}px Georgia, serif`;
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText('Daily Life in 19th Century Netherlands', w/2, h*0.15);
+    ctx.font = `${Math.floor(w*0.016)}px Georgia, serif`;
+    ctx.fillText('Population growth · Industrialisation · Emigration', w/2, h*0.25);
+    // Desks and students (rows of rectangles)
+    ctx.fillStyle = 'rgba(160,120,60,0.4)';
+    for (let r = 0; r < 3; r++) for (let c = 0; c < 5; c++) {
+      ctx.fillRect(w*(0.08 + c*0.18), h*(0.50 + r*0.14), w*0.13, h*0.08);
+    }
+    // Maxwell silhouette slightly apart, looking at phone/book
+    ctx.fillStyle = 'rgba(50,70,50,0.6)';
+    ctx.beginPath(); ctx.arc(w*0.44, h*0.56, h*0.04, 0, Math.PI*2); ctx.fill();
+    ctx.fillRect(w*0.425, h*0.60, w*0.03, h*0.08);
+    // Book on desk glowing faintly
+    const jg = ctx.createRadialGradient(w*0.46, h*0.67, 0, w*0.46, h*0.67, w*0.08);
+    jg.addColorStop(0, 'rgba(200,160,80,0.3)'); jg.addColorStop(1, 'rgba(200,160,80,0)');
+    ctx.fillStyle = jg; ctx.fillRect(0, 0, w, h);
+    ctx.textBaseline = 'alphabetic';
+
+  } else if (panel.bg === 'closeup') {
+    // Journal closeup — worn leather cover + title
+    const jg2 = ctx.createRadialGradient(w/2, h*0.48, 0, w/2, h*0.48, w*0.35);
+    jg2.addColorStop(0, 'rgba(140,90,30,0.6)'); jg2.addColorStop(1, 'rgba(140,90,30,0)');
+    ctx.fillStyle = jg2; ctx.fillRect(0, 0, w, h);
+    // Journal cover
+    ctx.fillStyle = 'rgba(120,75,20,0.85)';
+    const jw = Math.min(w*0.55, 480), jh = Math.min(h*0.55, 380);
+    const jx = w/2 - jw/2, jy = h*0.22;
+    ctx.fillRect(jx, jy, jw, jh);
+    ctx.strokeStyle = 'rgba(200,160,80,0.7)'; ctx.lineWidth = 3;
+    ctx.strokeRect(jx, jy, jw, jh);
+    // Inner border
+    ctx.strokeStyle = 'rgba(200,160,80,0.4)'; ctx.lineWidth = 1;
+    ctx.strokeRect(jx+10, jy+10, jw-20, jh-20);
+    // Title text on cover
+    ctx.fillStyle = 'rgba(220,180,80,0.9)';
+    ctx.font = `bold ${Math.floor(Math.min(jw*0.09, 28))}px Georgia, serif`;
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText('Van Duynhoven', w/2, jy + jh*0.35);
+    ctx.font = `${Math.floor(Math.min(jw*0.065, 20))}px Georgia, serif`;
+    ctx.fillText('Family History', w/2, jy + jh*0.52);
+    // Decorative line
+    ctx.strokeStyle = 'rgba(220,180,80,0.5)'; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(jx+30, jy + jh*0.44); ctx.lineTo(jx+jw-30, jy + jh*0.44); ctx.stroke();
+    ctx.textBaseline = 'alphabetic';
+
   } else if (panel.bg === 'sleep') {
-    // Stars
+    // Stars — fix: use Math.abs to ensure positive radius
     ctx.fillStyle = 'rgba(255,255,255,0.7)';
     for (let i = 0; i < 80; i++) {
-      const sx = Math.sin(i * 13.7) * w/2 + w/2;
-      const sy = Math.cos(i * 11.3) * h/2 + h/2;
-      ctx.beginPath(); ctx.arc(sx, sy, Math.sin(i)*1.5+0.5, 0, Math.PI*2); ctx.fill();
+      const sx2 = Math.sin(i * 13.7) * w/2 + w/2;
+      const sy2 = Math.cos(i * 11.3) * h/2 + h/2;
+      const r   = Math.abs(Math.sin(i)) * 1.5 + 0.5; // always positive
+      ctx.beginPath(); ctx.arc(sx2, sy2, r, 0, Math.PI*2); ctx.fill();
+    }
+    // Nebula glow
+    const ng = ctx.createRadialGradient(w*0.5, h*0.4, 0, w*0.5, h*0.4, w*0.4);
+    ng.addColorStop(0, 'rgba(80,40,160,0.25)'); ng.addColorStop(1, 'rgba(80,40,160,0)');
+    ctx.fillStyle = ng; ctx.fillRect(0, 0, w, h);
+    // Swirling light wisps
+    ctx.strokeStyle = 'rgba(140,100,255,0.2)'; ctx.lineWidth = 2;
+    for (let i = 0; i < 5; i++) {
+      ctx.beginPath();
+      ctx.arc(w*(0.3 + i*0.1), h*(0.3 + Math.sin(i)*0.2), w*(0.05 + i*0.03), 0, Math.PI*2);
+      ctx.stroke();
     }
   }
 
-  // Caption box at bottom
-  ctx.fillStyle = 'rgba(0,0,0,0.65)';
-  ctx.fillRect(0, h * 0.82, w, h * 0.18);
+  // ── Caption bar ────────────────────────────────────
+  ctx.fillStyle = 'rgba(0,0,0,0.70)';
+  ctx.fillRect(0, h * 0.80, w, h * 0.20);
   ctx.fillStyle = '#e8d4a0';
-  ctx.font = `${Math.floor(Math.min(w*0.032, 22))}px Georgia, serif`;
+  ctx.font = `${Math.floor(Math.min(w*0.030, 20))}px Georgia, serif`;
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
-  ctx.fillText(panel.caption || '', w/2, h * 0.91);
+  // Wrap long captions
+  const words = (panel.caption || '').split(' ');
+  const maxW   = w * 0.85;
+  let line = '';
+  const lines = [];
+  words.forEach(word => {
+    const test = line ? line + ' ' + word : word;
+    if (ctx.measureText(test).width > maxW && line) { lines.push(line); line = word; }
+    else line = test;
+  });
+  if (line) lines.push(line);
+  const lineH = Math.floor(Math.min(w*0.032, 22));
+  const startY = h * 0.90 - ((lines.length - 1) * lineH * 0.5);
+  lines.forEach((l, i) => ctx.fillText(l, w/2, startY + i * lineH));
   ctx.textBaseline = 'alphabetic';
 }

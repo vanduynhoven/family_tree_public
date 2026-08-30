@@ -27,6 +27,26 @@ export const NPC_DATA = {
           { dutch:'"Duinhoven" betekent "duintuin". [Duinhoven means dune garden.]', en:'Our name speaks of this land.' },
           'I give you the Family Seal. Carry it always — it is the mark of our line.',
         ],
+        repeat1: [
+          { dutch:'Ah, je bent terug! [Ah, you are back!]', en:'Good to see you again.' },
+          'The heather blooms late this year. A hard winter is coming, the elders say.',
+          'My son helps me tend the east field now. He learns slowly, but he learns.',
+        ],
+        repeat2: [
+          'You know, our family has lived here since before my grandfather\'s grandfather.',
+          { dutch:'Wij horen bij dit land. [We belong to this land.]', en:'The dunes, the heath, the church bells.' },
+          'The tax collector came through again last week. God give us patience.',
+        ],
+        heart2: [
+          'You have come back many times now. You are becoming a friend of the family.',
+          'Let me tell you something I do not share easily — my grandfather\'s name was Dirck too.',
+          'Three generations of Dircks on this farm. Perhaps four one day.',
+        ],
+        heart3: [
+          { dutch:'Ik vertrouw je. [I trust you.]', en:'So I will tell you something.' },
+          'There is a stone in the south field. Very old. My grandfather said it marks where the first Duinhoven built his house.',
+          'Go find it if you wish. It is near the ancient shrine.',
+        ],
         raven: [
           { dutch:'Raven! Weet jij wat "duinhoven" betekent? [Raven! Do you know what "duinhoven" means?]', en:'' },
           '"Dune garden." That is your family name. Say it — it is beautiful.',
@@ -54,6 +74,16 @@ export const NPC_DATA = {
           'Dirck is my kin. We share these fields and share the name.',
           'The church bell rings at dawn — every day the same. Life is steady here.',
         ],
+        repeat1: [
+          'I was up before dawn again. The chickens do not wait for sunrise.',
+          { dutch:'Hard werken is goed voor de ziel. [Hard work is good for the soul.]', en:'My mother always said that.' },
+          'Have you spoken with Dirck yet? He knows more of our history than I do.',
+        ],
+        heart2: [
+          'You keep coming back. That means something around here.',
+          'My grandmother was a Verwegen before she married. Two families, one village, for generations.',
+          'Sometimes I think the fields know us. They grow better when the same hands tend them.',
+        ],
       },
     },
   ],
@@ -71,6 +101,16 @@ export const NPC_DATA = {
           'Stand near the water and cast your line. Be patient — the fish come to those who wait.',
           { dutch:'Vis is goed eten. [Fish is good food.]', en:'Better than tax collector stew!' },
         ],
+        repeat1: [
+          'Back again? The eel were running last night, just after dusk.',
+          'My father taught me: face downstream and let the line drift. The fish come to you.',
+          { dutch:'Geduld is alles. [Patience is everything.]', en:'In fishing and in life.' },
+        ],
+        repeat2: [
+          'I have fished this river for thirty years. I know every bend and every rock.',
+          'The perch like the shaded spots under the willows. Try there in the afternoon.',
+          'A traveller gave me a Dutch coin last spring. Never saw one before.',
+        ],
       },
     },
   ],
@@ -87,6 +127,16 @@ export const NPC_DATA = {
         generic: [
           { dutch:'Rust een beetje! [Rest a little!]', en:'You look tired, traveller.' },
           'Give me a herb or a fish and I will give you a bed. Sleep well and wake refreshed.',
+        ],
+        repeat1: [
+          'You again! Sit down, sit down. The fire is warm tonight.',
+          'I had a merchant from Utrecht pass through yesterday. Strange times.',
+          'Do you need a rest? Bring me something from the fields and we will settle the account.',
+        ],
+        repeat2: [
+          { dutch:'Welkom terug, vriend. [Welcome back, friend.]', en:'You are becoming a regular here.' },
+          'The van Duinhoven family? Good people. Quiet, hardworking, honest.',
+          'I\'ve kept this inn for twenty years. Everyone passes through eventually.',
         ],
       },
     },
@@ -162,6 +212,27 @@ export const NPC_DATA = {
           'We will have twelve children. God willing, they will all survive.',
           'Take this train ticket. One day, one of my sons will use a ticket like this — to America.',
         ],
+        repeat1: [
+          'You are back! Anna made fresh bread this morning — the smell carries all the way to the road.',
+          'The factory in Veghel is hiring again. Long hours, poor pay. But it is work.',
+          { dutch:'Het leven is zwaar, maar goed. [Life is hard, but good.]', en:'We have the land, the faith, the family.' },
+        ],
+        repeat2: [
+          'My father Martinus always said: keep your family together no matter what.',
+          'I worry about the young ones who go to the cities. They lose themselves there.',
+          { dutch:'Hier in Boekel kennen wij elkaar. [Here in Boekel we know each other.]', en:'The city is cold and strange.' },
+        ],
+        heart2: [
+          'I do not often talk about this — I am afraid for my son Johan.',
+          'He speaks of leaving. America, he says. There is nothing for him here, he says.',
+          'Perhaps he is right. But it breaks something in me to think of it.',
+        ],
+        heart3: [
+          { dutch:'Je bent een goede vriend geworden. [You have become a good friend.]', en:'' },
+          'Let me tell you about my father Martinus. He married a Verwegen girl in 1858.',
+          'Two Van Duijnhoven brothers married two Verwegen sisters — same year! Same church!',
+          'That is how small this village is. Everyone is connected to everyone.',
+        ],
         raven: [
           { dutch:'Raven! Weet je het woord voor trein? [Raven! Do you know the word for train?]', en:'"Trein." T-R-E-I-N.' },
           'The railway brought the modern world to our village. One day it will carry my family far away.',
@@ -194,6 +265,15 @@ export const NPC_DATA = {
           { dutch:'De fabriek is zwaar werk. [The factory is hard work.]', en:'But the canal here — the eel are fat this time of year.' },
           'Fish in the canal after your shift. It feeds the family on days the pay falls short.',
         ],
+        repeat1: [
+          'The overseer cut our lunch break again today. Half an hour. Half!',
+          { dutch:'Maar wat kan je doen? [But what can you do?]', en:'A man must feed his children.' },
+          'The eel were good last night. Cast near the old mill wheel.',
+        ],
+        repeat2: [
+          'I heard talk of a strike in Utrecht. The men there are braver than us.',
+          'Or perhaps just hungrier. Hard to say which is which these days.',
+        ],
       },
     },
   ],
@@ -215,6 +295,26 @@ export const NPC_DATA = {
           'America. We say it like a prayer. Moorhead, Minnesota. A Dutch Catholic community there.',
           'My father Marianus never left Brabant. I wonder sometimes if he knew what it would cost.',
           'Take these papers — immigration papers. Without them, you cannot cross the border.',
+        ],
+        repeat1: [
+          'The sea is rough again tonight. Anna does not complain, but I can see it in her face.',
+          { dutch:'Tien dagen op zee. [Ten days at sea.]', en:'Each one feels like a week.' },
+          'I keep thinking about the farm. Who is living there now? Who is tending the fields?',
+        ],
+        repeat2: [
+          'My brother Martinus stayed behind. I said goodbye knowing I might never see him again.',
+          'That is the hardest part no one tells you about emigrating.',
+          { dutch:'Afscheid nemen is sterven een beetje. [To say goodbye is to die a little.]', en:'A Dutch saying.' },
+        ],
+        heart2: [
+          'I kept a small jar of Brabant soil in my coat pocket for the crossing.',
+          'I thought — if something happens, at least a piece of home comes with me.',
+          'When we landed in New York I left the jar on the dock. America had to be enough.',
+        ],
+        heart3: [
+          { dutch:'Ik mis het zo erg. [I miss it so much.]', en:'But this is the right thing for the children.' },
+          'Gerardus, Hubertus, little Francine — they will grow up American. They will not know what they left.',
+          'And that is both the blessing and the grief of it.',
         ],
         isabella: [
           'Isabella. You came all this way to find us on the ship.',
@@ -240,6 +340,21 @@ export const NPC_DATA = {
           'I packed the boterkoek recipe in my luggage. Some things you carry no matter what.',
           'The sea is bigger than I imagined. The horizon goes on forever.',
           'I will die in Minnesota in 1987. But today — today we are just beginning.',
+        ],
+        repeat1: [
+          'The children are seasick. I have been up since three this morning.',
+          { dutch:'Maar ik klaag niet. [But I do not complain.]', en:'This is what we chose.' },
+          'The cook gave me ginger for the little ones. That helped.',
+        ],
+        repeat2: [
+          'Last night I dreamed of my mother\'s kitchen in Boekel. The smell of bread.',
+          'She gave me her recipe book when we left. I have it at the bottom of the big suitcase.',
+          'I told her: I will make boterkoek in America every Christmas. And I kept that promise.',
+        ],
+        heart2: [
+          'You keep visiting. That reminds me of my sister — she always came back too.',
+          'I left four sisters in Boekel. We wrote letters for twenty years.',
+          { dutch:'Brieven zijn niet genoeg. [Letters are not enough.]', en:'But they are what you have.' },
         ],
         tenley: [
           'You are looking for the women of this family.',
@@ -359,6 +474,21 @@ export const NPC_DATA = {
           'I built the family tree website trying to hold all these threads together.',
           'Five hundred years of this family, and here we are. Still going.',
         ],
+        repeat1: [
+          'You know what surprised me when I moved to Haarlem? How normal it felt.',
+          'Like something in my DNA already knew this place, even though I had never been here.',
+          { dutch:'Thuiskomen zonder het ooit te hebben verlaten. [Coming home without ever having left.]', en:'Strange feeling.' },
+        ],
+        repeat2: [
+          'The girls are doing well. Raven is learning Dutch faster than I did.',
+          'Starling keeps asking me about every single ancestor on the family tree.',
+          'She is four years old and already more curious about history than most adults I know.',
+        ],
+        heart2: [
+          'Can I tell you something? Building that family tree changed me.',
+          'When you see all those names going back to 1450 — Dirck, Johannes, Petrus, Martinus, Marianus, Johan, me — you feel very small.',
+          'But also very connected. It is hard to explain.',
+        ],
         henry: [
           'Henry — you\'ve been talking to all of them, haven\'t you.',
           'You\'ve met Dirck in 1539 and you\'re here now in 2020. How does it feel?',
@@ -378,6 +508,21 @@ export const NPC_DATA = {
           { dutch:'Hallo! Ik spreek een beetje Nederlands. [Hello! I speak a little Dutch.]', en:'Just a little. I am still learning.' },
           'Dad says we have family going back to 1539. I can\'t even imagine that.',
           'I want to go see the Netherlands someday. The real Netherlands, not just Haarlem.',
+        ],
+        repeat1: [
+          'My Dutch teacher gave us a list of words today. I already knew three of them!',
+          { dutch:'"Familie", "huis", "water". [Family, house, water.]', en:'The easy ones first.' },
+          'But I want to learn the old words too. The ones from the village.',
+        ],
+        repeat2: [
+          'I found an old photo of Boekel online. It looks exactly like I imagined it.',
+          'Little cobblestone streets, a church, flat fields all around.',
+          'Dad says that is where Dirck lived in 1539. The same village!',
+        ],
+        heart2: [
+          'You know what I love about speaking Dutch? People here look surprised.',
+          { dutch:'Ze verwachtten het niet van mij. [They did not expect it from me.]', en:'But I am Dutch, just… different Dutch.' },
+          'American Dutch, Dad calls it. I think that is a real thing.',
         ],
         raven: [
           'Oh! It\'s me — I mean, it\'s you — I mean…',

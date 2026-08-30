@@ -15,6 +15,7 @@ export class NPC extends Entity {
     this.item       = data.item    || null;
     this.friendship = 0;          // 0-5 hearts
     this.talked     = false;
+    this.talkCount  = 0;          // increments each conversation, drives repeat lines
     this.homeX      = x;
     this.homeY      = y;
     this.speed      = 35;
@@ -29,7 +30,39 @@ export class NPC extends Entity {
   }
 
   linesForCharacter(charId) {
-    return this.lines[charId] || this.lines.generic || [];
+    // Lines can be an array (flat) or an object with keys:
+    //   generic, <charId>, repeat1, repeat2, repeat3, heart2, heart3, heart5
+    // Priority: charId > generic, then repeat based on talkCount, then heart-gated
+    const pool = this.lines;
+
+    // 1. Pick base set: charId-specific or generic
+    const base = pool[charId] || pool.generic || [];
+
+    // 2. On repeat visits, try friendship-gated or numbered repeat sets
+    if (this.talkCount > 0) {
+      const heartKey = this.friendship >= 5 ? 'heart5'
+                     : this.friendship >= 3 ? 'heart3'
+                     : this.friendship >= 2 ? 'heart2' : null;
+      if (heartKey && pool[heartKey]) return pool[heartKey];
+
+      const repeatKey = `repeat${this.talkCount}`;  // repeat1, repeat2, repeat3
+      if (pool[repeatKey]) return pool[repeatKey];
+
+      // If no specific repeat key, cycle through repeatX keys that exist
+      const repeatKeys = Object.keys(pool).filter(k => k.startsWith('repeat'));
+      if (repeatKeys.length) {
+        const idx = (this.talkCount - 1) % repeatKeys.length;
+        return pool[repeatKeys[idx]] || base;
+      }
+
+      // Fall back to a short "already-talked" line so it's never fully silent
+      return pool.repeat_default || [
+        `${this.data?.given || this.name.split(' ')[0]} smiles at you warmly. ♥`,
+        'It is good to talk again. Come back any time.',
+      ];
+    }
+
+    return base;
   }
 
   addFriendship(amt) {

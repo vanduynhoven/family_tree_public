@@ -237,6 +237,7 @@ export class Game {
 
     // Add friendship
     npc.addFriendship(1);
+    npc.talkCount++;
     npc.talked = true;
 
     // Give gate item
@@ -306,7 +307,10 @@ export class Game {
       this.player.update(dt, engine.keys, this.world);
     }
 
-    if (!inputBlocked) {
+    // Dialog advance: E / Space always works during dialog
+    if (this._dialogNPC) {
+      if (engine.consumeAction()) this.ui.advanceDialog();
+    } else if (!inputBlocked) {
       if (engine.consumeAttack()) this.attack();
       if (engine.consumeFish())   this.fish();
       if (engine.consumeAction()) this.interact();
