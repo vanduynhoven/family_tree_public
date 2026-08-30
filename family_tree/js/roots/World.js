@@ -343,15 +343,38 @@ export class World {
   }
 
   entryPosition(dir) {
-    // Place player safely clear of any border tiles (trees, walls).
-    // Use the screen's spawn column/row as the passage alignment point.
     const spawnR = this.screen?.spawn?.r ?? 7;
     const spawnC = this.screen?.spawn?.c ?? 10;
+    const exit   = this.screen?.exits?.[dir];
+    const passR  = (dir === 'right' || dir === 'left')  ? (exit?.pos ?? spawnR) : spawnR;
+    const passC  = (dir === 'down'  || dir === 'up')    ? (exit?.pos ?? spawnC) : spawnC;
+
+    // Scan inward from the entry edge along the passage column/row
+    // to find the first pair of walkable tiles (player needs 2 tile heights to stand)
+    const scanForWalkable = (startR, startC, dR, dC, maxSteps) => {
+      for (let i = 0; i < maxSteps; i++) {
+        const r = startR + dR * i;
+        const c = startC + dC * i;
+        // Check foot hitbox (player body spans ~2 rows)
+        const footR = r + 1;
+        if (!this.solidAt(c * TILE + 4, r * TILE + 4) &&
+            !this.solidAt(c * TILE + 4, footR * TILE + 4)) {
+          return { x: c * TILE + 4, y: r * TILE + 4 };
+        }
+      }
+      // Fallback to spawn
+      return { x: spawnC * TILE + 4, y: spawnR * TILE + 4 };
+    };
+
     switch (dir) {
-      case 'right': return { x: TILE,                          y: spawnR * TILE };
-      case 'left':  return { x: SCREEN_COLS * TILE - TILE * 2, y: spawnR * TILE };
-      case 'down':  return { x: spawnC * TILE,  y: TILE * 3 };  // row 3 — past border trees
-      case 'up':    return { x: spawnC * TILE,  y: SCREEN_ROWS * TILE - TILE * 3 }; // 3 rows from bottom
+      case 'right':
+        return scanForWalkable(passR, 1,          0,  1, SCREEN_COLS - 2);
+      case 'left':
+        return scanForWalkable(passR, SCREEN_COLS-2, 0, -1, SCREEN_COLS - 2);
+      case 'down':
+        return scanForWalkable(1,    passC,   1,  0, SCREEN_ROWS - 2);
+      case 'up':
+        return scanForWalkable(SCREEN_ROWS-3, passC, -1,  0, SCREEN_ROWS - 2);
     }
     return { x: TILE * 10, y: TILE * 7 };
   }
