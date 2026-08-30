@@ -220,8 +220,8 @@ export class Game {
     const W = this.engine.width, H = this.engine.height;
     const ox = this.engine.cameraX, oy = this.engine.cameraY;
 
-    const fromMap = this.world.screens[tr.fromIdx]?.map;
-    const toMap   = this.world.screens[tr.toIdx]?.map;
+    const fromMap = this.world.grid?.[tr.fromRow]?.[tr.fromCol]?.map;
+    const toMap   = this.world.grid?.[tr.toRow]?.[tr.toCol]?.map;
 
     let dx=0,dy=0;
     if(tr.dir==='right'){dx=-1;} if(tr.dir==='left'){dx=1;}
