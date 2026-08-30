@@ -517,6 +517,26 @@
                 });
             });
             
+            // Country flags — only track when user clicks on flag elements, not just seeing them
+            var flagEls = document.querySelectorAll('[data-country], .country-flag');
+            flagEls.forEach(function(node) {
+                var country = node.getAttribute('data-country');
+                if (!country) {
+                    // Try to detect from emoji
+                    var text = node.textContent || '';
+                    Object.keys(FLAG_COUNTRIES).forEach(function(flag) {
+                        if (text.indexOf(flag) !== -1) country = FLAG_COUNTRIES[flag];
+                    });
+                }
+                if (country) {
+                    node.style.cursor = node.style.cursor || 'pointer';
+                    node.addEventListener('click', function() {
+                        if (!isKidModeOn()) return;
+                        trackCountry(country);
+                    });
+                }
+            });
+            
             // When live GEDCOM stats arrive, fold in earliest year too
             document.addEventListener('gedcom-stats-loaded', function (ev) {
                 if (!isKidModeOn()) return; // Check at event time
@@ -528,24 +548,13 @@
             autoScanWired = true;
         }
 
-        // Only track countries and years when Kid Mode is on
-        if (!kidModeOn) return;
-
-        // Country flags anywhere on the page.
-        var flags = Object.keys(FLAG_COUNTRIES);
-        var bodyText = document.body ? document.body.innerText : '';
-        flags.forEach(function (flag) {
-            if (bodyText.indexOf(flag) !== -1) { trackCountry(FLAG_COUNTRIES[flag]); }
-        });
-
-        // Years — scan visible year mentions (4-digit 1400–2099).
-        var yearRe = /\b(1[4-9]\d{2}|20\d{2})\b/g;
-        var m;
-        var seen = {};
-        while ((m = yearRe.exec(bodyText)) !== null) {
-            var y = parseInt(m[1], 10);
-            if (!seen[y]) { seen[y] = true; state.years.indexOf(y) === -1 && state.years.push(y); }
-        }
+        // NOTE: We no longer auto-scan body text for flags and years.
+        // Achievements should be earned through explicit interactions:
+        // - Clicking on person cards/badges
+        // - Clicking on story cards
+        // - Visiting specific pages (generations, tree, chart, timeline)
+        // - Clicking on country flags
+        // This prevents getting 8+ achievements just by loading the home page.
 
         evaluate();
     }
