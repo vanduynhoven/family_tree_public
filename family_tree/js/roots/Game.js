@@ -40,8 +40,13 @@ export class Game {
     this._eraId       = 0;
     this._timeOfDay   = 0.3;
     this.characterId  = 'traveller';
-    this.unlockedEras = new Set([0]);
+    this.unlockedEras = new Set([0, 8]); // Era 0 (1539) and Era 8 (2026 home) always unlocked
     this._gedcom      = null;  // parsed GEDCOM data
+
+    // Persistent NPC state — survives screen transitions and era travel
+    // Key: npc.gedcomId || npc.name
+    this._npcFriendship = new Map();  // key → hearts (0-5)
+    this._npcTalkCount  = new Map();  // key → number of conversations
 
     // Bind event listeners
     this._bindQuestEvents();
@@ -63,9 +68,33 @@ export class Game {
     this.characterId = charId;
     const char = getCharacter(charId);
 
+    // Restore save data if a save exists for this character
+    const savedData = this.save.load(0);
+    if (savedData && savedData.characterId === charId) {
+      // Restore NPC friendship hearts + talk counts
+      if (savedData.npcFriendship) {
+        this._npcFriendship = new Map(Object.entries(savedData.npcFriendship));
+      }
+      if (savedData.npcTalkCount) {
+        this._npcTalkCount = new Map(Object.entries(savedData.npcTalkCount));
+      }
+      // Restore unlocked eras
+      if (savedData.unlockedEras) {
+        this.unlockedEras = new Set(savedData.unlockedEras);
+      }
+    }
+
     // Initialise player with character appearance
     this.player = new Player(SCREEN_COLS/2 * TILE, (SCREEN_ROWS-3) * TILE, char.sprite);
     this.player.dutchWords = [];
+
+    // Restore player state from save
+    if (savedData && savedData.characterId === charId && savedData.inventory) {
+      this.player.inventory      = savedData.inventory;
+      this.player.collectedFacts = savedData.collectedFacts || [];
+      this.player.hp             = savedData.playerHP      || 100;
+      this.player.stamina        = savedData.playerStamina || 100;
+    }
 
     // Initialise quest manager
     this.quests = new QuestManager(charId, this.events);
@@ -80,6 +109,7 @@ export class Game {
 
     // Load sprite sheets first, then start the game
     loadSprites('./assets/sprites/').then(() => {
+      this._startLocation = char.startLocation || 'haarlem'; // 'haarlem' | 'mankato'
       this.loadEra(startEra);
       this._state = STATE.PLAYING;
 
@@ -113,12 +143,13 @@ export class Game {
 
   loadEra(eraId) {
     this._eraId = eraId;
-    setEra(eraId);
+    setEra(Math.min(eraId, 7)); // Renderer only has 8 palettes (0-7); clamp
 
     // Merge NPC_DATA with GEDCOM metadata
-    const npcData = this._buildNpcData(eraId);
+    const npcData  = this._buildNpcData(eraId);
+    const location = this._startLocation || 'haarlem';
 
-    this.world.loadEra(eraId, npcData);
+    this.world.loadEra(eraId, npcData, 1, 1, location, this._npcFriendship, this._npcTalkCount);
     const sp = this.world.screen?.spawn;
     if (this.player) {
       this.player.x = (sp?.c ?? 10) * TILE + 4;
@@ -133,7 +164,7 @@ export class Game {
   }
 
   travelToEra(targetId) {
-    if (targetId < 0 || targetId > 7) return;
+    if (targetId < 0 || targetId > 8) return;
     if (!this.unlockedEras.has(targetId)) return;
     const ctx = this.engine.ctx;
     ctx.fillStyle = 'rgba(80,40,180,0.88)';
@@ -229,18 +260,57 @@ export class Game {
   }
 
   // ── Click-to-navigate / click-to-act ─────────────────
-  // Called from canvas click listener set up in _afterIntro
 
   handleCanvasClick(screenX, screenY) {
     if (this._state !== STATE.PLAYING) return;
     if (this._dialogNPC) { this.ui.advanceDialog(); return; }
     if (this.ui.journalOpen || this.ui.eraSelOpen) return;
 
-    // Convert screen → world coords
+    // Convert screen coords → world coords
     const wx = screenX + this.engine.cameraX;
     const wy = screenY + this.engine.cameraY;
 
-    // Check what was clicked — prioritise interactive objects
+    // ── Off-screen click → walk toward the nearest valid screen edge ──
+    // This lets the player click beyond the current screen to trigger a transition.
+    const screenW = SCREEN_COLS * TILE;
+    const screenH = SCREEN_ROWS * TILE;
+    const offRight  = wx >= screenW;
+    const offLeft   = wx < 0;
+    const offBottom = wy >= screenH;
+    const offTop    = wy < 0;
+
+    if (offRight || offLeft || offBottom || offTop) {
+      // Determine which edge the click is toward and whether it has an exit
+      let dir = null;
+      if (offRight  && wx - this.player.cx >= Math.abs(wy - this.player.cy)) dir = 'right';
+      else if (offLeft   && this.player.cx - wx >= Math.abs(wy - this.player.cy)) dir = 'left';
+      else if (offBottom && wy - this.player.cy >= Math.abs(wx - this.player.cx)) dir = 'down';
+      else if (offTop    && this.player.cy - wy >= Math.abs(wx - this.player.cx)) dir = 'up';
+      // Also handle purely off-screen in one axis
+      if (!dir) {
+        if (offRight)  dir = 'right';
+        else if (offLeft)   dir = 'left';
+        else if (offBottom) dir = 'down';
+        else if (offTop)    dir = 'up';
+      }
+
+      if (dir && this.world.canExitDir(dir)) {
+        // Walk the player toward the open passage on that edge
+        const exits = this.world.screen?.exits || {};
+        const exit  = exits[dir];
+        let edgeTx, edgeTy;
+        if (dir === 'right')  { edgeTx = screenW - 1;  edgeTy = (exit?.pos ?? 7) * TILE + TILE/2; }
+        else if (dir === 'left')   { edgeTx = 1;          edgeTy = (exit?.pos ?? 7) * TILE + TILE/2; }
+        else if (dir === 'down')   { edgeTx = (exit?.pos ?? 10) * TILE + TILE/2; edgeTy = screenH - 1; }
+        else                       { edgeTx = (exit?.pos ?? 10) * TILE + TILE/2; edgeTy = 1; }
+        this._navigateTo(edgeTx, edgeTy, null);
+        return;
+      }
+      // No exit in that direction — ignore the click
+      return;
+    }
+
+    // ── On-screen click — check for interactive targets first ──
 
     // 1. NPC?
     for (const npc of this.world.activeNPCs) {
@@ -287,14 +357,16 @@ export class Game {
       return;
     }
 
-    // 6. Plain ground — just walk there
+    // 6. Plain walkable ground
     if (!this.world.solidAt(wx, wy)) {
+      this._navigateTo(wx, wy, null);
+    }
+    // Solid tile click — walk toward it as far as possible (player bumps the wall)
+    else {
       this._navigateTo(wx, wy, null);
     }
   }
 
-  // Simple point-click navigation: walk the player toward (tx, ty),
-  // call onArrival when close enough (< TILE*0.8).
   _navigateTo(tx, ty, onArrival) {
     this._clickTarget  = { tx, ty, onArrival };
     this._clickArrived = false;
@@ -311,10 +383,13 @@ export class Game {
       return;
     }
 
-    // Synthesise key-like movement via direct player position update
-    const dx = tx - this.player.cx;
-    const dy = ty - this.player.cy;
-    const len = Math.hypot(dx, dy);
+    // If a screen transition just started, clear the target (world handles it)
+    if (this.world.transition) { this._clickTarget = null; return; }
+
+    // Walk toward target
+    const dx  = tx - this.player.cx;
+    const dy  = ty - this.player.cy;
+    const len = Math.hypot(dx, dy) || 1;
     const spd = this.player.speed * dt;
     const nx  = this.player.x + (dx / len) * spd;
     const ny  = this.player.y + (dy / len) * spd;
@@ -330,11 +405,10 @@ export class Game {
     }
     this.player.walkCycle += dt * 9;
 
-    // Update facing toward target
     if (Math.abs(dx) > Math.abs(dy)) this.player.facing = dx > 0 ? 'right' : 'left';
     else this.player.facing = dy > 0 ? 'down' : 'up';
 
-    // Cancel nav if player manually moves
+    // Cancel if player manually uses keyboard/d-pad
     const keys = this.engine.keys;
     if (keys.up || keys.down || keys.left || keys.right) this._clickTarget = null;
   }
@@ -396,10 +470,15 @@ export class Game {
       this.events.emit('facts_milestone', { count: this.player.collectedFacts.length });
     }
 
-    // Add friendship
+    // Add friendship — cap at 5
     npc.addFriendship(1);
     npc.talkCount++;
     npc.talked = true;
+
+    // Persist to cross-screen friendship maps (key = gedcomId || name)
+    const npcKey = npc.gedcomId || npc.name;
+    this._npcFriendship.set(npcKey, npc.friendship);
+    this._npcTalkCount.set(npcKey, npc.talkCount);
 
     // Give gate item
     if (npc.item && !this.player.hasItem(npc.item.id)) {
@@ -483,7 +562,7 @@ export class Game {
     // ── Check screen exit ──────────────────────────────
     const exitDir = this.world.checkScreenExit(this.player);
     if (exitDir && this.world.canExitDir(exitDir)) {
-      this.world.startTransition(exitDir, this.player, this._eraId, this._buildNpcData(this._eraId));
+      this.world.startTransition(exitDir, this.player, this._eraId, this._buildNpcData(this._eraId), this._startLocation || 'haarlem');
     }
 
     // ── World update ───────────────────────────────────
@@ -564,7 +643,7 @@ export class Game {
       this.player.hp, this.player.maxHp,
       this.player.stamina, this.player.maxStamina,
       this.player.collectedFacts.length,
-      Object.keys(NPC_DATA).reduce((s, k) => s + (NPC_DATA[k]?.length || 0), 0),
+      this._totalNpcCount(),
       fishable,
     );
 
@@ -624,44 +703,175 @@ export class Game {
   _parseGEDCOM(text) {
     const individuals = new Map();
     let cur = null;
+    let inBirt = false, inDeat = false;
+
     for (const rawLine of text.split('\n')) {
       const line = rawLine.trim();
       if (!line) continue;
       const m = line.match(/^(\d+)\s+(@[^@]+@|\S+)\s*(.*)?$/);
       if (!m) continue;
       const [, level, tag, value] = m;
-      if (level === '0' && tag.startsWith('@I')) {
-        cur = { id: tag, name:'', birthYear:null, birthPlace:'', occupation:'' };
+      const lvl = parseInt(level);
+
+      if (lvl === 0 && tag.startsWith('@I')) {
+        cur = { id:tag, name:'', given:'', surname:'', birthYear:null, birthPlace:'',
+                deathYear:null, occupation:'', sex:'', famc:null, fams:[] };
         individuals.set(tag, cur);
+        inBirt = false; inDeat = false;
       } else if (cur) {
-        if (tag === 'NAME')  cur.name = value.replace(/\//g,'').trim();
-        if (tag === 'DATE' && !cur.birthYear) {
-          const y = value.match(/\d{4}/);
-          if (y) cur.birthYear = parseInt(y[0]);
+        if (tag === 'NAME') {
+          cur.name = value.replace(/\//g, '').trim();
+          // Extract surname from /Surname/ pattern
+          const sn = value.match(/\/([^\/]+)\//);
+          cur.surname = sn ? sn[1].trim() : '';
+          cur.given   = value.replace(/\/[^\/]*\//g, '').trim().split(' ')[0];
         }
-        if (tag === 'PLAC' && !cur.birthPlace) cur.birthPlace = value;
+        if (tag === 'SEX')  cur.sex  = value;
         if (tag === 'OCCU') cur.occupation = value;
+        if (tag === 'FAMC') cur.famc = value;
+        if (tag === 'FAMS') cur.fams.push(value);
+
+        if (tag === 'BIRT') { inBirt = true; inDeat = false; }
+        if (tag === 'DEAT') { inDeat = true; inBirt = false; }
+        if (tag === 'DATE') {
+          const y = value.match(/\d{4}/);
+          if (y) {
+            if (inBirt && !cur.birthYear) cur.birthYear = parseInt(y[0]);
+            if (inDeat && !cur.deathYear) cur.deathYear = parseInt(y[0]);
+          }
+        }
+        if (tag === 'PLAC') {
+          if (inBirt && !cur.birthPlace) cur.birthPlace = value;
+        }
+        // Reset section flags on new level-1 tag
+        if (lvl === 1 && tag !== 'BIRT' && tag !== 'DEAT') { inBirt = false; inDeat = false; }
       }
     }
     return { individuals };
   }
 
   _buildNpcData(eraId) {
-    // Combine static NPC_DATA with GEDCOM enrichment
+    // Start with static NPC_DATA (hand-authored, richer dialog)
     const result = {};
+    const staticKeys = new Set(); // gedcomIds already covered by static data
+
     for (const [key, arr] of Object.entries(NPC_DATA)) {
       if (!key.startsWith(`${eraId}_`)) continue;
       result[key] = arr.map(d => {
+        if (d.gedcomId) staticKeys.add(d.gedcomId);
         if (d.gedcomId && this._gedcom) {
           const gd = this._gedcom.individuals.get(d.gedcomId);
-          if (gd) {
-            return { ...d, _gedcomName: gd.name, _birthYear: gd.birthYear, _birthPlace: gd.birthPlace };
-          }
+          if (gd) return { ...d, _gedcomName: gd.name, _birthYear: gd.birthYear, _birthPlace: gd.birthPlace };
         }
         return d;
       });
     }
+
+    // Auto-generate NPC entries for every GEDCOM individual in this era
+    // who isn't already covered by static NPC_DATA
+    if (this._gedcom) {
+      for (const [id, gd] of this._gedcom.individuals) {
+        if (staticKeys.has(id)) continue;       // hand-authored entry exists
+        if (!gd.name || !gd.name.trim()) continue; // unnamed
+        const assignedEra = _gedcomEraId(gd.birthYear);
+        if (assignedEra !== eraId) continue;
+
+        // Deterministic screen assignment — spread people across the 4×4 grid
+        // Use a hash of the gedcom ID to pick row/col
+        const hash = _strHash(id);
+        const row  = hash % 4;          // 0-3
+        const col  = (hash >> 4) % 4;   // 0-3
+        const screenKey = `${eraId}_${row}_${col}`;
+
+        // Deterministic tile position within the screen
+        const spawnR = 3 + (hash % 8);      // rows 3-10
+        const spawnC = 4 + ((hash >> 3) % 10); // cols 4-13
+
+        // Build appearance from name hash (consistent colour per person)
+        const skinTones  = ['#f0c080','#d8a060','#c89050','#d0b080','#d4a870'];
+        const hairColors = ['#2a1808','#1a0a00','#6a4020','#3a2010','#804020','#d4a020'];
+        const bodyColors = ['#3a2a18','#2a3a5a','#5a4020','#3a4828','#6a4030','#2a4050'];
+        const hi = hash & 0xfff;
+        const skinColor  = skinTones [hi % skinTones.length];
+        const hairColor  = hairColors[(hi >> 4) % hairColors.length];
+        const bodyColor  = bodyColors[(hi >> 8) % bodyColors.length];
+
+        // Parse given name (first word of name field)
+        const given = gd.name.split(' ')[0];
+        const surname = gd.name.replace(given, '').trim();
+
+        // Build auto-generated dialog lines using all available GEDCOM data
+        const yearStr  = gd.birthYear  ? gd.birthYear.toString()  : 'unknown time';
+        const deathStr = gd.deathYear  ? ` I lived until ${gd.deathYear}.` : '';
+        const placeStr = gd.birthPlace ? gd.birthPlace.split(',')[0].trim() : 'this region';
+        const occupStr = gd.occupation || '';
+        const surnameDisplay = gd.surname || surname;
+
+        const lines = { generic: [] };
+
+        // Line 1: personal introduction
+        if (gd.birthYear && gd.birthPlace) {
+          lines.generic.push(
+            `I am ${given}${surnameDisplay ? ' ' + surnameDisplay : ''}. Born in ${placeStr} in ${yearStr}.${deathStr}`
+          );
+        } else {
+          lines.generic.push(
+            `My name is ${given}${surnameDisplay ? ' ' + surnameDisplay : ''}. I have lived here all my life.`
+          );
+        }
+
+        // Line 2: occupation or era flavour
+        if (occupStr) {
+          lines.generic.push(`I work as a ${occupStr.toLowerCase()}. It keeps food on the table.`);
+        } else {
+          lines.generic.push(_eraFlavourLine(eraId, given));
+        }
+
+        // Line 3: family connection hint
+        lines.generic.push(
+          `The Van Duynhoven family? Yes — I know them. ${_eraFamilyHint(eraId)}`
+        );
+
+        // Repeat lines (2nd and 3rd visits)
+        lines.repeat1 = [
+          `${given} greets you with a nod.`,
+          `"You again! How goes the journey?"`,
+          _eraFlavourLine(eraId, given),
+        ];
+        lines.repeat2 = [
+          `"There is always more to tell, if you have time to listen."`,
+          gd.occupation
+            ? `Being a ${gd.occupation.toLowerCase()} in these times is no easy thing.`
+            : _eraFlavourLine(eraId, given),
+        ];
+
+        const npcEntry = {
+          gedcomId:  id,
+          name:      gd.name,
+          given,
+          era:       eraId,
+          spawnR,
+          spawnC,
+          bodyColor,
+          hairColor,
+          skinColor,
+          lines,
+        };
+
+        if (!result[screenKey]) result[screenKey] = [];
+        result[screenKey].push(npcEntry);
+      }
+    }
+
     return result;
+  }
+
+  // Total NPC count (static + GEDCOM) — used in HUD
+  _totalNpcCount() {
+    if (!this._gedcom) {
+      return Object.keys(NPC_DATA).reduce((s, k) => s + (NPC_DATA[k]?.length || 0), 0);
+    }
+    return this._gedcom.individuals.size;
   }
 
   _bindQuestEvents() {
@@ -673,4 +883,56 @@ export class Game {
       this.music.sfxQuestComplete?.();
     });
   }
+}
+
+// ── Module-level helpers for GEDCOM NPC generation ───────
+
+/** Assign a GEDCOM individual to an era by birth year */
+function _gedcomEraId(birthYear) {
+  if (!birthYear) return 0;
+  if (birthYear <= 1600) return 0;
+  if (birthYear <= 1780) return 1;
+  if (birthYear <= 1850) return 2;
+  if (birthYear <= 1920) return 3;
+  if (birthYear <= 1952) return 4;
+  if (birthYear <= 1972) return 5;
+  if (birthYear <= 2000) return 6;
+  return 7;
+}
+
+/** Simple deterministic string hash (djb2-style) */
+function _strHash(str) {
+  let h = 5381;
+  for (let i = 0; i < str.length; i++) h = (h * 33 ^ str.charCodeAt(i)) & 0x7fffffff;
+  return h;
+}
+
+/** Era-specific flavour line for auto-generated NPCs */
+function _eraFlavourLine(eraId, name) {
+  const lines = [
+    `The heather is in bloom. A good omen, they say.`,                                      // 0
+    `Business flows like canal water — everywhere at once.`,                                // 1
+    `The French soldiers marched through again this morning.`,                              // 2
+    `The factory whistle rules our lives now.`,                                             // 3
+    `Ten days at sea. I am beginning to forget what land smells like.`,                     // 4
+    `Minnesota is flat but the soil is rich. We will manage.`,                              // 5
+    `Strange times. Everything is changing so fast.`,                                       // 6
+    `Video calls to the Netherlands, same family — different world.`,                       // 7
+  ];
+  return lines[eraId] || lines[0];
+}
+
+/** Era-specific family connection hint for auto-generated NPCs */
+function _eraFamilyHint(eraId) {
+  const hints = [
+    `Their farm is east of the church. Good people, quiet workers.`,                        // 0
+    `They worship at the old church in the south quarter.`,                                 // 1
+    `They keep to themselves these days. Careful with the French about.`,                   // 2
+    `Marianus is the one to speak to. He knows everything.`,                                // 3
+    `Johan and his family are on B deck. Come find them.`,                                  // 4
+    `The van Duijnhovens farm two miles east of town. Ask at the church.`,                  // 5
+    `They moved here from Minnesota. Nice family.`,                                         // 6
+    `Arthur built a whole website about the family. Ask him about it.`,                     // 7
+  ];
+  return hints[eraId] || hints[0];
 }

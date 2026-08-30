@@ -338,12 +338,17 @@ export class UI {
     const list = document.getElementById('rt-era-list');
     if (!list) return;
     list.innerHTML = '';
-    const unlockedEras = this.game.unlockedEras || new Set([0]);
+    const unlockedEras = this.game.unlockedEras || new Set([0, 8]);
     ERAS.forEach(era => {
       const locked = !unlockedEras.has(era.id);
+      const locLabel = era.id === 8
+        ? (this.game._startLocation === 'mankato'
+            ? '313 Hanover St, Mankato MN'
+            : 'Leidsevaart 276, Haarlem NL')
+        : era.name;
       const btn = document.createElement('button');
       btn.className = 'rt-era-btn' + (locked ? ' locked' : '');
-      btn.innerHTML = `<span class="rt-era-year">${era.year}</span> ${era.name} ${locked ? '🔒' : ''}`;
+      btn.innerHTML = `<span class="rt-era-year">${era.year}</span> ${locLabel} ${locked ? '🔒' : ''}`;
       if (!locked) btn.addEventListener('click', () => { this.closeEraSel(); this.game.travelToEra(era.id); });
       list.appendChild(btn);
     });

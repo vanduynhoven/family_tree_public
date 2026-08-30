@@ -28,6 +28,10 @@ export class SaveManager {
         collectedFacts:JSON.parse(JSON.stringify(game.player.collectedFacts)),
         questState:    game.quests?.serialize() || {},
         visitedScreens:Array.from(game.world.visitedSet),
+        // Persistent NPC state — hearts + talk counts
+        npcFriendship: Object.fromEntries(game._npcFriendship || []),
+        npcTalkCount:  Object.fromEntries(game._npcTalkCount  || []),
+        unlockedEras:  Array.from(game.unlockedEras || []),
         savedAt:       new Date().toISOString(),
       };
       localStorage.setItem(`${PREFIX}${slot}`, JSON.stringify(data));

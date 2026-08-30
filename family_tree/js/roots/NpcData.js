@@ -12,7 +12,13 @@ export const NPC_DATA = {
 
   // ── Era 0 · 1539 · Aarle-Rixtel ──────────────────────
 
-  '0_1_1': [  // Town Centre — key ancestor
+  // KEY ANCESTOR: Dirck van Duinhoven — moves through the world on a daily schedule
+  // Morning (0.0-0.3): praying at church area → screen [0,0] or [1,0]
+  // Midday (0.3-0.6): working east field → screen [2,2]
+  // Afternoon (0.6-0.8): returning home → screen [1,1]
+  // Evening (0.8-1.0): tavern/well area → screen [1,1] south side
+
+  '0_2_2': [  // East farms — where Dirck spends the morning tending fields
     {
       gedcomId: '@I001@',
       name: 'Dirck van Duinhoven',
@@ -20,25 +26,33 @@ export const NPC_DATA = {
       era: 0, spawnR: 7, spawnC: 9,
       bodyColor: '#5a4020', hairColor: '#2a1a08', skinColor: '#d0a060',
       item: { id:'family_seal', label:'Family Seal', emoji:'🔏' },
+      // Schedule: morning in the field, midday rest, afternoon walk home
+      schedule: [
+        { time: 0.0, r: 5, c: 8 },   // early morning: east field corner
+        { time: 0.25, r: 8, c: 12 }, // late morning: further in the field
+        { time: 0.55, r: 6, c: 9 },  // midday: resting near path
+        { time: 0.75, r: 11, c: 7 }, // afternoon: heading home
+        { time: 0.9,  r: 7, c: 9 },  // evening: waiting for vespers
+      ],
       lines: {
         generic: [
-          { dutch:'Goede dag, vreemdeling! [Good day, stranger!]', en:'Welcome to Aarle-Rixtel.' },
+          { dutch:'Goede dag, vreemdeling! [Good day, stranger!]', en:'You found me at last. I wondered who was asking after me in the village.' },
           'My name is Dirck van Duinhoven. Our family has farmed this heathland for generations.',
           { dutch:'"Duinhoven" betekent "duintuin". [Duinhoven means dune garden.]', en:'Our name speaks of this land.' },
           'I give you the Family Seal. Carry it always — it is the mark of our line.',
         ],
         repeat1: [
-          { dutch:'Ah, je bent terug! [Ah, you are back!]', en:'Good to see you again.' },
-          'The heather blooms late this year. A hard winter is coming, the elders say.',
-          'My son helps me tend the east field now. He learns slowly, but he learns.',
+          { dutch:'Ah, je bent terug! [Ah, you are back!]', en:'The heather blooms late this year. A hard winter is coming.' },
+          'My son helps me in the east field now. He learns slowly, but he learns.',
+          { dutch:'Wij horen bij dit land. [We belong to this land.]', en:'The dunes, the heath, the church bells.' },
         ],
         repeat2: [
-          'You know, our family has lived here since before my grandfather\'s grandfather.',
-          { dutch:'Wij horen bij dit land. [We belong to this land.]', en:'The dunes, the heath, the church bells.' },
-          'The tax collector came through again last week. God give us patience.',
+          'The tax collector came through again. God give us patience.',
+          'I am here most mornings. By midday I take my rest. Evenings — at the church.',
+          { dutch:'Een eerlijk man werkt van zonsopgang tot zonsondergang. [An honest man works from sunrise to sunset.]', en:'' },
         ],
         heart2: [
-          'You have come back many times now. You are becoming a friend of the family.',
+          'You have come back many times. You are becoming a friend of the family.',
           'Let me tell you something I do not share easily — my grandfather\'s name was Dirck too.',
           'Three generations of Dircks on this farm. Perhaps four one day.',
         ],
@@ -61,7 +75,8 @@ export const NPC_DATA = {
     },
   ],
 
-  '0_1_2': [  // Farmland
+  // Clue NPC at the starting screen — points the player toward Dirck
+  '0_1_1': [
     {
       gedcomId: '@I002@',
       name: 'Aelken van Duinhoven',
@@ -72,12 +87,13 @@ export const NPC_DATA = {
         generic: [
           { dutch:'Het graan groeit goed dit jaar. [The grain grows well this year.]', en:'God is merciful.' },
           'Dirck is my kin. We share these fields and share the name.',
-          'The church bell rings at dawn — every day the same. Life is steady here.',
+          'Looking for him? He tends the east fields every morning until midday.',
+          { dutch:'Ga naar de oostelijke akkers. [Go to the eastern fields.]', en:'That is where you\'ll find Dirck.' },
         ],
         repeat1: [
-          'I was up before dawn again. The chickens do not wait for sunrise.',
+          'I was up before dawn again.',
           { dutch:'Hard werken is goed voor de ziel. [Hard work is good for the soul.]', en:'My mother always said that.' },
-          'Have you spoken with Dirck yet? He knows more of our history than I do.',
+          'Have you spoken with Dirck yet? He\'ll be in the east field until the church bell at noon.',
         ],
         heart2: [
           'You keep coming back. That means something around here.',
@@ -196,17 +212,48 @@ export const NPC_DATA = {
 
   // ── Era 3 · 1872 · Industrial Noord-Brabant ─────────
 
-  '3_1_1': [
+  '3_1_1': [  // Village centre — clue NPC points to south fields
+    {
+      gedcomId: null,
+      name: 'Village Baker',
+      given: 'Dries',
+      era: 3, spawnR: 7, spawnC: 8,
+      bodyColor: '#d0a840', hairColor: '#6a4010', skinColor: '#c89050',
+      lines: {
+        generic: [
+          { dutch:'Versgebakken brood! [Freshly baked bread!]', en:'Best in the village.' },
+          'You\'re looking for Marianus? He tends the south fields every morning until the church bell.',
+          { dutch:'Ga naar de velden in het zuiden. [Go to the fields in the south.]', en:'That is where you\'ll find him.' },
+          'By midday he passes through the village on his way to vespers.',
+        ],
+        repeat1: [
+          'The harvest looks good. Marianus said the same this morning.',
+          { dutch:'Goede grond, goede oogst. [Good soil, good harvest.]', en:'' },
+        ],
+      },
+    },
+  ],
+
+  '3_2_1': [  // South fields — Marianus works here mornings
     {
       gedcomId: '@I042@',
       name: 'Marianus van Duijnhoven',
       given: 'Marianus',
-      era: 3, spawnR: 7, spawnC: 9,
+      era: 3, spawnR: 5, spawnC: 7,
+      schedule: [
+        { time:0.0,  r:11, c:5 },
+        { time:0.2,  r:5,  c:7 },
+        { time:0.4,  r:8,  c:12 },
+        { time:0.55, r:6,  c:9 },
+        { time:0.7,  r:9,  c:7 },
+        { time:0.85, r:12, c:5 },
+        { time:0.95, r:7,  c:9 },
+      ],
       bodyColor: '#3a2a18', hairColor: '#2a1808', skinColor: '#c89050',
       item: { id:'train_ticket', label:'Train Ticket', emoji:'🎟️' },
       lines: {
         generic: [
-          { dutch:'Goedemorgen! Ik ben Marianus. [Good morning! I am Marianus.]', en:'Born right here in Boekel, 24 April 1872.' },
+          { dutch:'Goedemorgen! Ik ben Marianus. [Good morning! I am Marianus.]', en:'You found me in the fields! Born right here in Boekel, 24 April 1872.' },
           'The railway reached Veghel last year. Everything is changing so fast.',
           { dutch:'Mijn vrouw heet Anna. [My wife is named Anna.]', en:'Anna Maria van den Elzen — we marry in 1906.' },
           'We will have twelve children. God willing, they will all survive.',
@@ -528,6 +575,125 @@ export const NPC_DATA = {
           'Oh! It\'s me — I mean, it\'s you — I mean…',
           'This is very strange. But also kind of wonderful.',
           { dutch:'Familie is altijd met je. [Family is always with you.]', en:'I think that\'s what this is all about.' },
+        ],
+      },
+    },
+  ],
+
+  // ── Era 8 · 2026 · Haarlem — Grote Markt & Tierney's ─
+
+  '8_3_2': [  // Grote Markt — Tierney's pub + flower market
+    {
+      gedcomId: null,
+      name: 'Tierney\'s Landlord',
+      given: 'Padraig',
+      era: 8, spawnR: 11, spawnC: 4,
+      bodyColor: '#2a6020', hairColor: '#d03010', skinColor: '#d4a880',
+      isInnkeeper: true,
+      lines: {
+        generic: [
+          'Welcome to Tierney\'s! Best Irish pub in Haarlem — and they know it.',
+          'Arthur and the girls come in every Saturday after the flower market. Good family.',
+          'Full Irish breakfast, Guinness on tap, and a warm fire in winter.',
+          'Rest here a while — give me a fish or a flower from the market and I\'ll feed you well.',
+        ],
+        repeat1: [
+          'Back again? Pull up a chair. The stew is on.',
+          'The flower market outside was busy this morning. Raven bought tulips again.',
+          { dutch:'Gezelligheid, dat is het! [Cosy company, that\'s it!]', en:'That\'s what a pub is for.' },
+        ],
+        repeat2: [
+          'You know, Haarlem reminds me of Galway in some ways. All that water.',
+          'Arthur was in here last weekend telling me about his family research.',
+          'Five hundred years of Dutch ancestry. Remarkable.',
+        ],
+        heart2: [
+          'Let me tell you a secret — we do a special Dutch-Irish fusion menu on Sundays.',
+          'Stamppot with a Guinness gravy. Sounds mad but it works.',
+          { dutch:'Proost! [Cheers!]', en:'Sláinte!' },
+        ],
+        raven: [
+          { dutch:'Raven! Jouw favoriete tafeltje is vrij! [Raven! Your favourite table is free!]', en:'' },
+          'The usual? Chips and a lemonade?',
+          'Your dad was in earlier asking if you\'d passed through. He\'ll be along.',
+        ],
+        starling: [
+          'Starling! Look how much you\'ve grown.',
+          'I\'ve got your favourite orange juice behind the bar.',
+          'The flower lady outside saved you a little tulip bouquet. She always does.',
+        ],
+      },
+    },
+    {
+      gedcomId: null,
+      name: 'Flower Market Vendor',
+      given: 'Lies',
+      era: 8, spawnR: 9, spawnC: 10,
+      bodyColor: '#c06080', hairColor: '#d4a020', skinColor: '#d8b880',
+      lines: {
+        generic: [
+          'Fresh tulips, roses, dahlias — straight from the Bollenstreek, every Saturday!',
+          { dutch:'Verse bloemen voor een mooie dag! [Fresh flowers for a beautiful day!]', en:'' },
+          'Arthur\'s girls always stop here first, before they go into Tierney\'s.',
+          'A bunch of tulips makes a wonderful gift. Only three euros.',
+        ],
+        repeat1: [
+          'The dahlias came in this morning — gorgeous reds and oranges.',
+          { dutch:'De tulpen van vandaag zijn bijzonder mooi. [Today\'s tulips are particularly beautiful.]', en:'' },
+          'Raven always picks the purple ones. Good taste, that child.',
+        ],
+        repeat2: [
+          'I\'ve been selling flowers on this square for twenty-two years.',
+          'Rain or shine, the Saturday market runs. This square has had a market since medieval times.',
+          { dutch:'De Grote Markt is van ons allemaal. [The Grote Markt belongs to all of us.]', en:'' },
+        ],
+        heart2: [
+          'You\'re a regular now! I\'ll set a bunch aside for you each week.',
+          'The bulbs come from just outside Haarlem — the Keukenhof fields. World-famous.',
+          'Did you know Haarlem was the centre of the global tulip trade in the 1600s?',
+          { dutch:'Dat wist je niet, hè? [You didn\'t know that, did you?]', en:'' },
+        ],
+        raven: [
+          'Raven! The purple tulips just arrived — I saved you some.',
+          'Your Dutch is getting so much better every week.',
+          { dutch:'Mag ik de paarse, alstublieft? [May I have the purple ones, please?]', en:'That\'s exactly how you say it.' },
+          'Here — take a bunch. Consider it a Dutch lesson.',
+        ],
+        starling: [
+          'Starling, little one! Look at these sunflowers — as tall as you!',
+          'I saved the little rainbow bouquet. I know you love the colours.',
+          { dutch:'Bloemen zijn vrolijk. [Flowers are cheerful.]', en:'Just like you.' },
+        ],
+      },
+      item: { id:'haarlem_tulips', label:'Haarlem Tulips', emoji:'🌷' },
+    },
+  ],
+
+  // ── Era 8 · 2026 · Haarlem — Home (Leidsevaart 276) ──
+
+  '8_1_0': [  // The family home screen
+    {
+      gedcomId: '@I090@',
+      name: 'Arthur Van Duynhoven',
+      given: 'Arthur',
+      era: 8, spawnR: 9, spawnC: 9,
+      bodyColor: '#2050a0', hairColor: '#1a1a2a', skinColor: '#c89050',
+      lines: {
+        generic: [
+          'Leidsevaart 276. We\'ve lived here three years now. It still feels like a dream.',
+          'On Saturdays we walk to the Grote Markt — flowers from Lies, then Tierney\'s for lunch.',
+          'The girls are growing up Dutch-American. Raven speaks better Dutch than me already.',
+          'If you find the old journal in the attic, come find me. There\'s a story there worth knowing.',
+        ],
+        repeat1: [
+          'The canal outside is still this morning. Perfect weather for a bike ride.',
+          { dutch:'Ik hou van Haarlem. [I love Haarlem.]', en:'It\'s the right place for us.' },
+          'The family tree website keeps growing. 449 people now, going back to 1450.',
+        ],
+        heart2: [
+          'I\'ll tell you something not many people know.',
+          'Coming back to the Netherlands — I wasn\'t just following my heart. I was following the tree.',
+          'Dirck van Duinhoven was from a village forty kilometres from here. I can feel it.',
         ],
       },
     },

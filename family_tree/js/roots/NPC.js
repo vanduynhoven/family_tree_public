@@ -22,6 +22,10 @@ export class NPC extends Entity {
     this.wanderTimer = 0;
     this.wanderDx   = 0;
     this.wanderDy   = 0;
+    // Schedule: [{time:0.0-1.0, r, c}] — NPC walks to tile (r,c) at this time of day
+    this.schedule     = data.schedule    || null;
+    // Wander radius in pixels when not on a schedule
+    this.wanderRadius = data.wanderRadius != null ? data.wanderRadius * TILE : TILE * 3;
 
     this.bodyColor  = data.bodyColor || '#806040';
     this.hairColor  = data.hairColor || '#403020';
@@ -86,6 +90,41 @@ export class NPC extends Entity {
   update(dt, world, game) {
     if (game?.dialogActive) return; // freeze during dialog
 
+    // ── Schedule-based movement ──────────────────────────
+    // If this NPC has a schedule, walk toward current waypoint
+    if (this.schedule && this.schedule.length > 0) {
+      const tod = game?._timeOfDay ?? 0.4;
+      // Find active waypoint (last one whose time <= tod)
+      let wp = this.schedule[0];
+      for (const s of this.schedule) {
+        if (s.time <= tod) wp = s;
+        else break;
+      }
+      const tx = wp.c * TILE + 4;
+      const ty = wp.r * TILE + 4;
+      const dist = Math.hypot(this.cx - tx, this.cy - ty);
+
+      if (dist > TILE * 0.6) {
+        // Walk toward waypoint
+        const dx = tx - this.cx, dy = ty - this.cy;
+        const len = Math.hypot(dx, dy) || 1;
+        const spd = this.speed * dt;
+        const nx = this.x + (dx / len) * spd;
+        const ny = this.y + (dy / len) * spd;
+        const pad = 3;
+        if (!world.solidAt(nx + pad, this.y + pad) &&
+            !world.solidAt(nx + this.w - pad, this.y + this.h - pad)) this.x = nx;
+        if (!world.solidAt(this.x + pad, ny + pad) &&
+            !world.solidAt(this.x + this.w - pad, ny + this.h - pad)) this.y = ny;
+
+        if (Math.abs(dx) > Math.abs(dy)) this.facing = dx > 0 ? 'right' : 'left';
+        else this.facing = dy > 0 ? 'down' : 'up';
+        return; // don't also wander
+      }
+      // At waypoint — do small local wander
+    }
+
+    // ── Default wander ────────────────────────────────────
     this.wanderTimer -= dt;
     if (this.wanderTimer <= 0) {
       const dirs = [[-1,0],[1,0],[0,-1],[0,1],[0,0],[0,0],[0,0]]; // pause more often
@@ -101,8 +140,9 @@ export class NPC extends Entity {
 
     if (!this.wanderDx && !this.wanderDy) return;
 
-    // Stay within 3 tiles of home
-    if (Math.hypot(this.cx - this.homeX, this.cy - this.homeY) > TILE * 3) {
+    // Stay within wander radius of homeX/homeY
+    const wanderRadius = this.wanderRadius ?? TILE * 3;
+    if (Math.hypot(this.cx - this.homeX, this.cy - this.homeY) > wanderRadius) {
       this.wanderDx = this.cx > this.homeX ? -1 : 1;
       this.wanderDy = 0;
     }
