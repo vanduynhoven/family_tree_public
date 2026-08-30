@@ -58,38 +58,48 @@ export class Game {
   // ── Public entry ────────────────────────────────────
 
   async init() {
-    // Show character select
-    this.ui.showCharacterSelect(CHARACTERS, id => this._onCharSelected(id));
+    // Pass hasSave checker so UI can show Continue vs New Game per character
+    const hasSave = (charId) => {
+      const d = this.save.load(0);
+      return !!(d && d.characterId === charId);
+    };
+    this.ui.showCharacterSelect(CHARACTERS, hasSave, (id, mode) => this._onCharSelected(id, mode));
   }
 
   // ── Character selection ─────────────────────────────
 
-  _onCharSelected(charId) {
+  _onCharSelected(charId, mode = 'continue') {
     this.characterId = charId;
     const char = getCharacter(charId);
-
-    // Restore save data if a save exists for this character
     const savedData = this.save.load(0);
-    if (savedData && savedData.characterId === charId) {
-      // Restore NPC friendship hearts + talk counts
+    const hasSave   = savedData && savedData.characterId === charId;
+
+    if (mode === 'continue' && hasSave) {
+      // ── CONTINUE: restore all saved state ──────────
       if (savedData.npcFriendship) {
         this._npcFriendship = new Map(Object.entries(savedData.npcFriendship));
       }
       if (savedData.npcTalkCount) {
         this._npcTalkCount = new Map(Object.entries(savedData.npcTalkCount));
       }
-      // Restore unlocked eras
       if (savedData.unlockedEras) {
         this.unlockedEras = new Set(savedData.unlockedEras);
       }
+    } else {
+      // ── NEW GAME: reset all state ───────────────────
+      this._npcFriendship = new Map();
+      this._npcTalkCount  = new Map();
+      this.unlockedEras   = new Set([0, 8]);
+      // Delete any existing save so it doesn't carry over
+      this.save.deleteSave(0);
     }
 
     // Initialise player with character appearance
     this.player = new Player(SCREEN_COLS/2 * TILE, (SCREEN_ROWS-3) * TILE, char.sprite);
     this.player.dutchWords = [];
 
-    // Restore player state from save
-    if (savedData && savedData.characterId === charId && savedData.inventory) {
+    // Restore player state from save (continue only)
+    if (mode === 'continue' && hasSave && savedData.inventory) {
       this.player.inventory      = savedData.inventory;
       this.player.collectedFacts = savedData.collectedFacts || [];
       this.player.hp             = savedData.playerHP      || 100;
@@ -416,14 +426,25 @@ export class Game {
     const nx  = this.player.x + (dx / len) * spd;
     const ny  = this.player.y + (dy / len) * spd;
     const pad = 3;
+    const p   = this.player;
 
-    if (!this.world.solidAt(nx + pad, this.player.y + pad) &&
-        !this.world.solidAt(nx + this.player.w - pad, this.player.y + this.player.h - pad)) {
-      this.player.x = nx;
+    // Foot-based collision (bottom 35% of sprite)
+    const footTop    = p.y + p.h * 0.65;
+    const footBottom = p.y + p.h - pad;
+
+    if (!this.world.solidAt(nx + pad,        footTop) &&
+        !this.world.solidAt(nx + p.w - pad,  footTop) &&
+        !this.world.solidAt(nx + pad,        footBottom) &&
+        !this.world.solidAt(nx + p.w - pad,  footBottom)) {
+      p.x = nx;
     }
-    if (!this.world.solidAt(this.player.x + pad, ny + pad) &&
-        !this.world.solidAt(this.player.x + this.player.w - pad, ny + this.player.h - pad)) {
-      this.player.y = ny;
+    const newFootTop    = ny + p.h * 0.65;
+    const newFootBottom = ny + p.h - pad;
+    if (!this.world.solidAt(p.x + pad,       newFootTop) &&
+        !this.world.solidAt(p.x + p.w - pad, newFootTop) &&
+        !this.world.solidAt(p.x + pad,       newFootBottom) &&
+        !this.world.solidAt(p.x + p.w - pad, newFootBottom)) {
+      p.y = ny;
     }
     this.player.walkCycle += dt * 9;
 

@@ -135,18 +135,29 @@ export class Player extends Entity {
     const ny  = this.y + dy * spd;
     const pad = 3;
 
+    // ── Foot-based collision ──────────────────────────────
+    // Only the bottom ~35% of the sprite (where the feet are) checks for
+    // solid tiles. The head and torso can overlap tree canopies, roof tiles,
+    // and building tops — matching standard top-down RPG behaviour.
+    const footTop    = this.y + this.h * 0.65;  // top edge of foot hitbox
+    const footBottom = this.y + this.h - pad;   // bottom edge
+
     if (dx !== 0 &&
-        !world.solidAt(nx + pad, this.y + pad) &&
-        !world.solidAt(nx + this.w - pad, this.y + pad) &&
-        !world.solidAt(nx + pad, this.y + this.h - pad) &&
-        !world.solidAt(nx + this.w - pad, this.y + this.h - pad)) {
+        !world.solidAt(nx + pad,            footTop) &&
+        !world.solidAt(nx + this.w - pad,   footTop) &&
+        !world.solidAt(nx + pad,            footBottom) &&
+        !world.solidAt(nx + this.w - pad,   footBottom)) {
       this.x = nx;
     }
+
+    const newFootTop    = ny + this.h * 0.65;
+    const newFootBottom = ny + this.h - pad;
+
     if (dy !== 0 &&
-        !world.solidAt(this.x + pad, ny + pad) &&
-        !world.solidAt(this.x + this.w - pad, ny + pad) &&
-        !world.solidAt(this.x + pad, ny + this.h - pad) &&
-        !world.solidAt(this.x + this.w - pad, ny + this.h - pad)) {
+        !world.solidAt(this.x + pad,          newFootTop) &&
+        !world.solidAt(this.x + this.w - pad, newFootTop) &&
+        !world.solidAt(this.x + pad,          newFootBottom) &&
+        !world.solidAt(this.x + this.w - pad, newFootBottom)) {
       this.y = ny;
     }
   }

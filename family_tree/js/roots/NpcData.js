@@ -631,13 +631,13 @@ export const NPC_DATA = {
         ],
         raven: [
           { dutch:'Raven! Jouw favoriete tafeltje is vrij! [Raven! Your favourite table is free!]', en:'' },
-          'The usual? Chips and a lemonade? Your dad will be along.',
-          'Lies from the flower stall saved you the purple tulips again.',
+          'The usual? Hot chocolate and a cheese toastie coming right up.',
+          'Your booth next to the bar is free — the cosy enclosed one. Your dad\'s already in there.',
         ],
         starling: [
-          'Starling! Look how much you\'ve grown.',
-          'I\'ve got your favourite orange juice behind the bar.',
-          'Come in, come in — your dad\'s already at the corner table.',
+          'Starling! Come in, come in.',
+          'Hot chocolate and a cheese toastie — I\'ve already put the order in.',
+          { dutch:'Jouw tafeltje staat klaar. [Your table is ready.]', en:'The booth next to the bar — nice and cosy.' },
         ],
       },
     },

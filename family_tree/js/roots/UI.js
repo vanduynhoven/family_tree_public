@@ -371,7 +371,7 @@ export class UI {
 
   // ── Character Select ─────────────────────────────────
 
-  showCharacterSelect(characters, onSelect) {
+  showCharacterSelect(characters, hasSave, onSelect) {
     const overlay = document.getElementById('rt-char-select');
     if (!overlay) return;
     overlay.style.display = 'flex';
@@ -379,6 +379,7 @@ export class UI {
     if (!list) return;
     list.innerHTML = '';
     characters.forEach(char => {
+      const saveExists = hasSave(char.id);
       const card = document.createElement('div');
       card.className = 'rt-char-card';
       card.innerHTML = `
@@ -386,10 +387,20 @@ export class UI {
         <div class="rt-char-name">${char.name}</div>
         <div class="rt-char-branch">${char.branch}</div>
         <div class="rt-char-hook">"${char.hook}"</div>
+        <div class="rt-char-actions">
+          ${saveExists
+            ? `<button class="rt-char-btn rt-char-continue" data-id="${char.id}" data-mode="continue">▶ Continue</button>
+               <button class="rt-char-btn rt-char-newgame" data-id="${char.id}" data-mode="new">✦ New Game</button>`
+            : `<button class="rt-char-btn rt-char-continue" data-id="${char.id}" data-mode="new">▶ Start</button>`
+          }
+        </div>
       `;
-      card.addEventListener('click', () => {
-        overlay.style.display = 'none';
-        onSelect(char.id);
+      card.querySelectorAll('.rt-char-btn').forEach(btn => {
+        btn.addEventListener('click', e => {
+          e.stopPropagation();
+          overlay.style.display = 'none';
+          onSelect(btn.dataset.id, btn.dataset.mode);
+        });
       });
       list.appendChild(card);
     });
