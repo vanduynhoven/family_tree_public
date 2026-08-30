@@ -41,7 +41,8 @@
     { href: 'timeline.html',                    label: 'Timeline',  icon: '📅', desc: 'Events over time' },
     { href: 'visualizations/tree.html',         label: 'Tree',      icon: '🌿', desc: 'Collapsible tree' },
     { href: 'visualizations/family_chart.html', label: 'Fan Chart', icon: '🥧', desc: 'Radial view' },
-    { href: 'game.html',                        label: 'Chronicles', icon: '🎮', desc: 'Time-travel adventure' }
+    { href: 'game.html',                        label: 'Chronicles', icon: '🎮', desc: 'Time-travel adventure' },
+    { href: 'roots.html',                        label: 'Roots Across Time', icon: '🌳', desc: 'New Stardew-style family RPG' }
   ];
 
   function isExpanded() {
