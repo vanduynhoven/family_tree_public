@@ -265,11 +265,11 @@ export function buildEraWorld(eraId, location = 'haarlem') {
         for(let r=1;r<H-1;r++) m[r][9]=T.ROAD;
         grid[2][2]=makeScreen(m,{left:{pos:7},right:{pos:7},up:{pos:10},down:{pos:10}},'1539 · Dirck\'s East Field',{r:7,c:9}); }
 
-      // [2,3] Heathland path to stones
+      // [2,3] Heathland path to stones — only connects left and up (no [3,3] screen)
       { const m=blank(T.FLOWER); border(m,T.TREE);
         fill(m,1,1,H-3,W-3,T.FLOWER);
         for(let r=3;r<H-3;r+=2){ set(m,r,3,T.ROCK); set(m,r,W-4,T.ROCK); }
-        grid[2][3]=makeScreen(m,{left:{pos:7},up:{pos:10},down:{pos:10}},'1539 · Heather Path',{r:7,c:10}); }
+        grid[2][3]=makeScreen(m,{left:{pos:7},up:{pos:10}},'1539 · Heather Path',{r:7,c:10}); }
 
       // [3,0] Marshland — tavern/inn at edge
       { const m=blank(T.GRASS); border(m,T.TREE);

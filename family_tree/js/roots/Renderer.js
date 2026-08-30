@@ -855,15 +855,43 @@ export function drawDroppedItem(ctx, x, y, emoji, frame) {
 }
 
 // ── Fishing bobber ────────────────────────────────────────
-export function drawBobber(ctx, x, y, dipped, frame) {
-  const bob=dipped?5:Math.sin(frame/22)*2.5;
-  ctx.strokeStyle='rgba(180,160,100,0.5)'; ctx.lineWidth=1;
-  ctx.beginPath(); ctx.moveTo(x-30,y-30); ctx.lineTo(x,y+bob); ctx.stroke();
-  ctx.fillStyle=dipped?'#cc2020':'#e8e8e8';
-  ctx.beginPath(); ctx.ellipse(x,y+bob,5,7,0,0,Math.PI*2); ctx.fill();
-  ctx.fillStyle='#ff4040';
-  ctx.beginPath(); ctx.ellipse(x,y+bob-2,5,4,0,0,Math.PI); ctx.fill();
-  ctx.fillStyle='#404040'; ctx.beginPath(); ctx.arc(x,y+bob+6,1.5,0,Math.PI*2); ctx.fill();
+export function drawBobber(ctx, x, y, dipped, frame, handX, handY) {
+  const bob = dipped ? 5 : Math.sin(frame / 22) * 2.5;
+
+  // Fishing line from player's hand to bobber
+  const hx = handX ?? x - 32;  // fallback if not provided
+  const hy = handY ?? y - 32;
+
+  // Line: slightly curved by drawing two segments through a midpoint
+  const midX = (hx + x) / 2 + (y - hy) * 0.12; // slight arc outward
+  const midY = (hy + y + bob) / 2 - Math.abs(x - hx) * 0.08;
+
+  ctx.strokeStyle = 'rgba(200,180,120,0.7)';
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  ctx.moveTo(hx, hy);
+  ctx.quadraticCurveTo(midX, midY, x, y + bob);
+  ctx.stroke();
+
+  // Rod tip dot at hand
+  ctx.fillStyle = 'rgba(160,130,80,0.8)';
+  ctx.beginPath(); ctx.arc(hx, hy, 2.5, 0, Math.PI*2); ctx.fill();
+
+  // Float body (red top, white bottom)
+  ctx.fillStyle = dipped ? '#cc2020' : '#e8e8e8';
+  ctx.beginPath(); ctx.ellipse(x, y+bob, 5, 7, 0, 0, Math.PI*2); ctx.fill();
+  ctx.fillStyle = '#ff4040';
+  ctx.beginPath(); ctx.ellipse(x, y+bob-2, 5, 4, 0, 0, Math.PI); ctx.fill();
+  // Tip
+  ctx.fillStyle = '#404040';
+  ctx.beginPath(); ctx.arc(x, y+bob+6, 1.5, 0, Math.PI*2); ctx.fill();
+
+  // Ripple ring when dipped
+  if (dipped) {
+    ctx.strokeStyle = 'rgba(100,180,255,0.4)';
+    ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.ellipse(x, y+bob+2, 10, 4, 0, 0, Math.PI*2); ctx.stroke();
+  }
 }
 
 // ── Minimap ───────────────────────────────────────────────

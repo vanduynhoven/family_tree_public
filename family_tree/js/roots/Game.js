@@ -698,8 +698,22 @@ export class Game {
 
     // Fishing bobber
     if (this.player.fishTimer > 0) {
-      drawBobber(ctx, this.player.bobberX - ox, this.player.bobberY - oy,
-                 this.player.fishDipped, frame);
+      // Calculate player hand position (rod tip) based on sprite position and facing
+      const renderW = TILE * 0.95;
+      const renderH = TILE * 1.1;
+      const rx = this.player.x - ox + (TILE - renderW) / 2;
+      const ry = this.player.y - oy + TILE - renderH;
+      let handSX, handSY;
+      switch (this.player.facing) {
+        case 'right': handSX = rx + renderW * 0.85; handSY = ry + renderH * 0.38; break;
+        case 'left':  handSX = rx - renderW * 0.05; handSY = ry + renderH * 0.38; break;
+        case 'down':  handSX = rx + renderW * 0.75; handSY = ry + renderH * 0.50; break;
+        default:      handSX = rx + renderW * 0.20; handSY = ry + renderH * 0.30; break; // up
+      }
+      drawBobber(ctx,
+        this.player.bobberX - ox, this.player.bobberY - oy,
+        this.player.fishDipped, frame,
+        handSX, handSY);
     }
 
     // ── Minimap ────────────────────────────────────────
