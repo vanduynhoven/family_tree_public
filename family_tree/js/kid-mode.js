@@ -237,6 +237,8 @@
       achBtn.innerHTML = '\uD83C\uDFC5';
     }
   }
+  // Export so achievements.js can call it from evaluate() to refresh badge count
+  window.updateAchievementsBadge = updateAchievementsBadge;
 
   function showAchievementsPopup() {
     // Check if popup already exists
@@ -294,15 +296,18 @@
     if (on) {
       annotateGlossary();
       addHeadingEmojis();
+      startGlossaryObserver(); // Watch for dynamically added content
     } else {
       removeHeadingEmojis();
+      glossaryDone = false; // Allow re-annotation next time Kid Mode is enabled
+      stopGlossaryObserver(); // Stop watching for dynamic content
       /* Tooltips are left in the DOM (harmless) but hidden by CSS when off. */
     }
     // Notify other modules (e.g. Achievements) that Kid Mode changed.
     // Skip if bottom-nav already fired the event (to avoid double-firing).
     if (!document.getElementById('bottom-nav')) {
       try {
-        document.dispatchEvent(new CustomEvent('kid-mode-changed', { detail: { on: on } }));
+        document.dispatchEvent(new CustomEvent('kid-mode-changed', { detail: { on: on, enabled: on } }));
       } catch (e) { /* CustomEvent unsupported — ignore */ }
     }
 
@@ -343,7 +348,7 @@
     }
   }
 
-  /* Walk text nodes and wrap known hard words in a tooltip <span>. Runs once. */
+  /* Walk text nodes and wrap known hard words in a tooltip <span>. Resets when Kid Mode is turned off. */
   var glossaryDone = false;
   function annotateGlossary() {
     if (glossaryDone) return;
@@ -401,6 +406,46 @@
   }
 
   function escapeRe(s) { return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }
+
+  // MutationObserver: re-annotate newly added text nodes when Kid Mode is on
+  var _mutationObserver = null;
+  function startGlossaryObserver() {
+    if (_mutationObserver) return;
+    var words = Object.keys(GLOSSARY).sort(function(a,b){ return b.length - a.length; });
+    var pattern = new RegExp('\\b(' + words.map(escapeRe).join('|') + ')\\b', 'gi');
+    _mutationObserver = new MutationObserver(function(mutations) {
+      if (!isOn()) return;
+      mutations.forEach(function(mutation) {
+        mutation.addedNodes.forEach(function(node) {
+          if (node.nodeType === Node.TEXT_NODE) {
+            wrapNode(node, pattern);
+          } else if (node.nodeType === Node.ELEMENT_NODE) {
+            var walker = document.createTreeWalker(node, NodeFilter.SHOW_TEXT, {
+              acceptNode: function(n) {
+                if (!n.nodeValue || !n.nodeValue.trim()) return NodeFilter.FILTER_REJECT;
+                var p = n.parentNode;
+                while (p && p !== document.body) {
+                  if (p.classList && p.classList.contains('kid-term')) return NodeFilter.FILTER_REJECT;
+                  if (['SCRIPT','STYLE','TEXTAREA','INPUT','BUTTON','SVG','CODE','PRE'].indexOf(p.nodeName) !== -1) return NodeFilter.FILTER_REJECT;
+                  p = p.parentNode;
+                }
+                pattern.lastIndex = 0;
+                return pattern.test(n.nodeValue) ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT;
+              }
+            });
+            var targets = [];
+            var t;
+            while ((t = walker.nextNode())) targets.push(t);
+            targets.forEach(function(t) { wrapNode(t, pattern); });
+          }
+        });
+      });
+    });
+    _mutationObserver.observe(document.body, { childList: true, subtree: true });
+  }
+  function stopGlossaryObserver() {
+    if (_mutationObserver) { _mutationObserver.disconnect(); _mutationObserver = null; }
+  }
 
   function init() {
     makeButton();

@@ -244,10 +244,10 @@
             id: 'completionist',
             icon: '🏆',
             title: 'Completionist',
-            desc: 'Visited all 7 generation pages!',
+            desc: 'Visited all 8 generation pages (Gen 0 through Gen 7)!',
             check: function (s) {
                 var n = s.generationsVisited ? s.generationsVisited.length : 0;
-                return { earned: n >= 7, progress: Math.min(n, 7), goal: 7 };
+                return { earned: n >= 8, progress: Math.min(n, 8), goal: 8 };
             }
         },
         
@@ -386,7 +386,9 @@
     }
     function trackYear(year) {
         var y = parseInt(year, 10);
-        if (!isNaN(y) && addUnique(state.years, y)) { evaluate(); }
+        // Validate: only accept plausible genealogical years (1000 AD to current year)
+        var currentYear = new Date().getFullYear();
+        if (!isNaN(y) && y >= 1000 && y <= currentYear && addUnique(state.years, y)) { evaluate(); }
     }
     function trackCountry(name) {
         if (addUnique(state.countries, name)) { evaluate(); }
@@ -546,13 +548,10 @@
             }
             
             // Track generation page visits
+            // Actual paths: generation_1_1799, generation_2_1829, ..., generation_7_2000s, generation_0_ancestors
             var genMatch = path.match(/generation_(\d+)/);
             if (genMatch) {
                 trackGenerationVisit(genMatch[1]);
-            }
-            // Also track gen 0 (ancestors)
-            if (path.indexOf('generation_0') !== -1 || path.indexOf('early_ancestors') !== -1) {
-                trackGenerationVisit('0');
             }
         }
         
