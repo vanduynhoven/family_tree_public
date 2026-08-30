@@ -2,6 +2,7 @@
 //  UI — HUD, dialog, journal, inventory, era select
 // ═══════════════════════════════════════════════════════════════
 import { ERAS } from './eras.js';
+import { SCREEN_COLS, SCREEN_ROWS } from './eras.js';
 
 export class UI {
   constructor(game) {
