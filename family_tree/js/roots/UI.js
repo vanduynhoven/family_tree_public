@@ -69,9 +69,9 @@ export class UI {
       <!-- Action buttons -->
       <div id="rt-actions">
         <div class="rt-ab" id="ab-attack" onclick="G?.interact()">⚔️💬<span>Act</span></div>
-        <div class="rt-ab rt-ab-fish" id="ab-fish" style="display:none" onclick="G?.fish()">🎣<span>Fish</span></div>
-        <div class="rt-ab" id="ab-era" onclick="G?.ui.showEraSel()">⏰<span>Time</span></div>
-        <div class="rt-ab" id="ab-journal" onclick="G?.ui.toggleJournal()">📖<span>Journal</span></div>
+        <div class="rt-ab rt-ab-fish" id="ab-fish" style="display:none">🎣<span>Fish</span></div>
+        <div class="rt-ab" id="ab-era">⏰<span>Time</span></div>
+        <div class="rt-ab" id="ab-journal">📖<span>Journal</span></div>
       </div>
 
       <!-- Damage flash -->
@@ -299,8 +299,8 @@ export class UI {
     content.innerHTML = '';
 
     if (tab === 'stories') {
-      const facts = this.game.player.collectedFacts;
-      if (!facts.length) { content.innerHTML = '<p style="color:#888">No stories collected yet.</p>'; return; }
+      const facts = this.game.player?.collectedFacts || [];
+      if (!facts.length) { content.innerHTML = '<p style="color:#888">No stories collected yet. Talk to ancestors to fill your chronicle.</p>'; return; }
       facts.forEach(f => {
         const div = document.createElement('div');
         div.className = 'rt-journal-entry';
@@ -319,7 +319,7 @@ export class UI {
         content.appendChild(div);
       });
     } else if (tab === 'dutch') {
-      const words = this.game.player.dutchWords || [];
+      const words = this.game.player?.dutchWords || [];
       if (!words.length) { content.innerHTML = '<p style="color:#888">No Dutch words found yet.</p>'; return; }
       words.forEach(w => {
         const div = document.createElement('div');

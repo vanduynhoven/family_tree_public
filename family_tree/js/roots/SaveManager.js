@@ -17,7 +17,7 @@ export class SaveManager {
       const data = {
         version:       VERSION,
         characterId:   game.characterId,
-        eraId:         game.eraId,
+        eraId:         game._eraId,
         screenRow:     game.world.screenRow,
         screenCol:     game.world.screenCol,
         playerX:       game.player.x,

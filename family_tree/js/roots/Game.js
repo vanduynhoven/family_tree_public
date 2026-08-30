@@ -109,9 +109,67 @@ export class Game {
     // Initialise quest manager
     this.quests = new QuestManager(charId, this.events);
 
-    // Start intro sequence
-    this._state = STATE.INTRO;
-    this.ui.playIntro(char.intro, () => this._afterIntro(char));
+    if (mode === 'continue' && hasSave) {
+      // ── CONTINUE: skip intro, jump straight to saved position ──
+      this._state = STATE.INTRO; // will be set to PLAYING in _afterIntro
+      loadSprites('./assets/sprites/').then(() => {
+        this._resumeFromSave(char, savedData);
+      });
+    } else {
+      // ── NEW GAME: play the character intro sequence ──
+      this._state = STATE.INTRO;
+      this.ui.playIntro(char.intro, () => this._afterIntro(char));
+    }
+  }
+
+  _resumeFromSave(char, savedData) {
+    const resumeEra      = savedData.eraId      ?? (char.startEra ?? 0);
+    const resumeRow      = savedData.screenRow  ?? 1;
+    const resumeCol      = savedData.screenCol  ?? 0;
+    const resumePlayerX  = savedData.playerX;
+    const resumePlayerY  = savedData.playerY;
+
+    this._startLocation = char.startLocation || 'haarlem';
+    this.loadEra(resumeEra);
+
+    // Override spawn position with saved player position if available
+    if (resumePlayerX != null && resumePlayerY != null) {
+      this.player.x = resumePlayerX;
+      this.player.y = resumePlayerY;
+    }
+    // Jump directly to the saved screen
+    if (this.world.screens?.[resumeRow]?.[resumeCol]) {
+      this.world.screenRow = resumeRow;
+      this.world.screenCol = resumeCol;
+      // Reload the screen's entities at the restored screen position
+      const npcData = this._buildNpcData(resumeEra);
+      this.world._loadScreen(resumeEra, npcData);
+    }
+
+    this._state = STATE.PLAYING;
+
+    this.engine.canvas.addEventListener('click', e => {
+      const rect = this.engine.canvas.getBoundingClientRect();
+      this.handleCanvasClick(e.clientX - rect.left, e.clientY - rect.top);
+    });
+    let _touchStart = null;
+    this.engine.canvas.addEventListener('touchstart', e => {
+      if (e.touches.length === 1) _touchStart = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+    }, { passive: true });
+    this.engine.canvas.addEventListener('touchend', e => {
+      if (!_touchStart) return;
+      const t = e.changedTouches[0];
+      if (Math.hypot(t.clientX - _touchStart.x, t.clientY - _touchStart.y) < 10) {
+        const rect = this.engine.canvas.getBoundingClientRect();
+        this.handleCanvasClick(t.clientX - rect.left, t.clientY - rect.top);
+      }
+      _touchStart = null;
+    }, { passive: true });
+
+    this._clickTarget  = null;
+    this._clickArrived = false;
+    this.engine.start((dt, frame) => this._tick(dt, frame));
+    this.ui.showToast(`▶ Resumed — ${ERAS[resumeEra]?.year || ''}`);
   }
 
   _afterIntro(char) {

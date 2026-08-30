@@ -248,8 +248,7 @@ const TILE_SRC = {
   [T.PLANK]:      [128, 96],    // Dirt_Brown (plank ships)
   [T.STEEL]:      [416, 96],    // Rock_Gray (steel floor)
   [T.BRIDGE]:     [128, 96],    // Dirt_Brown
-  [T.HOUSE_WALL]: [32,  96],    // Dirt_Tan (warm wall)
-  [T.HOUSE_ROOF]: [800, 320],   // Gravel (roof)
+  // HOUSE_WALL and HOUSE_ROOF are drawn procedurally — no LPC terrain mapping
   [T.DOOR]:       [128, 96],    // Dirt_Brown
   [T.PORTAL]:     [128, 544],   // Water (portal glows over it)
   [T.DEEP_WATER]: [224, 544],   // Water_Deep
@@ -371,6 +370,16 @@ function _drawTile(ctx, tile, px, py, r, c, now) {
   const seed    = r * 97 + c * 31 + _eraId * 7;
   const tr      = _rng(seed);
 
+  // ── HOUSE_WALL and HOUSE_ROOF drawn procedurally (no LPC terrain mapping) ──
+  if (tile === T.HOUSE_WALL) {
+    _drawHouseWall(ctx, px, py, _eraId, seed);
+    return;
+  }
+  if (tile === T.HOUSE_ROOF) {
+    _drawHouseRoof(ctx, px, py, _eraId, seed);
+    return;
+  }
+
   if (terrain) {
     // Pick source coords — use variants for natural variety
     let [sx, sy] = TILE_SRC[tile] ?? [32, 320];
@@ -394,7 +403,7 @@ function _drawTile(ctx, tile, px, py, r, c, now) {
     case T.FLOWER: _drawFlowers(ctx, px, py, tr); break;
     case T.CORN:   _drawCorn(ctx, px, py, tr, now); break;
     case T.PORTAL: _drawPortal(ctx, px, py, now); break;
-    case T.HOUSE_ROOF: _drawRoof(ctx, px, py); break;
+    // HOUSE_WALL and HOUSE_ROOF are handled before this switch in _drawTile
     case T.CROP_READY: _drawCropReady(ctx, px, py, now); break;
     case T.WATER:  _drawWaterShimmer(ctx, px, py, seed, now); break;
     case T.DEEP_WATER: _drawWaterShimmer(ctx, px, py, seed, now, true); break;
@@ -496,6 +505,103 @@ function _drawPortal(ctx, px, py, now) {
     const a=phase+i*Math.PI/3, pr=s*.3;
     ctx.beginPath(); ctx.arc(px+s/2+Math.cos(a)*pr, py+s/2+Math.sin(a)*pr, 2, 0, Math.PI*2); ctx.fill();
   }
+}
+
+function _drawHouseWall(ctx, px, py, eraId, seed) {
+  const s = TILE;
+  const wallColors = ['#d4b880','#c8a870','#c0a068','#b89860','#d0c0a0','#c8b888','#d0c8b0','#c8c0b0','#c8b080'];
+  const brickEras  = new Set([1, 3, 8]);
+  const wallColor  = wallColors[Math.min(eraId, wallColors.length-1)];
+
+  ctx.fillStyle = wallColor;
+  ctx.fillRect(px, py, s, s);
+
+  // Brick courses for brick eras
+  if (brickEras.has(eraId)) {
+    for (let row = 0; row < 4; row++) {
+      const ry = py + Math.round(row * s / 4);
+      const offset = (row % 2) * Math.round(s * 0.25);
+      ctx.fillStyle = 'rgba(0,0,0,0.10)';
+      ctx.fillRect(px, ry, s, 1); // mortar line
+      for (let bx = -s*0.25; bx < s; bx += s * 0.5) {
+        ctx.fillRect(px + Math.round(bx + offset), ry, 1, Math.round(s / 4));
+      }
+    }
+  } else {
+    // Plaster/wattle — subtle horizontal lines
+    ctx.fillStyle = 'rgba(0,0,0,0.05)';
+    for (let i = 1; i < 4; i++) ctx.fillRect(px, py + Math.round(i * s / 4), s, 1);
+  }
+
+  // Window on some tiles
+  if ((seed * 7919) % 3 === 0) {
+    const wx = px + Math.round(s * 0.22);
+    const wy = py + Math.round(s * 0.18);
+    const ww = Math.round(s * 0.56);
+    const wh = Math.round(s * 0.36);
+    ctx.fillStyle = eraId <= 2 ? 'rgba(255,220,140,0.55)' : 'rgba(180,220,255,0.50)';
+    ctx.fillRect(wx, wy, ww, wh);
+    ctx.strokeStyle = 'rgba(60,40,15,0.7)'; ctx.lineWidth = 1.5;
+    ctx.strokeRect(wx, wy, ww, wh);
+    ctx.beginPath(); ctx.moveTo(wx + ww/2, wy); ctx.lineTo(wx + ww/2, wy + wh); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(wx, wy + wh/2); ctx.lineTo(wx + ww, wy + wh/2); ctx.stroke();
+  }
+
+  // Shading
+  ctx.fillStyle = 'rgba(0,0,0,0.10)';
+  ctx.fillRect(px + s - 3, py, 3, s); // right shadow
+  ctx.fillStyle = 'rgba(255,255,255,0.08)';
+  ctx.fillRect(px, py, s, 2); // top highlight
+}
+
+function _drawHouseRoof(ctx, px, py, eraId, seed) {
+  const s = TILE;
+  const roofStyles = [
+    { color:'#786050', style:'thatch' },
+    { color:'#903030', style:'tile'   },
+    { color:'#7a3028', style:'tile'   },
+    { color:'#703020', style:'tile'   },
+    { color:'#605040', style:'plank'  },
+    { color:'#506040', style:'shingle'},
+    { color:'#405040', style:'flat'   },
+    { color:'#404858', style:'flat'   },
+    { color:'#903030', style:'tile'   },
+  ];
+  const rs = roofStyles[Math.min(eraId, roofStyles.length-1)];
+
+  ctx.fillStyle = rs.color;
+  ctx.fillRect(px, py, s, s);
+
+  if (rs.style === 'tile') {
+    for (let i = 0; i < 5; i++) {
+      const ry2 = py + Math.round(i * s / 5);
+      const rh2 = Math.round(s / 5);
+      ctx.fillStyle = i % 2 ? 'rgba(255,255,255,0.07)' : 'rgba(0,0,0,0.12)';
+      ctx.fillRect(px, ry2, s, rh2);
+      ctx.fillStyle = 'rgba(0,0,0,0.18)';
+      ctx.fillRect(px, ry2 + rh2 - 2, s, 2);
+    }
+  } else if (rs.style === 'thatch') {
+    ctx.fillStyle = '#8a7048';
+    for (let i = 0; i < 6; i++) ctx.fillRect(px, py + Math.round(i * s / 6), s, 2);
+    ctx.fillStyle = 'rgba(255,255,255,0.04)';
+    for (let i = 0; i < 8; i++) ctx.fillRect(px + Math.round(i * s / 8), py, 1, s);
+  } else if (rs.style === 'shingle') {
+    ctx.fillStyle = 'rgba(0,0,0,0.14)';
+    for (let row = 0; row < 4; row++) {
+      const ry2 = py + row * Math.round(s / 4);
+      const off = (row % 2) * Math.round(s / 4);
+      for (let col = -1; col < 5; col++) {
+        ctx.fillRect(px + col * Math.round(s / 4) + off, ry2, Math.round(s / 4) - 1, Math.round(s / 4));
+      }
+    }
+  } else { // flat / plank
+    ctx.fillStyle = 'rgba(0,0,0,0.08)';
+    for (let i = 1; i < 5; i++) ctx.fillRect(px, py + Math.round(i * s / 5), s, 1);
+  }
+
+  ctx.fillStyle = 'rgba(255,255,255,0.10)'; ctx.fillRect(px, py, s, 3);
+  ctx.fillStyle = 'rgba(0,0,0,0.22)';       ctx.fillRect(px, py + s - 4, s, 4);
 }
 
 function _drawRoof(ctx, px, py) {
@@ -636,30 +742,30 @@ export function drawPlayer(ctx, x, y, opts = {}) {
 
   // ── Layer 4: Head ─────────────────────────────────────
   // Head sprite: 32×32 per cell, 3 cols × 4 rows
-  // The LPC head occupies the top ~50% of the 64px body frame.
-  // At renderH=52px the head region is ~26px tall, centred in renderW.
+  // Push head down so it sits ON the body shoulders, not floating above.
+  // The LPC body's shoulder/collar area is at ~40% down the rendered height.
   if (head) {
     const headRow = HEAD_DIR_ROW[facing] ?? 2;
     const headCol = frameIdx > 0 ? (frameIdx % 2) : 1;
     const hsx = headCol * HEAD_FRAME;
     const hsy = headRow * HEAD_FRAME;
-    const headRenderW = renderW * 0.60;            // 60% of body width
-    const headRenderH = renderH * 0.48;            // 48% of body height (matches LPC proportion)
+    const headRenderW = renderW * 0.62;
+    const headRenderH = renderH * 0.54;            // tall enough to overlap shoulders
     const headRx = rx + (renderW - headRenderW) / 2;
-    const headRy = ry + renderH * 0.02;            // 2% down — aligns neck to body shoulder
+    const headRy = ry + renderH * 0.12;            // 12% down — neck sits on collar
     ctx.drawImage(head, hsx, hsy, HEAD_FRAME, HEAD_FRAME, headRx, headRy, headRenderW, headRenderH);
   }
 
   // ── Layer 5: Hair ─────────────────────────────────────
   // Hair sprite: 48×48 per cell, 1 col × 6 rows
-  // Hair overlaps the head, extending slightly above and to the sides.
+  // Hair anchors to same position as head, slightly wider for crown overhang.
   if (hair) {
     const hairRow = HAIR_DIR_ROW[facing] ?? 2;
     const hrsy = hairRow * HAIR_FRAME;
-    const hairRenderW = renderW * 0.72;            // slightly wider than head
-    const hairRenderH = renderH * 0.52;            // covers head + a little above
+    const hairRenderW = renderW * 0.74;
+    const hairRenderH = renderH * 0.58;
     const hairRx = rx + (renderW - hairRenderW) / 2;
-    const hairRy = ry - renderH * 0.01;            // 1% above head for hair crown
+    const hairRy = ry + renderH * 0.10;            // slightly above head anchor for crown
     ctx.drawImage(hair, 0, hrsy, HAIR_FRAME, HAIR_FRAME, hairRx, hairRy, hairRenderW, hairRenderH);
   }
 
