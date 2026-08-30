@@ -812,26 +812,7 @@ function drawIntroPanel(ctx, panel, w, h) {
     }
   }
 
-  // ── Caption bar ────────────────────────────────────
-  ctx.fillStyle = 'rgba(0,0,0,0.70)';
-  ctx.fillRect(0, h * 0.80, w, h * 0.20);
-  ctx.fillStyle = '#e8d4a0';
-  ctx.font = `${Math.floor(Math.min(w*0.030, 20))}px Georgia, serif`;
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
-  // Wrap long captions
-  const words = (panel.caption || '').split(' ');
-  const maxW   = w * 0.85;
-  let line = '';
-  const lines = [];
-  words.forEach(word => {
-    const test = line ? line + ' ' + word : word;
-    if (ctx.measureText(test).width > maxW && line) { lines.push(line); line = word; }
-    else line = test;
-  });
-  if (line) lines.push(line);
-  const lineH = Math.floor(Math.min(w*0.032, 22));
-  const startY = h * 0.90 - ((lines.length - 1) * lineH * 0.5);
-  lines.forEach((l, i) => ctx.fillText(l, w/2, startY + i * lineH));
+  // Caption is rendered by the #rt-intro-caption DOM element (not on canvas)
+  // — avoids double-render / overlap
   ctx.textBaseline = 'alphabetic';
 }

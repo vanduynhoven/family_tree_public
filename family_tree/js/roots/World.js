@@ -50,24 +50,32 @@ export class World {
 
     const { map, spawn } = scr;
 
+    // Track all names/IDs of named NPCs to prevent ambient duplicates
+    const namedNpcKeys = new Set();
+
     // Spawn named NPCs for this screen from npcData
     const screenKey = `${eraId}_${this.screenRow}_${this.screenCol}`;
     const npcsHere  = (npcData[screenKey] || []);
     npcsHere.forEach(d => {
+      // Deduplicate: skip if a named NPC with this gedcomId or name already exists
+      const npcKey = d.gedcomId || d.name;
+      if (namedNpcKeys.has(npcKey)) return;
+      namedNpcKeys.add(npcKey);
+      if (d.name) namedNpcKeys.add(d.name);
+      if (d.given) namedNpcKeys.add(d.given);
+
       const nx = (d.spawnC ?? spawn.c + Math.floor(Math.random()*4) - 2) * TILE + 4;
       const ny = (d.spawnR ?? spawn.r + Math.floor(Math.random()*4) - 2) * TILE + 4;
       const npc = new NPC(d, nx, ny);
       // Restore persistent friendship hearts and talk count
-      const npcKey = d.gedcomId || d.name;
       if (this._friendshipMap?.has(npcKey)) npc.friendship = this._friendshipMap.get(npcKey);
       if (this._talkCountMap?.has(npcKey))  npc.talkCount  = this._talkCountMap.get(npcKey);
       if (npc.talkCount > 0) npc.talked = true;
       this._npcs.push(npc);
     });
 
-    // Spawn ambient background NPCs — villagers, workers, passers-by
-    // Gives every screen life even if it has no named NPCs
-    this._spawnAmbientNPCs(eraId);
+    // Spawn ambient background NPCs — pass existing names so we don't duplicate
+    this._spawnAmbientNPCs(eraId, namedNpcKeys);
 
     // Spawn enemies (only in row 0, 2, 3 screens)
     if (this.screenRow !== 1) {
@@ -92,21 +100,31 @@ export class World {
     this._visited.add(`${this.screenRow},${this.screenCol}`);
   }
 
-  /** Populate a screen with era-appropriate background NPCs */
-  _spawnAmbientNPCs(eraId) {
+  /** Populate a screen with era-appropriate background NPCs.
+   *  existingNames: Set of names/ids already on this screen — skip those. */
+  _spawnAmbientNPCs(eraId, existingNames = new Set()) {
     const era = eraId;
-    // Era-specific ambient NPC pools — name, given, appearance, one-liner dialog
-    const pools = _ambientNPCPool(era);
+    const location = this._location || 'haarlem';
+    const pools = _ambientNPCPool(era, location);
     if (!pools.length) return;
 
-    // Number of ambient NPCs depends on screen type
-    // Settlement screens get more; wilderness gets fewer
-    const counts = { 0:1, 1:4, 2:3, 3:2 };  // row → count
-    const count = counts[this.screenRow] ?? 2;
+    const counts = { 0:1, 1:4, 2:3, 3:2 };
+    const count = Math.min(counts[this.screenRow] ?? 2, pools.length);
 
-    for (let i = 0; i < count; i++) {
-      const template = pools[(Math.floor(Math.random() * pools.length))];
-      // Find a random walkable spawn position
+    // Shuffle pool (Fisher-Yates) so each screen gets different NPCs without repeats
+    const shuffled = [...pools];
+    for (let i = shuffled.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+
+    let spawned = 0;
+    for (const template of shuffled) {
+      if (spawned >= count) break;
+
+      // Skip if this NPC's given name or full name already exists on the screen
+      if (existingNames.has(template.name) || existingNames.has(template.given)) continue;
+
       let tx = 0, ty = 0;
       for (let attempt = 0; attempt < 20; attempt++) {
         const tc = 2 + Math.floor(Math.random() * (SCREEN_COLS - 4));
@@ -115,19 +133,19 @@ export class World {
           tx = tc * TILE + 4; ty = tr * TILE + 4; break;
         }
       }
-      if (!tx && !ty) continue;  // couldn't find a clear spot
+      if (!tx && !ty) continue;
 
-      // Give each ambient NPC a random wander radius (small — they stay local)
-      const npcData = {
-        ...template,
-        era,
-        wanderRadius: 2 + Math.floor(Math.random() * 2), // 2-3 tile radius
-      };
-      const npc = new NPC(npcData, tx, ty);
+      const npcDef = { ...template, era, wanderRadius: 2 + Math.floor(Math.random() * 2) };
+      const npc = new NPC(npcDef, tx, ty);
       npc.homeX = tx; npc.homeY = ty;
-      // Offset wander timer so they don't all move at once
       npc.wanderTimer = Math.random() * 3;
+
+      // Mark this name as used so subsequent iterations don't duplicate it
+      existingNames.add(template.name);
+      if (template.given) existingNames.add(template.given);
+
       this._npcs.push(npc);
+      spawned++;
     }
   }
 
@@ -320,7 +338,8 @@ function _randomForage(eraId) {
 // These are background villagers/workers who populate every screen.
 // Each has a name, appearance, and one or two lines of flavour dialog.
 // They don't give quest items but make the world feel alive.
-function _ambientNPCPool(eraId) {
+// 'location' is used for Era 8 to pick the right country pool.
+function _ambientNPCPool(eraId, location = 'haarlem') {
   const pools = [
 
     // ── Era 0 · 1539 ──
@@ -392,48 +411,72 @@ function _ambientNPCPool(eraId) {
       { name:'Dutch Neighbour', given:'Hendrika', bodyColor:'#5a6040', hairColor:'#3a2810', skinColor:'#d8b880',
         lines:{ generic:['We\'ve been here three years now. Still homesick, but the children love it.',{ dutch:'Amerika is anders maar goed. [America is different but good.]', en:'' },'Gerardus van Duijnhoven? He farms on the county road, half mile east.'] } },
       { name:'Feed Store Man', given:'Dale', bodyColor:'#6a5020', hairColor:'#4a3018', skinColor:'#d4b070',
-        lines:{ generic:['Best corn crop in ten years. You can feel the soil is good here.',{ dutch:'Goede grond, goede oogst. [Good soil, good harvest.]', en:'' },'Dutch fella you\'re looking for? Gerardus works late — try the field after four.'] } },
+        lines:{ generic:['Best corn crop in ten years. You can feel the soil is good here.','Dutch fella you\'re looking for? Gerardus works late — try the field after four.'] } },
       { name:'Catholic Priest', given:'Father O\'Brien', bodyColor:'#101010', hairColor:'#484840', skinColor:'#d8b890',
         lines:{ generic:['This whole county is Dutch Catholic. Remarkable community.',{ dutch:'Gelovig volk zijn goede buren. [Religious people make good neighbours.]', en:'' },'Gerardus leads the rosary group on Thursdays. Try the church hall.'] } },
       { name:'Farm Wife', given:'Greta', bodyColor:'#7a5040', hairColor:'#5a3820', skinColor:'#d4b070',
         lines:{ generic:['I baked twelve loaves this morning. Normal Tuesday.',{ dutch:'Werken en bidden, dat is ons leven. [Work and pray, that is our life.]', en:'' },'The van Duijnhoven family? Good people. Gerardus is in the east field.'] } },
       { name:'Hardware Man', given:'Chuck', bodyColor:'#4a4828', hairColor:'#3a3820', skinColor:'#d4b068',
-        lines:{ generic:['New John Deere parts came in. Best tractor in the world.',{ dutch:'Sterk als een os. [Strong as an ox.]', en:'That\'s what Gerardus calls it.' },'Try the barn after sundown — that\'s when Gerardus tends the equipment.'] } },
+        lines:{ generic:['New John Deere parts came in. Best tractor in the world.','Try the barn after sundown — that\'s when Gerardus tends the equipment.'] } },
     ],
 
     // ── Era 6 · 1984 ──
     [
       { name:'Neighbourhood Kid', given:'Kevin', bodyColor:'#4060a0', hairColor:'#2a4010', skinColor:'#d4b080',
-        lines:{ generic:['Did you see the new BMX track by the school? Totally rad.',{ dutch:'Doe normaal dan doe je al gek genoeg. [Act normal, that\'s crazy enough.]', en:'My Dutch grandma says that.' },'The Van Dyn Hoven house is three blocks west — the one with the big oak.'] } },
+        lines:{ generic:['Did you see the new BMX track by the school? Totally rad.','The Van Dyn Hoven house is three blocks west — the one with the big oak.'] } },
       { name:'Neighbour Lady', given:'Peg', bodyColor:'#c05080', hairColor:'#c02020', skinColor:'#d8b890',
-        lines:{ generic:['Lovely neighbourhood. A bit different since the shopping mall opened though.',{ dutch:'De wereld verandert zo snel. [The world changes so fast.]', en:'My Dutch friend says that.' },'Chuck? Try the garage. He\'s always in there tinkering.'] } },
+        lines:{ generic:['Lovely neighbourhood. A bit different since the shopping mall opened though.','Chuck? Try the garage. He\'s always in there tinkering.'] } },
       { name:'Mailman', given:'Ron', bodyColor:'#3060b0', hairColor:'#4a3820', skinColor:'#d4b070',
-        lines:{ generic:['Twenty years on this route. Know every dog by name.',{ dutch:'Elke dag hetzelfde. [Every day the same.]', en:'And I love it.' },'You\'ll find Chuck Sr. at the VFW hall most Friday evenings.'] } },
+        lines:{ generic:['Twenty years on this route. Know every dog by name.','You\'ll find Chuck Sr. at the VFW hall most Friday evenings.'] } },
     ],
 
     // ── Era 7 · 2020 ──
     [
       { name:'Coffee Shop Barista', given:'Emma', bodyColor:'#c06040', hairColor:'#804020', skinColor:'#d8b880',
-        lines:{ generic:['Oat milk flat white? We\'re out of regular milk.',{ dutch:'Zo gaat dat tegenwoordig. [That\'s how it goes these days.]', en:'' },'Arthur usually comes in at nine. Cappuccino, always.'] } },
+        lines:{ generic:['Oat milk flat white? We\'re out of regular milk.','Arthur usually comes in at nine. Cappuccino, always.'] } },
       { name:'Pandemic Cyclist', given:'Sjoerd', bodyColor:'#40a060', hairColor:'#2a3010', skinColor:'#c8a060',
         lines:{ generic:['Best part of lockdown? The city belongs to cyclists.',{ dutch:'Haarlem is van de fiets. [Haarlem belongs to the bicycle.]', en:'Always has been.' }] } },
       { name:'Online Schoolteacher', given:'Merel', bodyColor:'#5060c0', hairColor:'#3a2a10', skinColor:'#d0b080',
         lines:{ generic:['Video calls all day. I miss actual classrooms.',{ dutch:'Zoom is geen school. [Zoom is not school.]', en:'The children are struggling.' },'Arthur Van Duynhoven teaches Dutch-American history online now.'] } },
     ],
 
-    // ── Era 8 · 2026 · Haarlem & Mankato ──
-    [
-      { name:'Canal Cyclist', given:'Floris', bodyColor:'#3060a0', hairColor:'#2a3010', skinColor:'#c8a060',
-        lines:{ generic:['Morning! Beautiful day for the canal.',{ dutch:'Fiets je mee naar de markt? [Cycling to the market?]', en:'' },'Tierney\'s opens at eleven on Saturdays. That\'s the rule.'] } },
-      { name:'Dog Walker', given:'Hanneke', bodyColor:'#8060a0', hairColor:'#5a3020', skinColor:'#d4b080',
-        lines:{ generic:['Three dogs, one walk, every morning. That\'s my life.',{ dutch:'Honden zijn de beste buren. [Dogs are the best neighbours.]', en:'' },'The van Duynhoven kids? Raven and Starling? Always at the flower market on Saturdays.'] } },
-      { name:'Market Regular', given:'Bert', bodyColor:'#605040', hairColor:'#504030', skinColor:'#c8a060',
-        lines:{ generic:['Same stall, twenty years. Tulips or roses today?',{ dutch:'De markt is het hart van Haarlem. [The market is the heart of Haarlem.]', en:'' },'You heading to Tierney\'s after? They do a good lunch.'] } },
-      { name:'Mankato Jogger', given:'Sarah', bodyColor:'#e06040', hairColor:'#803020', skinColor:'#d8b880',
-        lines:{ generic:['Morning run along the river. Can\'t start the day without it.',{ dutch:'Bewegen is leven. [Movement is life.]', en:'My Dutch friend taught me that.' },'You\'re looking for the Van Duynhoven house? 313 Hanover, big front porch.'] } },
-      { name:'Hanover St Retiree', given:'Harold', bodyColor:'#6a6858', hairColor:'#b0a898', skinColor:'#d8b880',
-        lines:{ generic:['This street hasn\'t changed in sixty years. That\'s how I like it.','These houses were built around 1890. Solid construction. They don\'t build like this anymore.','Peter John\'s grandchildren visit every summer. Nice family.'] } },
-    ],
   ];
+
+  // ── Era 8 · 2026 — SPLIT by location ──────────────────────────────
+  // Haarlem pool: Dutch canal cyclists, dog walkers, market regulars
+  // Mankato pool:  Minnesota joggers, retirees, neighbourhood regulars
+  // They must NOT cross over — a Minnesota jogger has no business in Haarlem.
+
+  if (eraId === 8) {
+    if (location === 'mankato') {
+      return [
+        { name:'Mankato Jogger',     given:'Sarah',   bodyColor:'#e06040', hairColor:'#803020', skinColor:'#d8b880',
+          lines:{ generic:['Morning run along the river. Can\'t start the day without it.','You\'re looking for the Van Duynhoven house? 313 Hanover, big front porch.'] } },
+        { name:'Hanover St Retiree', given:'Harold',  bodyColor:'#6a6858', hairColor:'#b0a898', skinColor:'#d8b880',
+          lines:{ generic:['This street hasn\'t changed in sixty years. That\'s how I like it.','These houses were built around 1890. Solid construction.','Peter John\'s grandchildren visit every summer. Nice family.'] } },
+        { name:'Dog Walker',         given:'Barb',    bodyColor:'#9060a0', hairColor:'#604030', skinColor:'#d4b080',
+          lines:{ generic:['Three dogs, one leash, every morning. My cardio.','Peter John\'s place? 313 Hanover, two houses down from the big elm.'] } },
+        { name:'Lawn Mower',         given:'Terry',   bodyColor:'#408020', hairColor:'#3a3010', skinColor:'#d4b070',
+          lines:{ generic:['Nice day for yard work.','The Van Duynhoven family? Good neighbours. Quiet, friendly.'] } },
+        { name:'School Bus Driver',  given:'Donna',   bodyColor:'#c08010', hairColor:'#4a3010', skinColor:'#d8b880',
+          lines:{ generic:['Route 7, every morning. Thirty years and counting.','Hanover Street? Three blocks north, turn right at the stop sign.'] } },
+      ];
+    } else {
+      // Haarlem pool
+      return [
+        { name:'Canal Cyclist',    given:'Floris',   bodyColor:'#3060a0', hairColor:'#2a3010', skinColor:'#c8a060',
+          lines:{ generic:['Morning! Beautiful day for the canal.',{ dutch:'Fiets je mee naar de markt? [Cycling to the market?]', en:'' },'Tierney\'s opens at eleven on Saturdays. That\'s the rule.'] } },
+        { name:'Dog Walker',       given:'Hanneke',  bodyColor:'#8060a0', hairColor:'#5a3020', skinColor:'#d4b080',
+          lines:{ generic:['Three dogs, one walk, every morning. That\'s my life.',{ dutch:'Honden zijn de beste buren. [Dogs are the best neighbours.]', en:'' },'The van Duynhoven kids? Raven and Starling? Always at the flower market on Saturdays.'] } },
+        { name:'Market Regular',   given:'Bert',     bodyColor:'#605040', hairColor:'#504030', skinColor:'#c8a060',
+          lines:{ generic:['Same stall, twenty years. Tulips or roses today?',{ dutch:'De markt is het hart van Haarlem. [The market is the heart of Haarlem.]', en:'' },'You heading to Tierney\'s after? They do a good lunch.'] } },
+        { name:'Bakery Owner',     given:'Ineke',    bodyColor:'#c09040', hairColor:'#6a4010', skinColor:'#d4b070',
+          lines:{ generic:['Fresh stroopwafels this morning!',{ dutch:'Goedemorgen! Alles goed? [Good morning! All well?]', en:'' },'The family at 276? Yes — Arthur and his girls. Sweet children.'] } },
+        { name:'Canal SUP Rider',  given:'Bram',     bodyColor:'#204080', hairColor:'#1a2010', skinColor:'#c8a060',
+          lines:{ generic:['Stand-up paddle on the Leidsevaart — perfect flat water.',{ dutch:'Prachtig, toch? [Beautiful, isn\'t it?]', en:'' },'The Grote Kerk is straight ahead, ten minutes on foot.'] } },
+      ];
+    }
+  }
+
   return pools[Math.min(eraId, pools.length - 1)] || [];
 }

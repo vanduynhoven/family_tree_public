@@ -270,47 +270,42 @@ export class Game {
     const wx = screenX + this.engine.cameraX;
     const wy = screenY + this.engine.cameraY;
 
-    // ── Off-screen click → walk toward the nearest valid screen edge ──
-    // This lets the player click beyond the current screen to trigger a transition.
     const screenW = SCREEN_COLS * TILE;
     const screenH = SCREEN_ROWS * TILE;
+
+    // ── Off-screen click — walk toward nearest exit ──────────────
     const offRight  = wx >= screenW;
     const offLeft   = wx < 0;
     const offBottom = wy >= screenH;
     const offTop    = wy < 0;
 
     if (offRight || offLeft || offBottom || offTop) {
-      // Determine which edge the click is toward and whether it has an exit
       let dir = null;
-      if (offRight  && wx - this.player.cx >= Math.abs(wy - this.player.cy)) dir = 'right';
-      else if (offLeft   && this.player.cx - wx >= Math.abs(wy - this.player.cy)) dir = 'left';
-      else if (offBottom && wy - this.player.cy >= Math.abs(wx - this.player.cx)) dir = 'down';
-      else if (offTop    && this.player.cy - wy >= Math.abs(wx - this.player.cx)) dir = 'up';
-      // Also handle purely off-screen in one axis
-      if (!dir) {
-        if (offRight)  dir = 'right';
-        else if (offLeft)   dir = 'left';
-        else if (offBottom) dir = 'down';
-        else if (offTop)    dir = 'up';
-      }
+      const adx = Math.abs(wx - this.player.cx);
+      const ady = Math.abs(wy - this.player.cy);
+      if      (offRight  && adx >= ady) dir = 'right';
+      else if (offLeft   && adx >= ady) dir = 'left';
+      else if (offBottom && ady >  adx) dir = 'down';
+      else if (offTop    && ady >  adx) dir = 'up';
+      else if (offRight)  dir = 'right';
+      else if (offLeft)   dir = 'left';
+      else if (offBottom) dir = 'down';
+      else if (offTop)    dir = 'up';
 
       if (dir && this.world.canExitDir(dir)) {
-        // Walk the player toward the open passage on that edge
-        const exits = this.world.screen?.exits || {};
-        const exit  = exits[dir];
-        let edgeTx, edgeTy;
-        if (dir === 'right')  { edgeTx = screenW - 1;  edgeTy = (exit?.pos ?? 7) * TILE + TILE/2; }
-        else if (dir === 'left')   { edgeTx = 1;          edgeTy = (exit?.pos ?? 7) * TILE + TILE/2; }
-        else if (dir === 'down')   { edgeTx = (exit?.pos ?? 10) * TILE + TILE/2; edgeTy = screenH - 1; }
-        else                       { edgeTx = (exit?.pos ?? 10) * TILE + TILE/2; edgeTy = 1; }
-        this._navigateTo(edgeTx, edgeTy, null);
-        return;
+        this._walkTowardExit(dir);
       }
-      // No exit in that direction — ignore the click
       return;
     }
 
-    // ── On-screen click — check for interactive targets first ──
+    // ── Near-edge click (within 2 tiles of an exit) — treat as exit click ─
+    const edgeMargin = TILE * 2;
+    if (wx >= screenW - edgeMargin && this.world.canExitDir('right')) { this._walkTowardExit('right'); return; }
+    if (wx <= edgeMargin           && this.world.canExitDir('left'))  { this._walkTowardExit('left');  return; }
+    if (wy >= screenH - edgeMargin && this.world.canExitDir('down'))  { this._walkTowardExit('down');  return; }
+    if (wy <= edgeMargin           && this.world.canExitDir('up'))    { this._walkTowardExit('up');    return; }
+
+    // ── On-screen click — check interactive targets ───────────────
 
     // 1. NPC?
     for (const npc of this.world.activeNPCs) {
@@ -357,34 +352,61 @@ export class Game {
       return;
     }
 
-    // 6. Plain walkable ground
-    if (!this.world.solidAt(wx, wy)) {
-      this._navigateTo(wx, wy, null);
-    }
-    // Solid tile click — walk toward it as far as possible (player bumps the wall)
-    else {
-      this._navigateTo(wx, wy, null);
-    }
+    // 6. Any ground tile — walk there (including solid, player will bump)
+    this._navigateTo(wx, wy, null);
+  }
+
+  /** Walk the player in direction dir until they cross the screen boundary. */
+  _walkTowardExit(dir) {
+    const screenW = SCREEN_COLS * TILE;
+    const screenH = SCREEN_ROWS * TILE;
+    const exits   = this.world.screen?.exits || {};
+    const exit    = exits[dir];
+    if (!exit) return;
+
+    // Target: a point well beyond the edge, aligned with the passage
+    // The player will walk there, checkScreenExit fires, transition starts
+    let tx, ty;
+    if (dir === 'right')  { tx = screenW + TILE * 2; ty = exit.pos * TILE + TILE / 2; }
+    else if (dir === 'left')   { tx = -TILE * 2;            ty = exit.pos * TILE + TILE / 2; }
+    else if (dir === 'down')   { tx = exit.pos * TILE + TILE / 2; ty = screenH + TILE * 2; }
+    else                       { tx = exit.pos * TILE + TILE / 2; ty = -TILE * 2; }
+
+    // Use a large arrival threshold so the nav doesn't "stop" before crossing
+    this._clickTarget = { tx, ty, onArrival: null, exitNav: true };
+    this._clickArrived = false;
   }
 
   _navigateTo(tx, ty, onArrival) {
-    this._clickTarget  = { tx, ty, onArrival };
+    this._clickTarget  = { tx, ty, onArrival, exitNav: false };
     this._clickArrived = false;
   }
 
   _tickClickNav(dt) {
     if (!this._clickTarget) return;
-    const { tx, ty, onArrival } = this._clickTarget;
+    const { tx, ty, onArrival, exitNav } = this._clickTarget;
     const dist = Math.hypot(this.player.cx - tx, this.player.cy - ty);
 
-    if (dist < TILE * 0.8) {
+    // Transition started — keep walking (don't clear during exit nav)
+    if (this.world.transition) {
+      if (!exitNav) { this._clickTarget = null; }
+      return;
+    }
+
+    // Arrival check — for exit nav, we never "arrive" naturally;
+    // checkScreenExit fires the transition. For normal nav, stop when close.
+    if (!exitNav && dist < TILE * 0.8) {
       this._clickTarget = null;
       onArrival?.();
       return;
     }
 
-    // If a screen transition just started, clear the target (world handles it)
-    if (this.world.transition) { this._clickTarget = null; return; }
+    // If exit nav target reached without transition firing (no exit there),
+    // clear so player doesn't walk forever
+    if (exitNav && dist < TILE * 0.8) {
+      this._clickTarget = null;
+      return;
+    }
 
     // Walk toward target
     const dx  = tx - this.player.cx;
@@ -789,61 +811,26 @@ export class Game {
 
         // Build appearance from name hash (consistent colour per person)
         const skinTones  = ['#f0c080','#d8a060','#c89050','#d0b080','#d4a870'];
-        const hairColors = ['#2a1808','#1a0a00','#6a4020','#3a2010','#804020','#d4a020'];
-        const bodyColors = ['#3a2a18','#2a3a5a','#5a4020','#3a4828','#6a4030','#2a4050'];
+        // Era-appropriate hair and clothing colours
+        const hairPalette = eraId <= 3
+          ? ['#2a1808','#1a0a00','#5a3010','#3a2010','#7a5020']  // Dutch/NL dark tones
+          : ['#2a1808','#1a0a00','#4a3020','#804020','#b08030','#a07840']; // mixed
+        const bodyPalette = _eraPalette(eraId);
         const hi = hash & 0xfff;
-        const skinColor  = skinTones [hi % skinTones.length];
-        const hairColor  = hairColors[(hi >> 4) % hairColors.length];
-        const bodyColor  = bodyColors[(hi >> 8) % bodyColors.length];
+        const skinColor = skinTones [hi % skinTones.length];
+        const hairColor = hairPalette[(hi >> 4) % hairPalette.length];
+        const bodyColor = bodyPalette[(hi >> 8) % bodyPalette.length];
 
-        // Parse given name (first word of name field)
-        const given = gd.name.split(' ')[0];
-        const surname = gd.name.replace(given, '').trim();
+        // Parse given and surname
+        const given   = gd.given   || gd.name.split(' ')[0];
+        const surname = gd.surname || '';
+        const fullName = surname ? `${given} ${surname}` : given;
 
-        // Build auto-generated dialog lines using all available GEDCOM data
-        const yearStr  = gd.birthYear  ? gd.birthYear.toString()  : 'unknown time';
-        const deathStr = gd.deathYear  ? ` I lived until ${gd.deathYear}.` : '';
-        const placeStr = gd.birthPlace ? gd.birthPlace.split(',')[0].trim() : 'this region';
-        const occupStr = gd.occupation || '';
-        const surnameDisplay = gd.surname || surname;
+        // Determine the person's location from birth place
+        const loc = _gedcomPersonLocation(gd.birthPlace, eraId);
 
-        const lines = { generic: [] };
-
-        // Line 1: personal introduction
-        if (gd.birthYear && gd.birthPlace) {
-          lines.generic.push(
-            `I am ${given}${surnameDisplay ? ' ' + surnameDisplay : ''}. Born in ${placeStr} in ${yearStr}.${deathStr}`
-          );
-        } else {
-          lines.generic.push(
-            `My name is ${given}${surnameDisplay ? ' ' + surnameDisplay : ''}. I have lived here all my life.`
-          );
-        }
-
-        // Line 2: occupation or era flavour
-        if (occupStr) {
-          lines.generic.push(`I work as a ${occupStr.toLowerCase()}. It keeps food on the table.`);
-        } else {
-          lines.generic.push(_eraFlavourLine(eraId, given));
-        }
-
-        // Line 3: family connection hint
-        lines.generic.push(
-          `The Van Duynhoven family? Yes — I know them. ${_eraFamilyHint(eraId)}`
-        );
-
-        // Repeat lines (2nd and 3rd visits)
-        lines.repeat1 = [
-          `${given} greets you with a nod.`,
-          `"You again! How goes the journey?"`,
-          _eraFlavourLine(eraId, given),
-        ];
-        lines.repeat2 = [
-          `"There is always more to tell, if you have time to listen."`,
-          gd.occupation
-            ? `Being a ${gd.occupation.toLowerCase()} in these times is no easy thing.`
-            : _eraFlavourLine(eraId, given),
-        ];
+        // Build accurate, location-specific dialog
+        const lines = _buildPersonDialog(given, fullName, gd, eraId, loc);
 
         const npcEntry = {
           gedcomId:  id,
@@ -907,32 +894,290 @@ function _strHash(str) {
   return h;
 }
 
-/** Era-specific flavour line for auto-generated NPCs */
-function _eraFlavourLine(eraId, name) {
-  const lines = [
-    `The heather is in bloom. A good omen, they say.`,                                      // 0
-    `Business flows like canal water — everywhere at once.`,                                // 1
-    `The French soldiers marched through again this morning.`,                              // 2
-    `The factory whistle rules our lives now.`,                                             // 3
-    `Ten days at sea. I am beginning to forget what land smells like.`,                     // 4
-    `Minnesota is flat but the soil is rich. We will manage.`,                              // 5
-    `Strange times. Everything is changing so fast.`,                                       // 6
-    `Video calls to the Netherlands, same family — different world.`,                       // 7
-  ];
-  return lines[eraId] || lines[0];
+/**
+ * Determine a person's location type from their birth place string.
+ * Returns: 'nl' | 'us' | 'ship' | 'unknown'
+ */
+function _gedcomPersonLocation(birthPlace, eraId) {
+  if (!birthPlace) return eraId === 4 ? 'ship' : 'nl'; // default NL for early eras
+  const bp = birthPlace.toLowerCase();
+
+  // Ship / ocean
+  if (bp.includes('atlantic') || bp.includes('ocean') || bp.includes('sea') ||
+      bp.includes('aboard') || bp.includes('ship') || bp.includes('vessel')) return 'ship';
+
+  // USA / Minnesota / Wisconsin
+  if (bp.includes('minnesota') || bp.includes('mn,') || bp.includes(', mn') ||
+      bp.includes('moorhead') || bp.includes('frazee') || bp.includes('mankato') ||
+      bp.includes('wisconsin') || bp.includes('wi,') || bp.includes(', wi') ||
+      bp.includes('new york') || bp.includes('united states') || bp.includes('u.s.') ||
+      bp.includes('usa') || bp.includes('america') || bp.includes('chicago') ||
+      bp.includes('illinois') || bp.includes('iowa') || bp.includes('michigan')) return 'us';
+
+  // Canada / NZ / other English-speaking
+  if (bp.includes('canada') || bp.includes('new zealand') || bp.includes('australia') ||
+      bp.includes('england') || bp.includes('ireland') || bp.includes('scotland')) return 'other';
+
+  // Default: Netherlands / Dutch location
+  return 'nl';
 }
 
-/** Era-specific family connection hint for auto-generated NPCs */
-function _eraFamilyHint(eraId) {
-  const hints = [
-    `Their farm is east of the church. Good people, quiet workers.`,                        // 0
-    `They worship at the old church in the south quarter.`,                                 // 1
-    `They keep to themselves these days. Careful with the French about.`,                   // 2
-    `Marianus is the one to speak to. He knows everything.`,                                // 3
-    `Johan and his family are on B deck. Come find them.`,                                  // 4
-    `The van Duijnhovens farm two miles east of town. Ask at the church.`,                  // 5
-    `They moved here from Minnesota. Nice family.`,                                         // 6
-    `Arthur built a whole website about the family. Ask him about it.`,                     // 7
+/**
+ * Era and location-appropriate clothing palette
+ */
+function _eraPalette(eraId) {
+  const palettes = [
+    ['#5a4020','#3a2810','#6a5030','#4a3820','#7a6040'],          // 0 1539 earthy homespun
+    ['#1a2a6a','#2a3a80','#6a4820','#3a3060','#205040'],          // 1 1660 merchant blues/greens
+    ['#2a3a5a','#3a4868','#4a3828','#5a4838','#2a2840'],          // 2 1799 muted wartime
+    ['#1a1208','#2a2010','#3a2818','#4a3820','#2a1a08'],          // 3 1872 factory dark
+    ['#2a3a5a','#1a2a3a','#3a2a18','#4a3828','#2a2a40'],          // 4 1950 ship/emigrant
+    ['#5a6040','#6a5020','#4a4828','#7a5040','#3a3820'],          // 5 1955 Minnesota practical
+    ['#4060a0','#c05080','#3060b0','#40a060','#806040'],          // 6 1984 colourful decade
+    ['#c06040','#5060c0','#40a060','#c08010','#204080'],          // 7 2020 modern variety
+    ['#2050a0','#308060','#5060c0','#c06040','#6a6858'],          // 8 2026
   ];
-  return hints[eraId] || hints[0];
+  return palettes[Math.min(eraId, palettes.length-1)];
+}
+
+/**
+ * Build historically accurate, location-specific dialog for a GEDCOM individual.
+ * All lines sound like they come from a real person of that time and place.
+ */
+function _buildPersonDialog(given, fullName, gd, eraId, loc) {
+  const year     = gd.birthYear  || null;
+  const died     = gd.deathYear  || null;
+  const place    = gd.birthPlace ? gd.birthPlace.split(',')[0].trim() : null;
+  const occu     = gd.occupation ? gd.occupation.toLowerCase() : null;
+  const isFemale = gd.sex === 'F';
+  const pronoun  = isFemale ? 'she' : 'he';
+
+  const lines = { generic: [], repeat1: [], repeat2: [] };
+
+  // ── Introduction ──────────────────────────────────────────────
+
+  // Line 1: who they are
+  if (year && place) {
+    lines.generic.push(`${_intro(eraId, loc, given, fullName, year, place)}`);
+  } else if (year) {
+    lines.generic.push(`My name is ${fullName}. I was born in ${year}.`);
+  } else {
+    lines.generic.push(`My name is ${fullName}. I live here, as my family has for generations.`);
+  }
+
+  // Line 2: occupation or life situation — era + location specific
+  if (occu) {
+    lines.generic.push(`${_occupationLine(occu, eraId, loc, given)}`);
+  } else {
+    lines.generic.push(`${_situationLine(eraId, loc, isFemale)}`);
+  }
+
+  // Line 3: death/life span context if known, or family awareness
+  if (died && year) {
+    const age = died - year;
+    lines.generic.push(`${_lifeSpanLine(given, year, died, age, eraId, loc)}`);
+  } else {
+    lines.generic.push(`${_familyAwarenessLine(eraId, loc, given)}`);
+  }
+
+  // ── Repeat visits ─────────────────────────────────────────────
+
+  lines.repeat1 = [
+    `${given} ${_repeatGreeting(eraId, loc)}.`,
+    `${_repeatLine1(eraId, loc, isFemale)}`,
+  ];
+
+  lines.repeat2 = [
+    `${_repeatLine2(eraId, loc, isFemale)}`,
+    occu ? `${_occupationDepth(occu, eraId, loc)}` : `${_situationLine2(eraId, loc, isFemale)}`,
+  ];
+
+  return lines;
+}
+
+// ── Dialog line builders ──────────────────────────────────────
+
+function _intro(eraId, loc, given, fullName, year, place) {
+  if (loc === 'ship') {
+    return `I am ${fullName}, from ${place}. Ten days at sea so far and counting.`;
+  }
+  if (loc === 'us') {
+    if (eraId === 5) return `Name's ${fullName}. Came over from the Netherlands in ${year > 1940 ? `the ${Math.floor((year-1920)/10)*10+1920}s` : `${year}`}. ${place} is home now.`;
+    if (eraId === 6) return `I'm ${fullName}. Born right here in ${place} in ${year}.`;
+    if (eraId === 7) return `${fullName}, from ${place}. Strange times we're living through.`;
+    return `${fullName}, originally from ${place}.`;
+  }
+  // Netherlands / Dutch
+  const dutchIntros = [
+    // Era 0 — 1539
+    `${_nl('Mijn naam is', 'My name is')} ${fullName}. ${_nl('Geboren in', 'Born in')} ${place} ${_nl('in het jaar', 'in the year')} ${year}.`,
+    // Era 1 — 1660
+    `I am ${fullName} of ${place}. My family has been here for three generations.`,
+    // Era 2 — 1799
+    `${fullName}. ${_nl('Geboren te', 'Born in')} ${place}, ${year}. These are difficult times.`,
+    // Era 3 — 1872
+    `${fullName}, from ${place}. Born in ${year}. The world is changing fast around us.`,
+    // Era 4 — ship (already handled)
+    `${fullName}, Rotterdam by way of ${place}.`,
+    // Era 5+ (NL side rare)
+    `${fullName}, from ${place}.`,
+  ];
+  return dutchIntros[Math.min(eraId, dutchIntros.length-1)];
+}
+
+function _nl(dutch, english) {
+  // 50% chance to use Dutch phrasing with translation
+  return `${dutch} [${english}]`;
+}
+
+function _occupationLine(occu, eraId, loc, given) {
+  const place = loc === 'us' ? 'here in Minnesota' : loc === 'ship' ? 'on this ship' : 'here';
+  if (eraId === 0) return `${_nl(`Als ${occu} werk ik hard`, `As a ${occu} I work hard`)} — from before dawn until dark.`;
+  if (eraId === 1) return `I am a ${occu}. Business is brisk in these prosperous times, when it comes.`;
+  if (eraId === 2) return `A ${occu} — in peacetime that was honest work. Now, with the French here, everything is uncertain.`;
+  if (eraId === 3) return `${_nl('Ik werk als', 'I work as')} ${occu}. ${_nl('Eerlijk werk', 'Honest work')}, but the hours are long and the pay is poor.`;
+  if (eraId === 4) return `I was a ${occu} back in the Netherlands. Starting over ${place}.`;
+  if (eraId === 5) return `${occu.charAt(0).toUpperCase() + occu.slice(1)} — that's me. Been at it since I was fifteen.`;
+  if (eraId === 6) return `I work as a ${occu}. Different career to my parents, that's for sure.`;
+  return `I'm a ${occu} these days. The work keeps changing.`;
+}
+
+function _situationLine(eraId, loc, isFemale) {
+  const she = isFemale;
+  if (loc === 'ship') {
+    return she
+      ? 'I spend my days keeping the children calm and trying not to think about the water beneath us.'
+      : 'I stand at the rail every morning. The horizon never changes, but it helps to look.';
+  }
+  const nl = [
+    // 0 · 1539
+    she ? `${_nl('Ik zorg voor het huis en de kinderen', 'I care for the house and children')} — the work never ends.`
+        : `${_nl('Het land werkt niet zichzelf', 'The land does not work itself')} — we rise before dawn.`,
+    // 1 · 1660
+    she ? 'I manage the household accounts. My husband does not know how much he relies on my arithmetic.'
+        : `${_nl('De handel gaat goed dit jaar', 'Trade is good this year')} — God willing it will last.`,
+    // 2 · 1799
+    she ? `${_nl('Wij vrouwen houden alles bijeen', 'We women hold everything together')} when the men are taken away.`
+        : 'I try to keep my head down and my family fed. That is all a man can do these days.',
+    // 3 · 1872
+    she ? `${_nl('Twaalf kinderen en het werk gaat maar door', 'Twelve children and the work just keeps going')}.`
+        : `${_nl('Vroeg opstaan, laat naar bed', 'Early to rise, late to bed')} — that is the life of a farmer.`,
+    // 4
+    'We had nothing to stay for. And everything to hope for.',
+    // 5
+    she ? 'I run the household and help with the farm accounts. The men do the lifting; I do the thinking.'
+        : 'Hard work and faith — that is what brought us here and that is what will keep us.',
+    // 6
+    she ? 'My mother came over from the Netherlands. I grew up hearing Dutch at the dinner table.'
+        : 'We built this neighbourhood from nothing in the fifties. I want my kids to appreciate that.',
+    // 7
+    'Lockdown has been hard. But you learn what matters when you cannot leave the house.',
+  ];
+  return nl[Math.min(eraId, nl.length-1)];
+}
+
+function _lifeSpanLine(given, year, died, age, eraId, loc) {
+  if (age < 5)  return `${given} died very young — only ${age} years old. So many children were lost in those days.`;
+  if (age < 20) return `${given} did not reach adulthood. Born ${year}, gone by ${died}. A short life, but remembered.`;
+  if (age > 80) return `I will live to ${died}${eraId <= 3 ? ' — a very long life for these times' : ''}. ${age} years. Much to see.`;
+  return `Born ${year}, died ${died}. ${age} years. ${_lifeContext(eraId, loc)}`;
+}
+
+function _lifeContext(eraId, loc) {
+  if (loc === 'us') return 'A good American life.';
+  if (eraId === 0) return `${_nl('Een eerlijk leven', 'An honest life')}.`;
+  if (eraId === 2) return 'Survived the occupation, at least.';
+  if (eraId === 3) return `${_nl('Genoeg om op terug te kijken', 'Enough to look back on')}.`;
+  return 'A full life.';
+}
+
+function _familyAwarenessLine(eraId, loc, given) {
+  if (loc === 'ship')
+    return 'Everyone on this ship knows the van Duijnhoven family. They are good people.';
+  if (loc === 'us') {
+    if (eraId === 5) return 'The van Duijnhoven family farm? East of town, county road 9. Can\'t miss it.';
+    if (eraId === 6) return 'Van Dyn Hoven — good family. The old spelling was different, they say.';
+    return 'The Van Duynhovens? Yes, I know them. Nice people.';
+  }
+  // NL
+  const hints = [
+    `${_nl('De familie Van Duinhoven? Die ken ik', 'The Van Duinhoven family? I know them')} — good people, hard workers.`,
+    `${_nl('Iedereen in dit dorp kent de Van Duynhovens', 'Everyone in this village knows the Van Duynhovens')}.`,
+    `The van Duijnhovens keep to themselves, especially since the French came. Wise of them.`,
+    `Marianus van Duijnhoven? His farm is south of the village. ${_nl('Een eerlijke man', 'An honest man')}.`,
+    `Johan van Duijnhoven — good man. Going to America, he says.`,
+  ];
+  return hints[Math.min(eraId, hints.length-1)];
+}
+
+function _repeatGreeting(eraId, loc) {
+  if (loc === 'us') return 'gives a friendly nod';
+  const greetings = [
+    `${_nl('knikt beleefd', 'nods politely')}`,
+    `${_nl('groet u vriendelijk', 'greets you warmly')}`,
+    'nods from across the street',
+    `${_nl('herkent u meteen', 'recognises you immediately')}`,
+    'spots you across the deck',
+    'waves from the porch',
+    'waves from the yard',
+    'sends a thumbs-up',
+  ];
+  return greetings[Math.min(eraId, greetings.length-1)];
+}
+
+function _repeatLine1(eraId, loc, isFemale) {
+  if (loc === 'ship') return 'The sea looks calmer today. Maybe the worst of the weather has passed.';
+  if (loc === 'us') {
+    if (eraId === 5) return 'Corn is coming in well this year. Best harvest in a decade, they say.';
+    if (eraId === 6) return 'The drive-in closed last year. Nothing feels the same.';
+    return 'Nice to see a familiar face.';
+  }
+  const nl = [
+    `${_nl('Het gaat goed met de oogst dit jaar', 'The harvest is good this year')}.`,
+    `${_nl('De tulpen bloeien vroeg', 'The tulips bloom early')} this season.`,
+    `${_nl('De Fransen zijn gisteren weer langsgelopen', 'The French passed through again yesterday')}. Stay off the main road.`,
+    `${_nl('De fabriek heeft overuren gevraagd', 'The factory has asked for overtime')} again. No rest for anyone.`,
+    `I did not sleep well. The ocean is noisy in a way I did not expect.`,
+    `That field is doing well. Rain came at just the right time.`,
+    `I see you again! How is the journey going?`,
+    `Still exploring, I see. Good.`,
+  ];
+  return nl[Math.min(eraId, nl.length-1)];
+}
+
+function _repeatLine2(eraId, loc, isFemale) {
+  if (loc === 'ship') return 'Only a few more days now. I try to keep busy so I do not think about what we left behind.';
+  if (loc === 'us') {
+    if (eraId === 5) return isFemale ? 'I miss the Netherlands sometimes. The cheese especially.' : 'My Dutch is getting rusty. The kids already speak English better than me.';
+    return 'There\'s always more to the story, if you have time.';
+  }
+  const nl = [
+    `${_nl('Wij leven hier al honderden jaren', 'We have lived here for hundreds of years')}. The land knows us.`,
+    `${_nl('De handel is goed als de oogst meevalt', 'Trade is good when the harvest cooperates')}.`,
+    `${_nl('Men went snel aan alles', 'One gets used to everything quickly')} — even occupation. That is the sad truth.`,
+    `${_nl('Mijn vader deed hetzelfde werk', 'My father did the same work')}. And his father before him.`,
+    `My wife packed the boterkoek recipe. She said: even if we lose everything else, we keep that.`,
+    `${isFemale ? 'The church keeps us together' : 'The community here is strong'} — all Dutch, all Catholic. That helps.`,
+    `Strange to think my grandparents came from the Netherlands. I have never been.`,
+    `${isFemale ? 'We video-called the cousins in Haarlem last week.' : 'Digital connections, physical distance. That is 2020.'} `,
+  ];
+  return nl[Math.min(eraId, nl.length-1)];
+}
+
+function _occupationDepth(occu, eraId, loc) {
+  if (loc === 'ship') return `Even ${occu}s must rest at sea. There is little to do but wait.`;
+  if (loc === 'us')   return `Being a ${occu} in ${eraId === 5 ? 'Minnesota' : 'America'} is not easy work, but it is honest.`;
+  const nl = [
+    `${_nl('Het werk van een', 'The work of a')} ${occu} ${_nl('is nooit af', 'is never done')}. From sunrise to the church bell.`,
+    `A ${occu}'s life in the Golden Age is one of constant movement — ships, markets, ledgers.`,
+    `As a ${occu}, I am caught between the demands of the French and the needs of my neighbours.`,
+    `The ${occu}'s trade has changed with the railways. Everything is faster now — and harder.`,
+    `I was a ${occu} in Boekel. What I will be in America, I cannot yet say.`,
+    ``,
+  ];
+  return nl[Math.min(eraId, nl.length-1)] || `The work of a ${occu} is honest work.`;
+}
+
+function _situationLine2(eraId, loc, isFemale) {
+  return _repeatLine2(eraId, loc, isFemale); // reuse
 }
