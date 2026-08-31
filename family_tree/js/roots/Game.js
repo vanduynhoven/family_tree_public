@@ -400,6 +400,7 @@ export class Game {
   _useItem(id) {
     const result = this.player.useItem(id);
     if (!result) return;
+    this.ui._hideItemTip?.();   // always dismiss tooltip when using an item
     if (!result.used) {
       this.ui.showToast(`Can't use ${id} right now.`, '#888');
       return;
