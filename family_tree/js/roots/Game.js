@@ -64,6 +64,8 @@ export class Game {
       return !!(d && d.characterId === charId);
     };
     this.ui.showCharacterSelect(CHARACTERS, hasSave, (id, mode) => this._onCharSelected(id, mode));
+    // Play the title screen track while the character select is shown
+    this.music.playTitleTrack();
   }
 
   // ── Character selection ─────────────────────────────
@@ -246,7 +248,10 @@ export class Game {
     this.engine.cameraY = 0;
     this._dialogNPC = null;
     document.getElementById('rt-dialog').style.display = 'none';
-    this.music.playTrack(eraId);
+    this.music.playTrack(eraId, this._eraVisitCount?.[eraId] % 2 === 1 ? 'b' : 'a');
+    // Track visit count so next visit plays the other variant
+    if (!this._eraVisitCount) this._eraVisitCount = {};
+    this._eraVisitCount[eraId] = (this._eraVisitCount[eraId] || 0) + 1;
     this.ui.showScreenTitle(this.world.screen?.title || ERAS[eraId]?.year || '');
   }
 

@@ -328,6 +328,336 @@ const TRACKS = [
     ],
   },
 
+  // ── Track 8 · Era 8 · 2026 Haarlem ───────────────────────
+  // Upbeat indie-pop in D major — present-day Haarlem, bright and modern
+  // Stardew-style bright square + walking bass + hi-hat percussion
+  {
+    bpm: 130,
+    voices: [
+      {
+        type: 'square', vol: 0.17, vibrato: false,
+        notes: [
+          ['D5',1],['E5',1],['F#5',2],  ['A5',2],['F#5',1],['E5',1],
+          ['D5',2],['C#5',2],           ['B4',2],['D5',2],
+          ['E5',1],['F#5',1],['G5',2],  ['F#5',4],
+          ['A5',2],['G5',1],['F#5',1],  ['E5',2],['D5',2],
+          ['F#5',2],['E5',2],           ['D5',4],
+        ],
+      },
+      {
+        type: 'triangle', vol: 0.19,
+        notes: [
+          ['D3',2],['A3',2],  ['B3',2],['F#3',2],
+          ['G3',2],['D3',2],  ['A3',2],['E3',2],
+          ['D3',2],['A3',2],  ['B3',2],['G3',2],
+          ['A3',2],['E3',2],  ['D3',4],
+        ],
+      },
+      {
+        type: 'noise', vol: 0.06,
+        notes: [
+          ['kick',0.5],['R',0.25],['kick',0.25],['snare',0.5],['R',0.5],
+          ['kick',0.5],['R',0.5],['snare',0.5],['R',0.5],
+          ['kick',0.5],['R',0.25],['kick',0.25],['snare',0.5],['kick',0.5],
+          ['snare',0.5],['R',0.5],['kick',0.5],['R',0.5],
+        ],
+      },
+      {
+        type: 'pulse', vol: 0.08, arp: true,
+        notes: [
+          ['D4',1],['F#4',1],['A4',1],['D5',1],
+          ['B3',1],['D4',1],['F#4',1],['B4',1],
+          ['G3',1],['B3',1],['D4',1],['G4',1],
+          ['A3',1],['C#4',1],['E4',1],['A4',1],
+        ],
+      },
+    ],
+  },
+
+  // ── Track 9 · Title / Character Select ────────────────────
+  // Gentle preview medley — warm, inviting, slightly mysterious
+  // Slow tempo, mostly triangle/pulse, hints of the journey ahead
+  {
+    bpm: 76,
+    voices: [
+      {
+        type: 'triangle', vol: 0.18, vibrato: true,
+        notes: [
+          // Hints of Era 0 melody, slower and more open
+          ['D4',3],['F4',2],['A4',3],
+          ['G4',2],['E4',2],['D4',4],
+          ['C4',3],['E4',2],['G4',3],
+          ['A4',2],['G4',2],['F4',4],
+          // Bridge into something brighter (Era 8 flavour)
+          ['D5',2],['E5',2],['F#5',2],['E5',2],
+          ['D5',4],['A4',4],
+          ['B4',2],['D5',2],['A4',2],['G4',2],
+          ['D4',8],
+        ],
+      },
+      {
+        type: 'pulse', vol: 0.10, arp: true,
+        notes: [
+          ['D4',2],['F4',2],['A4',2],['D4',2],
+          ['G3',2],['B3',2],['D4',2],['G3',2],
+          ['C4',2],['E4',2],['G4',2],['C4',2],
+          ['A3',2],['C4',2],['E4',2],['A3',2],
+          ['D4',2],['F#4',2],['A4',2],['D4',2],
+          ['B3',2],['D4',2],['F#4',2],['B3',2],
+          ['G3',2],['B3',2],['D4',2],['G3',2],
+          ['A3',4],['D3',4],
+        ],
+      },
+    ],
+  },
+
+  // ── B-Variant Tracks (Tracks 10–17) ─────────────────────
+  // Played on repeat visits to an era. Same era feeling, different melody.
+
+  // ── Track 10 · Era 0 · Variant B — Night / Candlelight ──
+  // Slower, more intimate — the village at dusk, D minor pentatonic
+  {
+    bpm: 80,
+    voices: [
+      {
+        type: 'triangle', vol: 0.20, vibrato: true,
+        notes: [
+          ['D4',3],['A4',2],['F4',3],
+          ['G4',2],['F4',2],['D4',4],
+          ['E4',3],['C4',2],['D4',3],
+          ['A3',2],['C4',2],['D4',4],
+          ['F4',2],['G4',2],['A4',2],['G4',2],
+          ['F4',3],['E4',1],['D4',4],
+        ],
+      },
+      {
+        type: 'square', vol: 0.10,
+        notes: [
+          ['D3',4],['F3',4],  ['G3',4],['A3',4],
+          ['C3',4],['D3',4],  ['A2',4],['D3',4],
+        ],
+      },
+    ],
+  },
+
+  // ── Track 11 · Era 1 · Variant B — Merchant Canal ────────
+  // More playful, shorter phrases — market day on the canal
+  {
+    bpm: 120,
+    voices: [
+      {
+        type: 'square', vol: 0.18, vibrato: false,
+        notes: [
+          ['G4',1],['B4',1],['D5',1],['B4',1],
+          ['G4',1],['A4',1],['C5',2],
+          ['B4',1],['D5',1],['G5',1],['D5',1],
+          ['E5',2],['D5',2],
+          ['C5',1],['B4',1],['A4',1],['G4',1],
+          ['D4',4],
+        ],
+      },
+      {
+        type: 'triangle', vol: 0.16,
+        notes: [
+          ['G2',2],['D3',2],  ['C3',2],['G2',2],
+          ['B2',2],['D3',2],  ['G2',4],
+          ['A2',2],['E3',2],  ['D3',4],
+        ],
+      },
+    ],
+  },
+
+  // ── Track 12 · Era 2 · Variant B — Rain on Cobblestones ──
+  // Quieter, slower march — occupation weariness
+  {
+    bpm: 92,
+    voices: [
+      {
+        type: 'square', vol: 0.16, vibrato: false,
+        notes: [
+          ['A3',2],['C4',2],  ['E4',2],['D4',2],
+          ['C4',2],['B3',2],  ['A3',4],
+          ['G3',2],['A3',2],  ['C4',2],['B3',2],
+          ['A3',4],           ['A3',2],['R',2],
+        ],
+      },
+      {
+        type: 'triangle', vol: 0.18,
+        notes: [
+          ['A2',4],['E3',4],  ['C3',4],['A2',4],
+          ['F2',4],['G2',4],  ['A2',8],
+        ],
+      },
+    ],
+  },
+
+  // ── Track 13 · Era 3 · Variant B — Sunday Church Bell ────
+  // Stately, slower — rest day contrast to factory grinding
+  {
+    bpm: 80,
+    voices: [
+      {
+        type: 'triangle', vol: 0.22, vibrato: true,
+        notes: [
+          ['E5',4],['B4',4],
+          ['G4',4],['A4',4],
+          ['B4',4],['G4',4],
+          ['E4',8],
+          ['D4',4],['F#4',4],
+          ['G4',4],['A4',4],
+          ['B4',4],['A4',2],['G4',2],
+          ['E4',8],
+        ],
+      },
+      {
+        type: 'square', vol: 0.10,
+        notes: [
+          ['E2',4],['B2',4],  ['G2',4],['E2',4],
+          ['D2',4],['A2',4],  ['E2',8],
+          ['D2',4],['B2',4],  ['G2',4],['E2',4],
+          ['D2',8],
+        ],
+      },
+    ],
+  },
+
+  // ── Track 14 · Era 4 · Variant B — Calm Crossing ─────────
+  // Gentler sea waltz — a still evening on the water
+  {
+    bpm: 100,
+    voices: [
+      {
+        type: 'triangle', vol: 0.20, vibrato: true,
+        notes: [
+          ['G4',3],['E4',3],  ['F4',3],['D4',3],
+          ['C4',3],['E4',3],  ['G4',6],
+          ['A4',3],['F4',3],  ['G4',3],['E4',3],
+          ['C4',6],           ['G3',6],
+        ],
+      },
+      {
+        type: 'pulse', vol: 0.09, arp: true,
+        notes: [
+          ['C4',3],['E4',3],['G4',3],
+          ['F3',3],['A3',3],['C4',3],
+          ['G3',3],['B3',3],['D4',3],
+          ['C3',3],['E3',3],['G3',3],
+        ],
+      },
+    ],
+  },
+
+  // ── Track 15 · Era 5 · Variant B — Evening Porch ─────────
+  // Slower Americana, twilight — end of the farming day
+  {
+    bpm: 96,
+    voices: [
+      {
+        type: 'triangle', vol: 0.20, vibrato: true,
+        notes: [
+          ['D5',2],['C5',2],['B4',2],['A4',2],
+          ['G4',4],['B4',4],
+          ['C5',2],['A4',2],['G4',4],
+          ['D4',8],
+          ['E4',2],['G4',2],['B4',2],['G4',2],
+          ['A4',4],['E4',4],
+          ['D4',2],['F#4',2],['G4',2],['A4',2],
+          ['D4',8],
+        ],
+      },
+      {
+        type: 'square', vol: 0.11,
+        notes: [
+          ['G2',4],['D3',4],  ['C3',4],['G2',4],
+          ['A2',4],['E2',4],  ['D2',4],['G2',4],
+        ],
+      },
+    ],
+  },
+
+  // ── Track 16 · Era 6 · Variant B — Night Drive ───────────
+  // Slower synth — 1984 late night, more introspective
+  {
+    bpm: 104,
+    voices: [
+      {
+        type: 'sawtooth', vol: 0.16, vibrato: true,
+        notes: [
+          ['C5',2],['B4',2],  ['A4',2],['G4',2],
+          ['F4',2],['E4',2],  ['A4',4],
+          ['G4',2],['A4',2],  ['C5',2],['B4',2],
+          ['A4',6],['R',2],
+        ],
+      },
+      {
+        type: 'square', vol: 0.14,
+        notes: [
+          ['A2',2],['R',2],  ['F2',2],['R',2],
+          ['G2',2],['R',2],  ['E2',2],['R',2],
+          ['A2',4],['F2',4],
+          ['G2',4],['A2',4],
+        ],
+      },
+    ],
+  },
+
+  // ── Track 17 · Era 7 · Variant B — Quiet Study ───────────
+  // Slower, more sparse — late night researching the family tree
+  {
+    bpm: 72,
+    voices: [
+      {
+        type: 'triangle', vol: 0.16, vibrato: true,
+        notes: [
+          ['C5',4],['E5',4],
+          ['D5',4],['B4',4],
+          ['G4',4],['A4',4],
+          ['C5',8],
+          ['F4',4],['G4',4],
+          ['E4',4],['D4',4],
+          ['C4',8],
+        ],
+      },
+      {
+        type: 'pulse', vol: 0.07, arp: true,
+        notes: [
+          ['C4',2],['E4',2],['G4',2],['C5',2],
+          ['G3',2],['B3',2],['D4',2],['G4',2],
+          ['F3',2],['A3',2],['C4',2],['F4',2],
+          ['C3',2],['E3',2],['G3',2],['C4',2],
+        ],
+      },
+    ],
+  },
+
+  // ── Track 18 · Era 8 · Variant B — Canal Afternoon ───────
+  // Mellower version — Sunday by the Leidsevaart
+  {
+    bpm: 110,
+    voices: [
+      {
+        type: 'triangle', vol: 0.19, vibrato: true,
+        notes: [
+          ['F#4',2],['A4',2],['D5',2],['A4',2],
+          ['B4',2],['G4',2],['F#4',4],
+          ['E4',2],['G4',2],['B4',2],['G4',2],
+          ['A4',4],['E4',4],
+          ['D4',2],['F#4',2],['A4',2],['B4',2],
+          ['G4',2],['A4',2],['F#4',4],
+          ['E4',2],['D4',2],['F#4',2],['E4',2],
+          ['D4',8],
+        ],
+      },
+      {
+        type: 'square', vol: 0.13,
+        notes: [
+          ['D3',4],['A3',4],  ['B3',4],['G3',4],
+          ['A3',4],['E3',4],  ['D3',4],['A2',4],
+        ],
+      },
+    ],
+  },
+
 ];
 
 // ── Music engine ──────────────────────────────────────────
@@ -357,14 +687,35 @@ export class Music {
     return this._muted;
   }
 
-  playTrack(idx) {
+  playTrack(idx, variant = 'a') {
     this._ensureCtx();
-    this._stopVoices();     // clears scheduling loops
-    this._silenceNow();     // disconnects all playing oscillators immediately
-    this._trackIdx = idx;
-    const track = TRACKS[idx] || TRACKS[0];
+    this._stopVoices();
+    this._silenceNow();
+
+    // Track layout:
+    //   0–7  : Era 0–7 (A variants)
+    //   8    : Era 8
+    //   9    : Title / character select
+    //   10–17: Era 0–7 B-variants
+    //   18   : Era 8 B-variant
+    let trackIdx;
+    if (variant === 'b') {
+      // B-variants: Era 0-7 at index 10-17, Era 8 at 18
+      trackIdx = idx <= 7 ? 10 + idx : 18;
+    } else {
+      trackIdx = idx;  // 0-8 = A variants; 9 = title
+    }
+
+    this._trackIdx = trackIdx;
+    this._eraIdx   = idx;    // remember era for variant cycling
+    const track = TRACKS[trackIdx] || TRACKS[trackIdx % TRACKS.length] || TRACKS[0];
     this._startTime = this._ctx.currentTime + 0.08;
     track.voices.forEach(v => this._scheduleVoice(track.bpm, v));
+  }
+
+  /** Play the title / character-select screen music (track 9) */
+  playTitleTrack() {
+    this.playTrack(9);
   }
 
   stop() {
