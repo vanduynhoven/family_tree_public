@@ -72,7 +72,7 @@ export class UI {
         <div class="rt-ab" id="ab-attack" onclick="G?.interact()">⚔️💬<span>Act</span></div>
         <div class="rt-ab rt-ab-fish" id="ab-fish" style="display:none">🎣<span>Fish</span></div>
         <div class="rt-ab" id="ab-era">⏰<span>Time</span></div>
-        <div class="rt-ab" id="ab-journal">📖<span>Journal</span></div>
+        <div class="rt-ab" id="ab-journal">📚<span>Family</span></div>
       </div>
 
       <!-- Damage flash -->
@@ -84,11 +84,11 @@ export class UI {
       <!-- Journal overlay -->
       <div id="rt-journal-overlay" style="display:none">
         <button id="rt-journal-close">✕</button>
-        <h2>📖 Family Chronicle</h2>
+        <h2>📚 Family Album</h2>
         <div id="rt-journal-tabs">
-          <button class="rt-jtab active" data-tab="stories">Stories</button>
-          <button class="rt-jtab" data-tab="quests">Quests</button>
-          <button class="rt-jtab" data-tab="dutch">Dutch</button>
+          <button class="rt-jtab active" data-tab="stories">👨‍👩‍👧 Ancestors</button>
+          <button class="rt-jtab" data-tab="quests">🗺️ Missions</button>
+          <button class="rt-jtab" data-tab="dutch">🇳🇱 Dutch Words</button>
         </div>
         <div id="rt-journal-content"></div>
       </div>
@@ -212,7 +212,7 @@ export class UI {
     el.textContent = text;
     el.style.color = color;
     el.style.opacity = '1';
-    this._toastTimer = setTimeout(() => { el.style.opacity = '0'; }, 2800);
+    this._toastTimer = setTimeout(() => { el.style.opacity = '0'; }, 3500);
   }
 
   showItemToast(item) {
@@ -246,7 +246,16 @@ export class UI {
       pc.getContext('2d').drawImage(src, 0, 0);
     }
 
-    document.getElementById('rt-dlg-name').textContent = npc.name || '';
+    // Show name + era relationship label for kids
+    const era = npc.era ?? 0;
+    const eraYear = [1539,1660,1799,1872,1950,1955,1984,2020,2026][era] || '';
+    const nameEl = document.getElementById('rt-dlg-name');
+    if (nameEl) {
+      nameEl.innerHTML = `${npc.name || ''}
+        <span style="font-size:0.75em;color:#80c0ff;font-weight:normal;margin-left:8px">
+          ${npc.gedcomId ? `👨‍👩‍👧 Your ancestor · ${eraYear}` : eraYear ? `📍 ${eraYear}` : ''}
+        </span>`;
+    }
     document.getElementById('rt-dlg-hearts').textContent = npc.friendship > 0 ? '♥'.repeat(npc.friendship) : '';
     this._showDialogLine();
 
@@ -257,10 +266,24 @@ export class UI {
   _showDialogLine() {
     const line = this._dialogLines[this._dialogIdx];
     if (!line) return;
-    const text = typeof line === 'object' && line.dutch
-      ? `${line.dutch} ${line.en || ''}`
-      : (line || '');
-    document.getElementById('rt-dlg-text').textContent = text;
+    const el = document.getElementById('rt-dlg-text');
+    if (!el) return;
+
+    if (typeof line === 'object' && line.dutch) {
+      // Show Dutch phrase in gold, English translation in normal white
+      // Kids see both clearly — language learning + understanding
+      const dutch = line.dutch || '';
+      const eng   = line.en || '';
+      if (eng) {
+        el.innerHTML =
+          `<span style="color:#f0c040;font-style:italic">${dutch}</span>` +
+          `<br><span style="color:#dde;font-size:0.9em">💬 ${eng}</span>`;
+      } else {
+        el.innerHTML = `<span style="color:#f0c040;font-style:italic">${dutch}</span>`;
+      }
+    } else {
+      el.textContent = typeof line === 'string' ? line : (line || '');
+    }
   }
 
   advanceDialog() {
@@ -305,12 +328,36 @@ export class UI {
     content.innerHTML = '';
 
     if (tab === 'stories') {
-      const facts = this.game.player?.collectedFacts || [];
-      if (!facts.length) { content.innerHTML = '<p style="color:#888">No stories collected yet. Talk to ancestors to fill your chronicle.</p>'; return; }
+      const facts    = this.game.player?.collectedFacts || [];
+      const total    = this.game._totalNpcCount?.() || '?';
+      if (!facts.length) {
+        content.innerHTML = `
+          <div style="text-align:center;padding:24px 12px;color:#aaa">
+            <div style="font-size:3em;margin-bottom:12px">👨‍👩‍👧‍👦</div>
+            <div style="font-size:1.1em;color:#dde;margin-bottom:8px">Your Family Album is empty!</div>
+            <div style="font-size:0.9em;color:#888">Walk up to family members and press <strong style="color:#f0c040">E</strong> or tap <strong style="color:#f0c040">Act</strong> to hear their story.</div>
+          </div>`;
+        return;
+      }
+      // Progress header
+      const pct = Math.round((facts.length / total) * 100) || 0;
+      const header = document.createElement('div');
+      header.style.cssText = 'text-align:center;padding:12px 0 16px;border-bottom:1px solid #333;margin-bottom:14px';
+      header.innerHTML = `
+        <div style="font-size:1.1em;color:#f0c040;margin-bottom:6px">
+          📖 ${facts.length} ancestor${facts.length !== 1 ? 's' : ''} met out of ${total}
+        </div>
+        <div style="background:#1a1a1a;border-radius:6px;height:8px;overflow:hidden">
+          <div style="background:linear-gradient(90deg,#27ae60,#2ecc71);width:${pct}%;height:100%;border-radius:6px;transition:width 0.5s"></div>
+        </div>
+        <div style="font-size:0.75em;color:#666;margin-top:4px">${pct}% of the family discovered ✨</div>`;
+      content.appendChild(header);
       facts.forEach(f => {
         const div = document.createElement('div');
         div.className = 'rt-journal-entry';
-        div.innerHTML = `<div class="rt-je-name">${f.name}</div><div class="rt-je-text">${f.text}</div>`;
+        div.innerHTML = `
+          <div class="rt-je-name">👤 ${f.name}</div>
+          <div class="rt-je-text">${f.text}</div>`;
         content.appendChild(div);
       });
     } else if (tab === 'quests') {

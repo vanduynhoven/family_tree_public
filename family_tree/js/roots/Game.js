@@ -213,6 +213,16 @@ export class Game {
 
       this.engine.start((dt, frame) => this._tick(dt, frame));
       this.ui.showToast(`⏰ ${ERAS[startEra]?.year} — Find your ancestors!`);
+
+      // Onboarding hint for first-time players (no collected facts yet)
+      if (!this.player.collectedFacts.length) {
+        setTimeout(() => {
+          this.ui.showToast('👨‍👩‍👧 Walk up to family members and press Act or tap them to hear their story!', '#80c0ff');
+        }, 3500);
+        setTimeout(() => {
+          this.ui.showToast('📚 Collect their stories to fill your Family Album!', '#a0e080');
+        }, 8000);
+      }
     });
   }
 
@@ -570,14 +580,26 @@ export class Game {
   _onDialogDone(npc) {
     this._dialogNPC = null;
 
-    // Add fact to journal
-    if (!this.player.collectedFacts.find(f => f.npcId === npc.gedcomId)) {
+    // Add fact to journal — only on first meeting
+    const alreadyMet = this.player.collectedFacts.find(f => f.npcId === (npc.gedcomId || npc.name));
+    if (!alreadyMet) {
       const lines = npc.linesForCharacter(this.characterId);
       const text  = (typeof lines[0] === 'object' ? lines[0].en || lines[0].dutch : lines[0]) || '';
       this.player.collectedFacts.push({ npcId: npc.gedcomId || npc.name, name: npc.name, text });
       this.events.emit('npc_talked', { npcId: npc.gedcomId });
-      // Facts milestone
       this.events.emit('facts_milestone', { count: this.player.collectedFacts.length });
+
+      // 🎉 Celebrate discovering a new ancestor — kid-friendly big toast
+      const given = npc.data?.given || npc.name.split(' ')[0];
+      const count = this.player.collectedFacts.length;
+      const msgs = [
+        `🎉 You met ${given}! Added to your Family Album!`,
+        `⭐ Amazing! ${given} is now in your Family Album!`,
+        `✨ New ancestor found: ${given}! Keep exploring!`,
+        `🌟 ${given} joined your family story! ${count} ancestors met!`,
+      ];
+      this.ui.showToast(msgs[Math.floor(Math.random() * msgs.length)], '#f0c040');
+      this.music.sfxCollect?.();
     }
 
     // Add friendship — cap at 5
