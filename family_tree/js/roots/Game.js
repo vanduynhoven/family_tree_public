@@ -638,11 +638,13 @@ export class Game {
     // Use a large arrival threshold so the nav doesn't "stop" before crossing
     this._clickTarget = { tx, ty, onArrival: null, exitNav: true };
     this._clickArrived = false;
+    this._navLastPos   = null;
   }
 
   _navigateTo(tx, ty, onArrival) {
     this._clickTarget  = { tx, ty, onArrival, exitNav: false };
     this._clickArrived = false;
+    this._navLastPos   = null;
   }
 
   _tickClickNav(dt) {
@@ -669,6 +671,23 @@ export class Game {
     if (exitNav && dist < TILE * 0.8) {
       this._clickTarget = null;
       return;
+    }
+
+    // ── Stuck detection ────────────────────────────────────
+    // If the player hasn't moved more than 2px in the last 1.5 seconds,
+    // they're blocked by a wall — cancel navigation silently.
+    if (!this._navLastPos) this._navLastPos = { x: this.player.x, y: this.player.y, t: 0 };
+    this._navLastPos.t += dt;
+    if (this._navLastPos.t >= 1.5) {
+      const moved = Math.hypot(this.player.x - this._navLastPos.x, this.player.y - this._navLastPos.y);
+      if (moved < 2) {
+        // Stuck — give up and call onArrival where we are (so NPC dialogs etc. still fire if close enough)
+        this._clickTarget = null;
+        this._navLastPos  = null;
+        if (!exitNav) onArrival?.();
+        return;
+      }
+      this._navLastPos = { x: this.player.x, y: this.player.y, t: 0 };
     }
 
     // Walk toward target
@@ -706,7 +725,7 @@ export class Game {
 
     // Cancel if player manually uses keyboard/d-pad
     const keys = this.engine.keys;
-    if (keys.up || keys.down || keys.left || keys.right) this._clickTarget = null;
+    if (keys.up || keys.down || keys.left || keys.right) { this._clickTarget = null; this._navLastPos = null; }
   }
 
   fish() {
