@@ -14,7 +14,7 @@ import { NPC_DATA, CROP_ITEMS }     from './NpcData.js';
 import { ERAS, FISH_TABLES, SCREEN_COLS, SCREEN_ROWS } from './EraData.js';
 import {
   TILE, T, setEra, loadSprites,
-  drawSky, drawTiles, drawBuildings, drawBobber,
+  drawSky, drawTiles, drawBobber,
 } from './Renderer.js';
 
 // ── Game states ──────────────────────────────────────────
@@ -694,9 +694,6 @@ export class Game {
     drawSky(ctx, W, H, frame, this._timeOfDay);
     drawTiles(ctx, this.world.map, SCREEN_ROWS, SCREEN_COLS, ox, oy, W, H);
 
-    // Draw building facade sprites (church, market hall, tavern, etc.)
-    drawBuildings(ctx, this._eraId, this.world.screenRow, this.world.screenCol, ox, oy);
-
     // Drops
     for (const d of this.world.activeDrops) d.draw(ctx, ox, oy, frame);
 
@@ -814,14 +811,12 @@ export class Game {
     ctx.translate(dx*W*ease, dy*H*ease);
     drawSky(ctx, W, H, frame, this._timeOfDay);
     if (fromMap) drawTiles(ctx, fromMap, SCREEN_ROWS, SCREEN_COLS, 0, 0, W, H);
-    drawBuildings(ctx, this._eraId, tr.fromR, tr.fromC, 0, 0);
     ctx.restore();
 
     ctx.save();
     ctx.translate(dx*W*(ease-1), dy*H*(ease-1));
     drawSky(ctx, W, H, frame, this._timeOfDay);
     if (toMap) drawTiles(ctx, toMap, SCREEN_ROWS, SCREEN_COLS, 0, 0, W, H);
-    drawBuildings(ctx, this._eraId, tr.toR, tr.toC, 0, 0);
     ctx.restore();
   }
 

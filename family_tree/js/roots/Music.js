@@ -359,21 +359,39 @@ export class Music {
 
   playTrack(idx) {
     this._ensureCtx();
-    this._stopVoices();
+    this._stopVoices();     // clears scheduling loops
+    this._silenceNow();     // disconnects all playing oscillators immediately
     this._trackIdx = idx;
     const track = TRACKS[idx] || TRACKS[0];
-    this._startTime = this._ctx.currentTime + 0.05;
+    this._startTime = this._ctx.currentTime + 0.08;
     track.voices.forEach(v => this._scheduleVoice(track.bpm, v));
   }
 
   stop() {
     this._stopVoices();
+    this._silenceNow();
     this._trackIdx = -1;
   }
 
   _stopVoices() {
     this._voices.forEach(id => clearTimeout(id));
     this._voices = [];
+  }
+
+  /** Immediately disconnect and recreate the master gain to silence all active oscillators */
+  _silenceNow() {
+    if (!this._ctx || !this._master) return;
+    try {
+      // Fade out quickly to avoid click, then disconnect
+      this._master.gain.cancelScheduledValues(this._ctx.currentTime);
+      this._master.gain.setValueAtTime(this._master.gain.value, this._ctx.currentTime);
+      this._master.gain.linearRampToValueAtTime(0, this._ctx.currentTime + 0.06);
+    } catch (e) { /* ignore */ }
+    // Recreate master gain — all old oscillators are now routed to nothing
+    const newMaster = this._ctx.createGain();
+    newMaster.gain.value = this._muted ? 0 : 0.28;
+    newMaster.connect(this._ctx.destination);
+    this._master = newMaster;
   }
 
   // Schedule a single voice — loops indefinitely

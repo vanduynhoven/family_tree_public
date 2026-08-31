@@ -69,8 +69,6 @@ export function loadSprites(basePath = './assets/sprites/') {
     hair_p:           'hair-princess.png',
     head:             'head.png',
     hair:             'hair.png',
-    buildings_castle: 'buildings-castle.png',
-    buildings_inside: 'buildings-inside.png',
   };
   const promises = Object.entries(sheets).map(([key, file]) => new Promise((resolve) => {
     if (_imgs[key]) { resolve(); return; }
@@ -82,154 +80,11 @@ export function loadSprites(basePath = './assets/sprites/') {
   return Promise.all(promises);
 }
 
-// ── Building sprite definitions ───────────────────────────
-// (sheet, sx, sy, sw, sh) in the source image
-const BLDG = {
-  //  from buildings-castle.png (544×352)
-  church_front:        ['buildings_castle', 112,   0, 208, 224],
-  gothic_window:       ['buildings_castle', 192,   0,  96,  96],
-  church_door:         ['buildings_castle', 192,  96,  96, 128],
-  stone_buttress:      ['buildings_castle', 112,   0,  80, 224],
-  arch_right:          ['buildings_castle', 288,   0, 128, 224],
-  market_door:         ['buildings_castle', 288,  96,  96, 128],
-  //  from buildings-inside.png (320×320)
-  hall_wall:           ['buildings_inside',   0,   0, 160,  96],
-  hall_column:         ['buildings_inside',  96,   0,  32, 160],
-  hall_columns:        ['buildings_inside',  96,  96, 192, 128],
-  hall_door:           ['buildings_inside', 224,   0,  96, 160],
-};
 
-/** Draw a named building sprite at world-space pixel (wx, wy) scaled to renderW×renderH */
-function _bldg(ctx, name, wx, wy, rw, rh, ox, oy) {
-  const def = BLDG[name];
-  if (!def) return;
-  const [sheetKey, sx, sy, sw, sh] = def;
-  const sheet = _imgs[sheetKey];
-  if (!sheet) return;
-  ctx.drawImage(sheet, sx, sy, sw, sh, Math.round(wx - ox), Math.round(wy - oy), rw, rh);
-}
+// drawBuildings removed — building appearance comes from procedural
+// _drawHouseWall() and _drawHouseRoof() per-tile rendering
+export function drawBuildings() {}
 
-/**
- * Draw building overlays for the given era + screen.
- * Call this AFTER drawTiles() and BEFORE entity drawing.
- * Buildings are drawn as large sprites at specific pixel positions,
- * giving churches, market halls, and taverns real appearances.
- */
-export function drawBuildings(ctx, eraId, screenRow, screenCol, ox, oy) {
-  const key = `${eraId}_${screenRow}_${screenCol}`;
-  const T2  = TILE * 2;  // common shorthand
-
-  switch (key) {
-
-    // ── Era 0 · 1539 · Sint-Lambertus Church [1,0] ────────
-    case '0_1_0': {
-      // Church facade across the top-centre of the screen
-      // Stone buttress left, gothic windows centre, arch right
-      _bldg(ctx, 'stone_buttress', 1*TILE, 0,       TILE*1.6, TILE*4.5, ox, oy);
-      _bldg(ctx, 'gothic_window',  2.6*TILE, TILE*0.5, TILE*2,   TILE*2,   ox, oy);
-      _bldg(ctx, 'church_door',    3*TILE,   TILE*2.5, TILE*1.6, TILE*2.5, ox, oy);
-      _bldg(ctx, 'arch_right',     4.6*TILE, 0,        TILE*2.6, TILE*4.5, ox, oy);
-      break;
-    }
-
-    // ── Era 0 · 1539 · Ancient Shrine [0,3] ───────────────
-    case '0_0_3': {
-      // Ruined stone arches framing the stone circle portal area
-      _bldg(ctx, 'stone_buttress', 1*TILE, TILE*0.5, TILE*1.4, TILE*3.5, ox, oy);
-      _bldg(ctx, 'stone_buttress', 5.5*TILE, TILE*0.5, TILE*1.4, TILE*3.5, ox, oy);
-      break;
-    }
-
-    // ── Era 1 · 1660 · Nieuwe Kerk [0,2] ──────────────────
-    case '1_0_2': {
-      // Protestant church with gothic windows
-      _bldg(ctx, 'church_front',  2*TILE, 0, TILE*4.4, TILE*4.8, ox, oy);
-      break;
-    }
-
-    // ── Era 1 · 1660 · Merchant hall [1,2] ────────────────
-    case '1_1_2': {
-      // Market hall — classical facade with columns
-      _bldg(ctx, 'hall_wall',    3*TILE, TILE*0.5, TILE*3.5, TILE*2,   ox, oy);
-      _bldg(ctx, 'hall_columns', 3*TILE, TILE*2.5, TILE*3.5, TILE*2.5, ox, oy);
-      _bldg(ctx, 'hall_door',    4.5*TILE, TILE*2,  TILE*2,   TILE*3,   ox, oy);
-      break;
-    }
-
-    // ── Era 2 · 1799 · Uden Church [2,1] ──────────────────
-    case '2_2_1': {
-      // Church with crypt entrance visible
-      _bldg(ctx, 'church_front', 1.5*TILE, 0, TILE*3.5, TILE*4.5, ox, oy);
-      _bldg(ctx, 'church_door',  2.8*TILE, TILE*2.8, TILE*1.5, TILE*2, ox, oy);
-      break;
-    }
-
-    // ── Era 3 · 1872 · Boekel Church [1,0] ────────────────
-    case '3_1_0': {
-      _bldg(ctx, 'church_front', 1.5*TILE, 0, TILE*3.5, TILE*4.5, ox, oy);
-      break;
-    }
-
-    // ── Era 3 · 1872 · Railway Station [0,2] ──────────────
-    case '3_0_2': {
-      // Station building — classical facade
-      _bldg(ctx, 'hall_wall',    2*TILE,   TILE*0.5, TILE*5,   TILE*2,   ox, oy);
-      _bldg(ctx, 'hall_columns', 2*TILE,   TILE*2.5, TILE*5,   TILE*2,   ox, oy);
-      _bldg(ctx, 'hall_door',    3.8*TILE, TILE*2,   TILE*2.2, TILE*2.5, ox, oy);
-      break;
-    }
-
-    // ── Era 5 · 1955 · Dutch Catholic Church [1,0] ────────
-    case '5_1_0': {
-      _bldg(ctx, 'church_front', 1.5*TILE, 0, TILE*3.5, TILE*4.5, ox, oy);
-      break;
-    }
-
-    // ── Era 5 · 1955 · Dutch Lutheran Church [1,3] ────────
-    case '5_1_3': {
-      _bldg(ctx, 'church_front', 1.8*TILE, 0, TILE*3, TILE*4, ox, oy);
-      break;
-    }
-
-    // ── Era 6 · 1984 · Courthouse [2,1] ───────────────────
-    case '6_2_1': {
-      // Courthouse — imposing classical columns
-      _bldg(ctx, 'hall_wall',    2*TILE,   TILE*0.5, TILE*5,   TILE*2,   ox, oy);
-      _bldg(ctx, 'hall_columns', 2*TILE,   TILE*2.5, TILE*5,   TILE*2.5, ox, oy);
-      _bldg(ctx, 'hall_door',    4*TILE,   TILE*2,   TILE*2.2, TILE*2.5, ox, oy);
-      break;
-    }
-
-    // ── Era 8 · 2026 Haarlem · Sint-Bavo Grote Kerk [3,3] ─
-    case '8_3_3': {
-      // The iconic Gothic Sint-Bavo church — full facade
-      _bldg(ctx, 'stone_buttress', 0.5*TILE, 0,       TILE*1.8, TILE*5,   ox, oy);
-      _bldg(ctx, 'church_front',   2.3*TILE, 0,       TILE*5,   TILE*5,   ox, oy);
-      _bldg(ctx, 'arch_right',     7.3*TILE, 0,       TILE*3,   TILE*5,   ox, oy);
-      // Large ornate church doors at entrance
-      _bldg(ctx, 'church_door',    4*TILE,   TILE*2.5, TILE*2,   TILE*2.5, ox, oy);
-      break;
-    }
-
-    // ── Era 8 · 2026 Haarlem · Grote Markt [3,2] ──────────
-    case '8_3_2': {
-      // Stadhuis (town hall) — classical
-      _bldg(ctx, 'hall_wall',    0.2*TILE, TILE*0.3, TILE*4,   TILE*2,   ox, oy);
-      _bldg(ctx, 'hall_columns', 0.2*TILE, TILE*2.3, TILE*4,   TILE*2.5, ox, oy);
-      _bldg(ctx, 'hall_door',    1.5*TILE, TILE*2,   TILE*1.8, TILE*2.5, ox, oy);
-      // Vleeshal (meat hall) east side — market arch
-      _bldg(ctx, 'arch_right',   10*TILE,  0,        TILE*3,   TILE*4.5, ox, oy);
-      _bldg(ctx, 'market_door',  10.8*TILE, TILE*2.5, TILE*1.8, TILE*2,  ox, oy);
-      break;
-    }
-
-    // ── Era 8 · 2026 Haarlem · Tierney's pub area [3,2] ───
-    // (Same screen as Grote Markt above — already covered)
-
-    default:
-      break;
-  }
-}
 
 // ── LPC terrain tile source map (32×32 tiles in terrain.png) ──
 // sx, sy = source pixel in terrain.png
@@ -905,24 +760,25 @@ export function drawMinimap(ctx, worldCols, worldRows, visitedSet, currentR, cur
     const key=`${r},${c}`, cur=r===currentR&&c===currentC;
     const hasPortal = portalSet?.has(key);
     const visited   = visitedSet.has(key);
-    // Use the screen's semantic color if visited, otherwise dark unknown
-    const screenColor = screens?.[r]?.[c]?.color;
+    // Three states: current (yellow), visited (single warm green), unknown (dark)
     let fill;
-    if (cur)        fill = '#f0c040';
-    else if (hasPortal) fill = '#2a0060';
-    else if (visited && screenColor) fill = screenColor;
-    else if (visited) fill = '#6a9050';
-    else fill = '#252525';
+    if (cur)          fill = '#f0c040';       // current screen — gold
+    else if (visited) fill = '#5a8a50';       // visited — single muted green
+    else              fill = '#252525';       // unknown — dark
     ctx.fillStyle = fill;
     ctx.beginPath(); ctx.roundRect(x+c*cellSize,y+r*cellSize,cellSize-1,cellSize-1,1); ctx.fill();
-    // Portal star marker
-    if (hasPortal) {
-      ctx.fillStyle = '#c080ff';
-      ctx.font = `bold ${cellSize-1}px sans-serif`;
+    // Portal star — purple glow on visited portal screens
+    if (hasPortal && (visited || cur)) {
+      ctx.fillStyle = '#d060ff';
+      ctx.font = `bold ${Math.max(cellSize-2,6)}px sans-serif`;
       ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-      ctx.fillText('★', x+c*cellSize+(cellSize-1)/2, y+r*cellSize+(cellSize-1)/2);
+      ctx.fillText('★', x+c*cellSize+(cellSize-1)/2, y+r*cellSize+(cellSize-1)/2+0.5);
     }
-    if (cur) { ctx.strokeStyle='rgba(255,255,255,0.5)'; ctx.lineWidth=1; ctx.beginPath(); ctx.roundRect(x+c*cellSize,y+r*cellSize,cellSize-1,cellSize-1,1); ctx.stroke(); }
+    // Current screen outline
+    if (cur) {
+      ctx.strokeStyle='rgba(255,255,255,0.6)'; ctx.lineWidth=1;
+      ctx.beginPath(); ctx.roundRect(x+c*cellSize,y+r*cellSize,cellSize-1,cellSize-1,1); ctx.stroke();
+    }
   }
 }
 
