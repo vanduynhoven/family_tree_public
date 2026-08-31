@@ -320,28 +320,10 @@ export class Game {
     // 3. At portal? → open era select
     if (this.world.atPortal(this.player)) { this.ui.showEraSel(); return; }
 
-    // 4. Crop ready? → harvest then pick up (2-click: swing to harvest, bend to pick up)
-    const crop = this.world.atCrop(this.player);
-    if (crop) {
-      const cropItem = CROP_ITEMS.find(c => c.era === this._eraId);
-      this.world.harvestCrop(crop.r, crop.c);
-      this.player.drainStamina(1);
-      if (cropItem) {
-        // Spawn slightly in front of the player so it's visibly on the ground
-        const offX = Math.cos({'left':-Math.PI,'right':0,'up':-Math.PI/2,'down':Math.PI/2}[this.player.facing]||0) * TILE * 0.6;
-        const offY = Math.sin({'left':-Math.PI,'right':0,'up':-Math.PI/2,'down':Math.PI/2}[this.player.facing]||0) * TILE * 0.6;
-        this.world.spawnDrop(cropItem, 0, 0, this.player.cx + offX - TILE*0.25, this.player.cy + offY - TILE*0.25);
-        this.ui.showToast(`${cropItem.emoji} Harvested ${cropItem.label}! Walk over to pick it up.`, '#a0e080');
-        this.music.sfxCollect?.();
-      }
-      return;
-    }
-
-    // 5. Livestock nearby? → butcher or pick up meat
+    // 4. Livestock nearby? → butcher or pick up meat (before crops — animal takes priority)
     for (const animal of this.world.activeLivestock) {
       if (this.player.distTo(animal) < TILE * 1.5) {
         if (!animal.butchered) {
-          // First click: butcher the animal
           animal.butchered = true;
           animal.butcherTimer = 0.5;
           const meatMap = {
@@ -357,15 +339,30 @@ export class Game {
           this.ui.showToast(`🔪 Butchered! Pick up the ${meat.emoji} ${meat.label}`, '#c0ffa0');
           this.music.sfxHit?.();
         } else if (animal._meatItem && this.player.collectItem(animal._meatItem)) {
-          // Second click: collect the meat
           this.ui.showItemToast(animal._meatItem);
           this._renderBothBars();
           this.events.emit('item_collected', { itemId: animal._meatItem.id });
           this.music.sfxCollect?.();
-          animal.alive = false;  // remove the livestock entity
+          animal.alive = false;
         }
         return;
       }
+    }
+
+    // 5. Crop ready? → harvest then pick up (2-click: swing to harvest, bend to pick up)
+    const crop = this.world.atCrop(this.player);
+    if (crop) {
+      const cropItem = CROP_ITEMS.find(c => c.era === this._eraId);
+      this.world.harvestCrop(crop.r, crop.c);
+      this.player.drainStamina(1);
+      if (cropItem) {
+        const offX = Math.cos({'left':-Math.PI,'right':0,'up':-Math.PI/2,'down':Math.PI/2}[this.player.facing]||0) * TILE * 0.6;
+        const offY = Math.sin({'left':-Math.PI,'right':0,'up':-Math.PI/2,'down':Math.PI/2}[this.player.facing]||0) * TILE * 0.6;
+        this.world.spawnDrop(cropItem, 0, 0, this.player.cx + offX - TILE*0.25, this.player.cy + offY - TILE*0.25);
+        this.ui.showToast(`${cropItem.emoji} Harvested ${cropItem.label}! Walk over to pick it up.`, '#a0e080');
+        this.music.sfxCollect?.();
+      }
+      return;
     }
 
     // 6. Dropped item nearby? → pick up

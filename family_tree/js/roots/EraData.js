@@ -477,10 +477,12 @@ export function buildEraWorld(eraId, location = 'haarlem') {
         fill(m,2,2,H-3,W-3,T.FLOWER);
         // Ring of ancient standing stones
         [[3,9],[3,10],[3,11],[5,7],[5,13],[7,5],[7,15],[9,7],[9,13],[11,9],[11,10],[11,11]].forEach(([r,c])=>set(m,r,c,T.ROCK));
-        // Central altar glowing
-        set(m,7,10,T.PORTAL); // this is a bonus portal — second way to time travel!
-        clearZone(m,7,10,2);
-        grid[3][3]=makeScreen(m,{left:{pos:7}},'1539 · Secret Stone Circle',{r:7,c:7}); }
+        // Central altar — bonus portal for players who find this secret room
+        set(m,6,9,T.PORTAL); set(m,6,10,T.PORTAL); set(m,6,11,T.PORTAL);
+        clearZone(m,9,7,2);  // spawn in clearing below the altar, away from portal
+        // Restore portal after clearZone (clearZone runs first inside makeScreen)
+        // Actually: clearZone in makeScreen is at spawn point (9,7), not portal (6,9-11) ✅
+        grid[3][3]=makeScreen(m,{left:{pos:7}},'1539 · Secret Stone Circle',{r:9,c:7}); }
       break; }
 
     // ═══════════════════════════════════════════════════
