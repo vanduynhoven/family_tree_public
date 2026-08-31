@@ -1082,7 +1082,7 @@ export function buildEraWorld(eraId, location = 'haarlem') {
       // [0,3] CAPTAIN'S BRIDGE + PORTAL — top of ship
       { const m=blank(T.STEEL); border(m,T.WALL);
         fill(m,1,1,H-3,W-3,T.STEEL);
-        fill(m,1,3,6,15,T.HOUSE_WALL); // bridge room
+        fill(m,1,3,6,15,T.HOUSE_WALL); // bridge room walls
         fill(m,7,2,H-3,W-3,T.COBBLE); // bridge deck floor
         set(m,6,8,T.DOOR); set(m,6,9,T.DOOR);
         fill(m,0,0,0,W-1,T.DEEP_WATER);
@@ -1097,6 +1097,12 @@ export function buildEraWorld(eraId, location = 'haarlem') {
         set(m,4,9,T.ROCK); set(m,4,10,T.ROCK);
         // PORTAL — navigation chart glows with time energy
         set(m,3,9,T.PORTAL); set(m,3,10,T.PORTAL); set(m,3,11,T.PORTAL);
+        // Clear walkable interior of bridge room so player can reach the portal
+        fill(m,2,4,5,14,T.COBBLE);   // interior floor
+        set(m,2,4,T.STEEL); set(m,2,14,T.STEEL); // side wall details stay
+        // Restore helm wheel and instruments on the cobble floor
+        set(m,4,9,T.ROCK); set(m,4,10,T.ROCK);
+        set(m,5,6,T.ROCK); set(m,5,12,T.ROCK);
         clearZone(m,9,9,2);
         grid[0][3]=makeScreen(m,{left:{pos:7},down:{pos:10}},'1950 · Captain\'s Bridge',{r:9,c:9}); }
 

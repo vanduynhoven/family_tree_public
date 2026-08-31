@@ -414,11 +414,30 @@ export class UI {
 
     npc.faceToward?.(this.game.player);
 
-    // Draw portrait
+    // Draw NPC portrait — colored head with emoji
     const pc = document.getElementById('rt-portrait');
-    if (pc && npc.getPortraitCanvas) {
-      const src = npc.getPortraitCanvas();
-      pc.getContext('2d').drawImage(src, 0, 0);
+    if (pc) {
+      const pctx = pc.getContext('2d');
+      const pw = pc.width, ph = pc.height;
+      pctx.clearRect(0, 0, pw, ph);
+      // Background gradient using NPC colors
+      const bg = pctx.createRadialGradient(pw*0.4, ph*0.35, 0, pw*0.5, ph*0.5, pw*0.55);
+      bg.addColorStop(0, npc.accent || npc.color || '#806040');
+      bg.addColorStop(1, npc.color || '#403020');
+      pctx.fillStyle = bg;
+      pctx.beginPath(); pctx.arc(pw/2, ph/2, pw*0.46, 0, Math.PI*2); pctx.fill();
+      // Subtle border
+      pctx.strokeStyle = 'rgba(255,255,255,0.2)'; pctx.lineWidth = 1.5;
+      pctx.beginPath(); pctx.arc(pw/2, ph/2, pw*0.46, 0, Math.PI*2); pctx.stroke();
+      // NPC emoji centered
+      pctx.font = `${Math.floor(pw * 0.42)}px serif`;
+      pctx.textAlign = 'center'; pctx.textBaseline = 'middle';
+      pctx.fillText(npc.emoji || '👤', pw/2, ph/2 + 2);
+      // Era badge in corner
+      const eraEmojis = ['⚔️','🎨','🪖','🏭','🚢','🌽','📼','💻','🌷'];
+      const eraEmoji = eraEmojis[npc.era ?? 0] || '⏰';
+      pctx.font = `${Math.floor(pw * 0.22)}px serif`;
+      pctx.fillText(eraEmoji, pw * 0.82, ph * 0.82);
     }
 
     // Show name + era relationship label for kids
