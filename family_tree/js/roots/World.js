@@ -325,8 +325,14 @@ export class World {
   harvestCrop(r, c) {
     if (this.map[r]?.[c] !== T.CROP_READY) return null;
     this.map[r][c] = T.CROP_SPENT;
-    // Regrow after next sleep (flagged externally via resetCrops)
     return { spent: true, r, c };
+  }
+
+  /** Spawn a collectible DroppedItem at a tile position (used for 2-click farming + livestock) */
+  spawnDrop(item, r, c) {
+    const x = c * TILE + TILE * 0.25;
+    const y = r * TILE + TILE * 0.25;
+    this._drops.push(new DroppedItem({ ...item, decorOnly: false }, x, y, -1));
   }
 
   resetCrops() {
@@ -434,7 +440,7 @@ export class World {
 
     // Cull dead entities — spawn loot for newly-dead enemies
     for (const enemy of this._enemies) {
-      if (!enemy.alive && enemy.deathTimer > 0 && !enemy._lootDropped) {
+      if (enemy.state === 'dead' && enemy.deathTimer > 0 && !enemy._lootDropped) {
         enemy._lootDropped = true;
         const drops = enemy.loot?.() || [];
         for (let i = 0; i < drops.length; i++) {

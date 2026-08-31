@@ -73,7 +73,7 @@ export class UI {
       <div id="rt-actions">
         <div class="rt-ab" id="ab-attack" onclick="G?.interact()">⚔️💬<span>Act</span></div>
         <div class="rt-ab rt-ab-fish" id="ab-fish" style="display:none">🎣<span>Fish</span></div>
-        <div class="rt-ab" id="ab-era">⏰<span>Time</span></div>
+        <div class="rt-ab" id="ab-era" title="Travel through time — use to return home to 2026">⏰<span>Travel</span></div>
         <div class="rt-ab" id="ab-journal" style="position:relative">📚<span>Family</span><span id="rt-quest-badge">!</span></div>
       </div>
 
@@ -683,6 +683,13 @@ export class UI {
     if (!list) return;
     list.innerHTML = '';
     characters.forEach(char => {
+      // Add a visual separator before the Generic Traveller
+      if (char.id === 'traveller') {
+        const sep = document.createElement('div');
+        sep.style.cssText = 'grid-column:1/-1;text-align:center;padding:8px 0;color:#555;font-size:11px;border-top:1px solid #333;margin-top:4px';
+        sep.textContent = '— or explore freely without a family connection —';
+        list.appendChild(sep);
+      }
       const saveExists = hasSave(char.id);
       const card = document.createElement('div');
       card.className = 'rt-char-card';

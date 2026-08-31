@@ -89,6 +89,10 @@ export class Game {
       }
       if (savedData.unlockedEras) {
         this.unlockedEras = new Set(savedData.unlockedEras);
+        // Traveller always gets all eras — override any saved partial state
+        if (charId === 'traveller') {
+          this.unlockedEras = new Set([0,1,2,3,4,5,6,7,8]);
+        }
       }
       // Restore music variant cycle so A/B alternation continues correctly
       if (savedData.eraVisitCount) {
@@ -315,17 +319,16 @@ export class Game {
     // 3. At portal? → open era select
     if (this.world.atPortal(this.player)) { this.ui.showEraSel(); return; }
 
-    // 4. Crop ready? → harvest
+    // 4. Crop ready? → harvest (spawns item on ground — 2-click: harvest then pick up)
     const crop = this.world.atCrop(this.player);
     if (crop) {
-      this.world.harvestCrop(crop.r, crop.c);
       const cropItem = CROP_ITEMS.find(c => c.era === this._eraId);
-      if (cropItem && this.player.collectItem(cropItem)) {
-        this.ui.showItemToast(cropItem);
-        this.ui.renderInventory(this.player.inventory, (id) => this._useItem(id));
-        this.player.drainStamina(1);
-        this.events.emit('item_collected', { itemId: cropItem.id });
-        this.music.sfxCollect?.();
+      this.world.harvestCrop(crop.r, crop.c);
+      this.player.drainStamina(1);
+      if (cropItem) {
+        this.world.spawnDrop(cropItem, crop.r, crop.c);
+        this.ui.showToast(`🌾 Harvested! Pick up the ${cropItem.emoji} ${cropItem.label}`, '#a0e080');
+        this.music.sfxHit?.();
       }
       return;
     }
@@ -333,6 +336,25 @@ export class Game {
     // 5. Dropped item nearby? → pick up
     for (const drop of this.world.activeDrops) {
       if (this.player.distTo(drop) < TILE * 1.5) {
+        // Decor animal: first click harvests (transforms to meat drop)
+        if (drop.decorOnly && drop.item.id.startsWith('decor_')) {
+          const meatMap = {
+            decor_cow:     { id:'beef',    label:'Beef',       emoji:'🥩' },
+            decor_pig:     { id:'pork',    label:'Pork',       emoji:'🥩' },
+            decor_sheep:   { id:'lamb',    label:'Lamb',       emoji:'🥩' },
+            decor_chicken: { id:'chicken', label:'Chicken',    emoji:'🍗' },
+            decor_horse:   { id:'horse_leather', label:'Leather', emoji:'🟫' },
+            decor_goat:    { id:'goat_cheese', label:'Goat Cheese', emoji:'🧀' },
+          };
+          const meat = meatMap[drop.item.id];
+          if (meat) {
+            drop.item    = meat;
+            drop.decorOnly = false;
+            this.ui.showToast(`🔪 Butchered! Pick up the ${meat.emoji} ${meat.label}`, '#c0ffa0');
+            this.music.sfxHit?.();
+          }
+          return;
+        }
         if (!drop.decorOnly && this.player.collectItem(drop.item)) {
           this.ui.showItemToast(drop.item);
           this.ui.renderInventory(this.player.inventory, (id) => this._useItem(id));
@@ -904,6 +926,16 @@ export class Game {
         this.player.x = pos.x;
         this.player.y = pos.y;
         this.ui.showScreenTitle(this.world.screen?.title || '');
+        // Check if all 16 screens in this era have now been explored
+        const totalScreens = WORLD_ROWS * WORLD_COLS;
+        if (this.world.visitedSet.size >= totalScreens && !this._exploredEras?.has(this._eraId)) {
+          if (!this._exploredEras) this._exploredEras = new Set();
+          this._exploredEras.add(this._eraId);
+          setTimeout(() => {
+            this.music.sfxEraUnlock?.();
+            this.ui.showToast(`🗺️ ${ERAS[this._eraId]?.year} fully explored! Every corner of this era discovered!`, '#f0c040');
+          }, 800);
+        }
       }
       return;
     }
@@ -924,6 +956,16 @@ export class Game {
         if (flash) { flash.style.opacity = '1'; setTimeout(() => { flash.style.opacity = '0'; }, 90); }
       }
       if (this._bumpCd > 0) this._bumpCd -= dt;
+
+      // Stamina warning: one-shot sfx when stamina crosses below 30%
+      const stPct = this.player.stamina / this.player.maxStamina;
+      if (stPct < 0.3 && stPct > 0 && !this._staminaWarnFired) {
+        this._staminaWarnFired = true;
+        this.music.sfxHurt?.();  // soft hurt sound as a "getting tired" cue
+        this.ui.showToast('😓 Getting tired — eat something to restore energy!', '#e08020');
+      } else if (stPct >= 0.4) {
+        this._staminaWarnFired = false;  // reset so it can fire again next dip
+      }
     }
 
     // Dialog advance: E / Space always works during dialog
@@ -1103,11 +1145,13 @@ export class Game {
   }
 
   _respawn() {
-    this.player.hp = Math.floor(this.player.maxHp * 0.3);
+    this.player.hp      = Math.floor(this.player.maxHp * 0.3);
+    this.player.stamina = Math.floor(this.player.maxStamina * 0.5); // restore half stamina so player can move
     const sp = this.world.screen?.spawn || { r:7, c:10 };
     this.player.x = sp.c * TILE + 4;
     this.player.y = sp.r * TILE + 4;
-    this.ui.showToast('💀 Defeated! Respawned.', '#e74c3c');
+    this.music.sfxHurt?.();
+    this.ui.showToast('💀 Defeated! Respawned at spawn point.', '#e74c3c');
   }
 
   // ── Screen transition drawing ─────────────────────────

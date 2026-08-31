@@ -44,6 +44,13 @@ export const ITEM_INFO = {
   iron:         { desc: 'A piece of raw iron from an 1872 factory. Heavy and strong.',                              useLabel: 'Give to Marianus — he can use it!', special: 'npc_gift' },
   rope:         { desc: 'A coil of ship rope from the 1950 Atlantic crossing.',                                     useLabel: 'Use — restores +18 Stamina',  stamina: 18 },
   fish_ration:  { desc: 'A salted fish ration from the ship\'s stores. Not delicious but very filling.',            useLabel: 'Eat — restores +22 HP',     heal: 22 },
+  // ── Livestock products (from 2-click butchering) ─────────
+  beef:           { desc: 'Fresh beef from a farm cow. Hearty and filling.',                    useLabel: 'Eat — restores +30 HP',           heal: 30 },
+  pork:           { desc: 'Fresh pork from a farm pig. Brings good memories of harvest time.',  useLabel: 'Eat — restores +25 HP',           heal: 25 },
+  lamb:           { desc: 'Tender lamb from a woolly sheep. A special meal.',                   useLabel: 'Eat — restores +22 HP',           heal: 22 },
+  chicken:        { desc: 'A farm chicken, fresh from the yard. Eggs AND meat!',               useLabel: 'Eat — restores +18 HP',           heal: 18 },
+  horse_leather:  { desc: 'Tough leather from a workhorse. Used to make belts and bags.',      useLabel: 'Give to an NPC for +2 friendship!', special: 'npc_gift' },
+  goat_cheese:    { desc: 'Creamy goat cheese from a Brabant farm goat. Delicious!',           useLabel: 'Eat — restores +15 HP +10 Stamina', heal: 15, stamina: 10 },
   // ── Farm animal decorations (decorOnly — cannot be picked up) ───────────
   decor_cow:     { desc: 'A dairy cow. Essential for milk, cheese, and butter on the farm.',     useLabel: 'Part of the scenery — cannot be picked up' },
   decor_pig:     { desc: 'A farmyard pig. Every Brabant farm had several. Very useful animals.', useLabel: 'Part of the scenery — cannot be picked up' },

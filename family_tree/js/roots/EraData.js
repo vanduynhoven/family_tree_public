@@ -1508,6 +1508,12 @@ export function buildEraWorld(eraId, location = 'haarlem') {
         for(let c=2;c<W-2;c+=4) set(m,6,c,T.TREE);
         for(let r=2;r<H-2;r+=2) set(m,r,9,T.CROP_SPENT); // dashed lane markings
         set(m,2,3,T.CIRCUIT); set(m,2,13,T.CIRCUIT);     // smart-home / doorbell cams
+        // Nature: front yard gardens, flower beds, backyard trees
+        fill(m,7,2,8,5,T.FLOWER); fill(m,7,12,8,16,T.FLOWER); // front gardens
+        set(m,10,3,T.TREE); set(m,10,15,T.TREE);  // backyard oaks
+        set(m,11,5,T.FLOWER); set(m,11,13,T.FLOWER); // side garden patches
+        set(m,4,7,T.FLOWER); set(m,4,11,T.FLOWER); // roadside flowers
+        fill(m,9,6,11,7,T.GRASS); fill(m,9,12,11,13,T.GRASS); // lawn patches
         grid[0][0]=makeScreen(m,{right:{pos:7},down:{pos:10}},'2020 · Minnesota Suburb',{r:7,c:12}); }
 
       // [0,1] Closed shops — lockdown Main Street
@@ -1590,12 +1596,16 @@ export function buildEraWorld(eraId, location = 'haarlem') {
         for(let c=3;c<W-3;c+=3) set(m,9,c,T.ROAD); // parking-bay markings
         grid[2][0]=makeScreen(m,{right:{pos:7},up:{pos:10},down:{pos:10}},'2020 · Essential Grocery',{r:10,c:12}); }
 
-      // [2,1] Outdoor exercise area — joggers
+      // [2,1] Outdoor exercise area — joggers, socially distanced parks
       { const m=blank(T.GRASS);
         fill(m,0,1,2,W-2,T.ROAD); // jogging path
         fill(m,3,3,H-4,W-4,T.FLOWER);
         for(let c=5;c<W-4;c+=4) set(m,5,c,T.TREE);
-        fill(m,7,7,10,12,T.WATER); // exercise pond
+        for(let c=3;c<W-3;c+=5) set(m,8,c,T.TREE);  // second tree row
+        fill(m,7,7,10,12,T.WATER); // exercise pond (fishing!)
+        set(m,8,7,T.BRIDGE); // bridge over pond
+        set(m,3,5,T.FLOWER); set(m,3,8,T.FLOWER); set(m,3,12,T.FLOWER); // wildflowers
+        fill(m,10,3,H-3,6,T.FLOWER); fill(m,10,14,H-3,W-3,T.FLOWER); // meadow edges
         grid[2][1]=makeScreen(m,{left:{pos:7},right:{pos:7},up:{pos:10},down:{pos:10}},'2020 · Outdoor Exercise',{r:7,c:9}); }
 
       // [2,2] FAMILY ZOOM CALL ROOM + PORTAL
@@ -1628,12 +1638,17 @@ export function buildEraWorld(eraId, location = 'haarlem') {
         for(let r=2;r<H-2;r+=2) set(m,r,3,T.FLOWER);
         grid[2][3]=makeScreen(m,{left:{pos:7},up:{pos:10}},'2020 · Empty Haarlem Street',{r:7,c:10}); }
 
-      // [3,0] Minnesota river walk
+      // [3,0] Minnesota river walk — Blue Earth River, social distancing signs
       { const m=blank(T.GRASS); border(m,T.TREE);
         fill(m,1,1,H-4,4,T.WATER);
         fill(m,5,5,7,7,T.BRIDGE); // fishing dock
         fill(m,1,5,H-3,W-3,T.GRASS);
         for(let c=6;c<W-3;c+=3) set(m,3,c,T.TREE);
+        // More river nature: reeds, wildflowers, birds on water
+        for(let r=2;r<H-3;r+=3) set(m,r,4,T.FLOWER); // riverside flowers
+        fill(m,8,7,11,10,T.FLOWER); // meadow patch
+        set(m,6,9,T.TREE); set(m,9,13,T.TREE); set(m,11,7,T.TREE); // scattered oaks
+        fill(m,H-4,6,H-3,W-3,T.FLOWER); // south meadow edge
         grid[3][0]=makeScreen(m,{right:{pos:7},up:{pos:10}},'2020 · River Walk',{r:7,c:12}); }
 
       // [3,1] Takeout coffee shop — drive-through

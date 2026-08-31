@@ -12,7 +12,8 @@ export const CHARACTERS = [
     emoji:    '🌍',
     branch:   '—',
     hook:     "You don't know this family — yet.",
-    startEra: 0,
+    startEra: 8,
+    startLocation: 'haarlem',  // traveller starts in Haarlem — the portal intro makes most sense here
     questIds: ['great_journey'],
     sprite:   { hairColor:'#806040', bodyColor:'#503040', skinColor:'#d0a070' },
     ending:   "You close the journal and place it back on the shelf. Outside, the world looks different now.",

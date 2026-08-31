@@ -662,7 +662,7 @@ export const NPC_DATA = {
           'Charlotte — my girl! You came all the way back to find me.',
           'I\'ve been thinking about the family name too. Let me tell you what really happened.',
           'The clerk simplified it when we moved to Wisconsin. Just like that — a piece of history changed.',
-          'Here — I will give you the courthouse record. Take it back to your branch of the family.',
+          'And look — I found your dad\'s old floppy disk with the first family tree database. Take it.',
         ],
         tenley: [
           'Tenley! You\'re asking about the women of the family, I can tell.',
@@ -690,8 +690,19 @@ export const NPC_DATA = {
           'Your grandfather Peter John lived it. Farm in Minnesota, church every Sunday.',
           'Find him in Era 5. He\'ll tell you exactly what it was like.',
         ],
+        raven: [
+          'Raven! Arthur\'s daughter — all the way from Haarlem to find me!',
+          'Your dad and I talk sometimes. He tells me you\'re growing up Dutch-American, just like we did.',
+          'Here — I found something in the attic. A floppy disk with the first family tree database.',
+          'Your dad built it on his first computer. Take it — it belongs with you.',
+        ],
+        starling: [
+          'Starling! Arthur\'s youngest — I can see the resemblance.',
+          'You were born in Haarlem, the country we left in 1950. That\'s something remarkable.',
+          'Here — take this old floppy disk. Your dad\'s first family tree, 1984 style.',
+        ],
       },
-      item: { id:'courthouse_record', label:'Courthouse Record', emoji:'🗂️' },
+      item: { id:'floppy_disk', label:'Floppy Disk', emoji:'💾' },
     },
   ],
 
