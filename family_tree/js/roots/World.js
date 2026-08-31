@@ -65,8 +65,10 @@ export class World {
     const npcsHere  = (npcData[screenKey] || []);
     npcsHere.forEach(d => {
       // Skip NPCs whose location doesn't match current world location
-      // (e.g. Romijn/Liv are Haarlem-only and shouldn't appear in Mankato)
-      if (d.location && d.location !== (this._location || 'haarlem')) return;
+      // For Era 8 specifically, also check against the eraId context location
+      // since Haarlem-only NPCs (Romijn/Liv/Henk/Paul) must never appear in Mankato
+      const worldLoc = this._location || 'haarlem';
+      if (d.location && d.location !== worldLoc) return;
       // Deduplicate: skip if a named NPC with this key already exists
       const npcKey = d.gedcomId || d.name;
       if (namedNpcKeys.has(npcKey)) return;

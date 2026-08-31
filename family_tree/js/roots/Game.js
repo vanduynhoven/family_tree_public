@@ -40,6 +40,7 @@ export class Game {
     this._eraId       = 0;
     this._timeOfDay   = 0.3;
     this.characterId  = 'traveller';
+    this._startLocation = 'haarlem';  // set properly in _afterIntro/_resumeFromSave per character
     this.unlockedEras = new Set([0, 8]); // Era 0 (1539) and Era 8 (2026 home) always unlocked
     this._gedcom      = null;  // parsed GEDCOM data
 
@@ -75,6 +76,8 @@ export class Game {
     const char = getCharacter(charId);
     const savedData = this.save.load(0);
     const hasSave   = savedData && savedData.characterId === charId;
+    // Set location immediately so any early loadEra calls use the right world
+    this._startLocation = char.startLocation || 'haarlem';
 
     if (mode === 'continue' && hasSave) {
       // ── CONTINUE: restore all saved state ──────────
