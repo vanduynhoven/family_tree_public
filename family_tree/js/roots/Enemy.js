@@ -189,6 +189,20 @@ export class Enemy extends Entity {
       ctx.fillStyle = '#f40'; ctx.fillRect(bx, by, bw * (this.hp / this.maxHp), 4);
     }
 
+    // Name label above sprite
+    const cx = this.x - ox + this.w / 2;
+    const labelY = this.y - oy - (this.hp < this.maxHp && !this.peaceful ? 14 : 6);
+    ctx.save();
+    ctx.font = 'bold 9px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'bottom';
+    // Shadow for legibility on any background
+    ctx.fillStyle = 'rgba(0,0,0,0.7)';
+    ctx.fillText(this.name, cx + 1, labelY + 1);
+    ctx.fillStyle = this.peaceful ? '#ffd700' : '#ffccaa';
+    ctx.fillText(this.name, cx, labelY);
+    ctx.restore();
+
     // Peaceful label (💰)
     if (this.peaceful && this.state !== STATE.DEAD) {
       ctx.globalAlpha = 0.9;

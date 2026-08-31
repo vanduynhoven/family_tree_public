@@ -4,6 +4,7 @@
 // ═══════════════════════════════════════════════════════════
 import { TILE, SOLID_TYPES, FISHABLE_WATER, T } from './Renderer.js';
 import { SCREEN_COLS, SCREEN_ROWS, WORLD_COLS, WORLD_ROWS, buildEraWorld, ENEMY_DEFS } from './EraData.js';
+import { NPC_DATA as _unused, STATIC_SCREEN_DROPS } from './NpcData.js';
 import { NPC } from './NPC.js';
 import { Enemy } from './Enemy.js';
 import { DroppedItem } from './DroppedItem.js';
@@ -156,6 +157,19 @@ export class World {
     }
 
     this._visited.add(`${this.screenRow},${this.screenCol}`);
+
+    // Static screen drops — guaranteed items on specific screens
+    // (Knoxley's ancient stones, collectible curiosities)
+    // Only spawn if the player hasn't already collected this item
+    const screenKey2 = `${eraId}_${this.screenRow}_${this.screenCol}`;
+    for (const sd of STATIC_SCREEN_DROPS) {
+      if (sd.screenKey !== screenKey2) continue;
+      const sx = sd.c * TILE + 8;
+      const sy = sd.r * TILE + 8;
+      if (!this.solidAt(sx, sy)) {
+        this._drops.push(new DroppedItem(sd.item, sx, sy, -1)); // -1 = permanent
+      }
+    }
   }
 
   /** Populate a screen with era-appropriate background NPCs.
@@ -230,11 +244,14 @@ export class World {
 
   // ── Tile queries ───────────────────────────────────────
 
-  solidAt(wx, wy) {
+  solidAt(wx, wy, player = null) {
     const c = Math.floor(wx / TILE);
     const r = Math.floor(wy / TILE);
     if (r < 0 || r >= SCREEN_ROWS || c < 0 || c >= SCREEN_COLS) return true;
-    return SOLID_TYPES.has(this.map[r]?.[c] ?? T.GRASS);
+    const tile = this.map[r]?.[c] ?? T.GRASS;
+    // flotsam item: player can temporarily walk on water
+    if (player?._flotsam && (tile === T.WATER || tile === T.DEEP_WATER)) return false;
+    return SOLID_TYPES.has(tile);
   }
 
   /** Returns the tile ID under a world coordinate */
@@ -429,8 +446,8 @@ function _randomForage(eraId) {
     [{id:'coal',label:'Coal',emoji:'⬛'},{id:'iron',label:'Iron',emoji:'🔩'},{id:'herb',label:'Herb',emoji:'🌿'},{id:'potato',label:'Potato',emoji:'🥔'}],
     [{id:'rope',label:'Rope',emoji:'🪢'},{id:'fish_ration',label:'Fish Ration',emoji:'🐟'},{id:'coin',label:'Dollar',emoji:'💵'},{id:'wood',label:'Driftwood',emoji:'🪵'}],
     [{id:'corn',label:'Corn',emoji:'🌽'},{id:'coin',label:'Dollar',emoji:'💵'},{id:'flower',label:'Prairie Flower',emoji:'🌻'},{id:'herb',label:'Herb',emoji:'🌿'}],
-    [{id:'coin',label:'Guilder',emoji:'🪙'},{id:'flower',label:'Tulip',emoji:'🌷'},{id:'cassette',label:'Cassette',emoji:'📼'},{id:'herb',label:'Herb',emoji:'🌿'}],
-    [{id:'coin',label:'Euro',emoji:'💶'},{id:'flower',label:'Flower',emoji:'🌸'},{id:'usb',label:'USB Drive',emoji:'💾'},{id:'herb',label:'Herb',emoji:'🌿'}],
+    [{id:'coin',label:'Guilder',emoji:'🪙'},{id:'flower',label:'Tulip',emoji:'🌷'},{id:'cassette_tape',label:'Cassette',emoji:'📼'},{id:'herb',label:'Herb',emoji:'🌿'}],
+    [{id:'coin',label:'Euro',emoji:'💶'},{id:'flower',label:'Flower',emoji:'🌸'},{id:'usb_drive',label:'USB Drive',emoji:'💾'},{id:'herb',label:'Herb',emoji:'🌿'}],
   ];
   const t = tables[eraId] || tables[0];
   return t[Math.floor(Math.random() * t.length)];

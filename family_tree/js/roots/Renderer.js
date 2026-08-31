@@ -172,6 +172,7 @@ export function drawSky(ctx, w, h, frame, tod = 0.5) {
 
 // ── Tile drawing ──────────────────────────────────────────
 export function drawTiles(ctx, map, rows, cols, ox, oy, w, h) {
+  if (!map) return;   // guard against null map during era transition
   const startC = Math.max(0, Math.floor(ox / TILE));
   const startR = Math.max(0, Math.floor(oy / TILE));
   const endC   = Math.min(cols-1, Math.ceil((ox+w) / TILE));

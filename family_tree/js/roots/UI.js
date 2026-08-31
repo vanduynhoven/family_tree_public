@@ -45,16 +45,16 @@ export class UI {
       <div id="rt-prompt"></div>
 
       <!-- Dialog box -->
-      <div id="rt-dialog">
+      <div id="rt-dialog" role="dialog" aria-label="Character dialog">
         <div id="rt-dlg-inner">
-          <canvas id="rt-portrait" width="64" height="64"></canvas>
+          <canvas id="rt-portrait" width="64" height="64" aria-hidden="true"></canvas>
           <div id="rt-dlg-body">
-            <div id="rt-dlg-name"></div>
-            <div id="rt-dlg-text"></div>
-            <div id="rt-dlg-hearts"></div>
+            <div id="rt-dlg-name" aria-label="Speaker name"></div>
+            <div id="rt-dlg-text" aria-live="polite" aria-atomic="true"></div>
+            <div id="rt-dlg-hearts" aria-hidden="true"></div>
           </div>
         </div>
-        <div id="rt-dlg-hint">▶ Tap or click to continue</div>
+        <div id="rt-dlg-hint" aria-hidden="true">▶ Tap or click to continue</div>
       </div>
 
       <!-- Inventory bar -->
@@ -188,6 +188,9 @@ export class UI {
       slot.className = 'rt-inv-slot';
       slot.style.position = 'relative';
       slot.style.cursor = 'pointer';
+      slot.setAttribute('role', 'button');
+      slot.setAttribute('tabindex', '0');
+      slot.setAttribute('aria-label', `${item.label}${(item.count||1)>1?' ×'+item.count:''} — press to use`);
 
       const emojiEl = document.createElement('span');
       emojiEl.textContent = item.emoji || '📦';
@@ -213,6 +216,10 @@ export class UI {
       slot.addEventListener('click', () => {
         if (onUse) onUse(item.id);
       });
+      // Keyboard activation (Enter / Space)
+      slot.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); if (onUse) onUse(item.id); }
+      });
 
       bar.appendChild(slot);
     });
@@ -225,7 +232,9 @@ export class UI {
 
     // Parse the tooltip: "Label ×N\nDesc\n\n💡 Use"
     const [header, ...rest] = text.split('\n');
-    const useIdx = rest.findLastIndex(l => l.startsWith('💡'));
+    // findLastIndex not available on iOS < 15.4 — use manual loop
+    let useIdx = -1;
+    for (let i = rest.length - 1; i >= 0; i--) { if (rest[i].startsWith('💡')) { useIdx = i; break; } }
     const desc = rest.slice(0, useIdx < 0 ? rest.length : useIdx).filter(Boolean).join(' ');
     const useLine = useIdx >= 0 ? rest[useIdx] : '';
 
@@ -390,6 +399,7 @@ export class UI {
   closeJournal() {
     this.journalOpen = false;
     document.getElementById('rt-journal-overlay').style.display = 'none';
+    this._hideItemTip();
   }
 
   _renderJournalTab(tab) {

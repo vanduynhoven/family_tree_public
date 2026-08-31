@@ -10,7 +10,7 @@ import { EventBus }      from './EventBus.js';
 import { SaveManager }   from './SaveManager.js';
 import { QuestManager }  from './QuestManager.js';
 import { CHARACTERS, getCharacter } from './CharacterData.js';
-import { NPC_DATA, CROP_ITEMS }     from './NpcData.js';
+import { NPC_DATA, CROP_ITEMS, STATIC_SCREEN_DROPS } from './NpcData.js';
 import { ERAS, FISH_TABLES, SCREEN_COLS, SCREEN_ROWS } from './EraData.js';
 import {
   TILE, T, setEra, loadSprites,
@@ -86,6 +86,14 @@ export class Game {
       }
       if (savedData.unlockedEras) {
         this.unlockedEras = new Set(savedData.unlockedEras);
+      }
+      // Restore music variant cycle so A/B alternation continues correctly
+      if (savedData.eraVisitCount) {
+        this._eraVisitCount = { ...savedData.eraVisitCount };
+      }
+      // Restore Dutch vocabulary (Raven's language quest)
+      if (savedData.dutchWords) {
+        this.player.dutchWords = savedData.dutchWords;
       }
     } else {
       // ── NEW GAME: reset all state ───────────────────
@@ -163,6 +171,11 @@ export class Game {
       const rect = this.engine.canvas.getBoundingClientRect();
       this.handleCanvasClick(e.clientX - rect.left, e.clientY - rect.top);
     });
+    this.engine.canvas.addEventListener('mousemove', e => {
+      const rect = this.engine.canvas.getBoundingClientRect();
+      this._onCanvasMouseMove(e.clientX - rect.left, e.clientY - rect.top, e.clientX, e.clientY);
+    });
+    this.engine.canvas.addEventListener('mouseleave', () => this._hideEnemyTip());
     let _touchStart = null;
     this.engine.canvas.addEventListener('touchstart', e => {
       if (e.touches.length === 1) _touchStart = { x: e.touches[0].clientX, y: e.touches[0].clientY };
@@ -181,6 +194,8 @@ export class Game {
     this._clickArrived = false;
     this.engine.start((dt, frame) => this._tick(dt, frame));
     this.ui.showToast(`▶ Resumed — ${ERAS[resumeEra]?.year || ''}`);
+    // Populate the inventory HUD bar with the restored items
+    this.ui.renderInventory(this.player.inventory, (id) => this._useItem(id));
   }
 
   _afterIntro(char) {
@@ -199,6 +214,11 @@ export class Game {
         const rect = this.engine.canvas.getBoundingClientRect();
         this.handleCanvasClick(e.clientX - rect.left, e.clientY - rect.top);
       });
+      this.engine.canvas.addEventListener('mousemove', e => {
+        const rect = this.engine.canvas.getBoundingClientRect();
+        this._onCanvasMouseMove(e.clientX - rect.left, e.clientY - rect.top, e.clientX, e.clientY);
+      });
+      this.engine.canvas.addEventListener('mouseleave', () => this._hideEnemyTip());
       let _touchStart = null;
       this.engine.canvas.addEventListener('touchstart', e => {
         if (e.touches.length === 1) _touchStart = { x: e.touches[0].clientX, y: e.touches[0].clientY };
@@ -214,6 +234,8 @@ export class Game {
       }, { passive: true });
 
       this.engine.start((dt, frame) => this._tick(dt, frame));
+      // Render inventory bar (empty on new game, populated on continue)
+      this.ui.renderInventory(this.player.inventory, (id) => this._useItem(id));
       this.ui.showToast(`⏰ ${ERAS[startEra]?.year} — Find your ancestors!`);
 
       // Onboarding hint for first-time players (no collected facts yet)
@@ -247,6 +269,7 @@ export class Game {
     this.engine.cameraX = 0;
     this.engine.cameraY = 0;
     this._dialogNPC = null;
+    this._clickTarget = null;   // cancel any in-flight click navigation
     document.getElementById('rt-dialog').style.display = 'none';
     this.music.playTrack(eraId, this._eraVisitCount?.[eraId] % 2 === 1 ? 'b' : 'a');
     // Track visit count so next visit plays the other variant
@@ -256,7 +279,7 @@ export class Game {
   }
 
   travelToEra(targetId) {
-    if (targetId < 0 || targetId > 8) return;
+    if (targetId < 0 || targetId > ERAS.length - 1) return;
     if (!this.unlockedEras.has(targetId)) return;
     const ctx = this.engine.ctx;
     ctx.fillStyle = 'rgba(80,40,180,0.88)';
@@ -355,10 +378,135 @@ export class Game {
       this.ui.showToast(`Can't use ${id} right now.`, '#888');
       return;
     }
+
+    // ── Special effects handled by Game ───────────────────
+    if (result.special === 'stun_enemy') {
+      // old_boot: stun nearest enemy for 3 seconds
+      const enemy = this._nearestEnemy(TILE * 3);
+      if (enemy) {
+        enemy.hurtTimer = 3.0;  // freeze AI for 3s
+        enemy.knockbackX = 0; enemy.knockbackY = 0;
+        this.player.removeItem(id, 1);
+        this.ui.showToast(`${result.emoji} You threw the boot! Enemy stunned for 3 seconds! 😵`, '#ffcc40');
+        this.music.sfxHit?.();
+      } else {
+        this.ui.showToast(`${result.emoji} No enemy nearby to throw it at!`, '#888');
+        // Don't consume — no target
+      }
+      this.ui.renderInventory(this.player.inventory, (id) => this._useItem(id));
+      this.save.save(this);
+      return;
+    }
+
+    if (result.special === 'npc_gift') {
+      // Coin/gift items: boost friendship with nearest NPC
+      const npc = this.world.nearestNPC(this.player);
+      if (npc && this.player.distTo(npc) < TILE * 3) {
+        npc.addFriendship(2);
+        const npcKey = npc.gedcomId || npc.name;
+        this._npcFriendship.set(npcKey, npc.friendship);
+        this.player.removeItem(id, 1);
+        const given = npc.data?.given || npc.name.split(' ')[0];
+        this.ui.showToast(`${result.emoji} You gave it to ${given}! ❤️❤️ +2 friendship!`, '#ff80c0');
+        this.music.sfxCollect?.();
+      } else {
+        this.ui.showToast(`${result.emoji} Walk close to a family member to give it to them.`, '#888');
+      }
+      this.ui.renderInventory(this.player.inventory, (id) => this._useItem(id));
+      this.save.save(this);
+      return;
+    }
+
+    if (result.special === 'water_step') {
+      // flotsam: small stamina restore + flag player can step over next water tile
+      this.player._flotsam = true;   // World.solidAt checks this
+      this.player.removeItem(id, 1);
+      setTimeout(() => { if (this.player) this.player._flotsam = false; }, 5000);
+      this.ui.showToast(`${result.emoji} Flotsam placed! You can cross one water tile for 5 seconds.`, '#80c0ff');
+      this.ui.renderInventory(this.player.inventory, (id) => this._useItem(id));
+      this.save.save(this);
+      return;
+    }
+
+    if (result.special === 'fishing_boost') {
+      this.ui.showToast(`${result.emoji} Lure equipped! Next catch has double chance of being rare! 🎣`, '#80ff80');
+      this.ui.renderInventory(this.player.inventory, (id) => this._useItem(id));
+      this.save.save(this);
+      return;
+    }
+
+    if (result.special === 'fishing_fast') {
+      this.ui.showToast(`${result.emoji} Smart Buoy deployed! Fish will bite much faster! ⚡🎣`, '#80ffff');
+      this.ui.renderInventory(this.player.inventory, (id) => this._useItem(id));
+      this.save.save(this);
+      return;
+    }
+
+    // ── Standard consumable (heal/stamina) ────────────────
     this.ui.showToast(`${result.emoji} Used! ${result.label}`, '#80ff80');
     this.music.sfxCollect?.();
     this.ui.renderInventory(this.player.inventory, (id) => this._useItem(id));
     this.save.save(this);
+  }
+
+  /** Check for nearby enemies on canvas hover and show/hide tooltip */
+  _onCanvasMouseMove(canvasX, canvasY, clientX, clientY) {
+    const wx = canvasX + this.engine.cameraX;
+    const wy = canvasY + this.engine.cameraY;
+    const hoverDist = TILE * 1.2;
+    let found = null;
+    for (const e of this.world.activeEnemies) {
+      if (e.alive && Math.hypot(e.cx - wx, e.cy - wy) < hoverDist) { found = e; break; }
+    }
+    if (found) {
+      // Only redraw if it's a different enemy
+      if (this._enemyTipTarget !== found) {
+        this._enemyTipTarget = found;
+        this._showEnemyTip(found, clientX, clientY);
+      }
+    } else {
+      this._enemyTipTarget = null;
+      this._hideEnemyTip();
+    }
+  }
+
+  /** Show a floating tooltip for an enemy near the given screen coordinates */
+  _showEnemyTip(enemy, screenX, screenY) {
+    this._hideEnemyTip();
+    const tip = document.createElement('div');
+    tip.id = 'rt-enemy-tip';
+    const peaceful = enemy.peaceful
+      ? `<div style="color:#ffd700;font-size:11px;margin-top:4px">💸 Peaceful — will steal coins, not fight</div>`
+      : `<div style="color:#ff8080;font-size:11px;margin-top:4px">⚔️ Battle enemy — attack to defeat</div>`;
+    const hpPct = Math.round((enemy.hp / enemy.maxHp) * 100);
+    const hpBar = enemy.hp < enemy.maxHp
+      ? `<div style="background:#300;border-radius:3px;height:5px;margin-top:5px"><div style="background:#f40;width:${hpPct}%;height:100%;border-radius:3px"></div></div>` : '';
+    tip.innerHTML = `
+      <div style="font-weight:bold;color:#ffccaa;font-size:13px;margin-bottom:4px">${enemy.emoji} ${enemy.name}</div>
+      <div style="color:#ccc;font-size:11px;line-height:1.45">${enemy.def?.desc || ''}</div>
+      ${peaceful}${hpBar}
+    `;
+    tip.style.cssText = `
+      position:fixed;z-index:9999;
+      background:rgba(10,5,20,0.96);
+      border:1px solid #604020;border-radius:6px;
+      padding:8px 10px;max-width:230px;
+      font-family:inherit;font-size:12px;
+      pointer-events:none;box-shadow:0 3px 12px rgba(0,0,0,0.8);
+    `;
+    document.body.appendChild(tip);
+    // Position above cursor, clamped to viewport
+    const tipW = 230;
+    let left = screenX - tipW / 2;
+    left = Math.max(4, Math.min(left, window.innerWidth - tipW - 4));
+    const top = Math.max(4, screenY - tip.offsetHeight - 12);
+    tip.style.left = left + 'px';
+    tip.style.top  = top + 'px';
+    this._enemyTip = tip;
+  }
+
+  _hideEnemyTip() {
+    if (this._enemyTip) { this._enemyTip.remove(); this._enemyTip = null; }
   }
 
   _nearestEnemy(maxDist) {
@@ -573,13 +721,24 @@ export class Game {
     // Start fishing
     const bpos = this.world.fishingBobberPos(this.player);
     this.player.startFishing(bpos.x, bpos.y);
+    // smart_buoy: halve the wait time
+    if (this.player.fishingBoostFast) {
+      this.player.fishTimer = Math.max(0.5, this.player.fishTimer * 0.4);
+      this.player.fishingBoostFast = false;
+    }
     this.music.sfxFishCast?.();
     this.ui.showToast('🎣 Fishing… watch for the dip!', '#80c0ff');
   }
 
   _grantFish() {
     const table = FISH_TABLES[this._eraId] || FISH_TABLES[0];
-    const pick  = Math.random() < 0.2 ? table[1] : table[0];
+    // fishing_boost (old_lure / retro_lure): 80% rare instead of 20%
+    const rareChance = this.player.fishingBoostRare ? 0.8 : 0.2;
+    if (this.player.fishingBoostRare) {
+      this.player.fishingBoostRare = false;
+      this.ui.showToast('🎣 The lure worked!', '#f0c040');
+    }
+    const pick = Math.random() < rareChance ? table[1] : table[0];
     if (!pick) return;
     if (this.player.collectItem(pick)) {
       this.ui.showItemToast(pick);
@@ -657,15 +816,17 @@ export class Game {
       }
     }
 
-    // Dutch word quest — collect from dialog
+    // Dutch word quest — collect from dialog, emit event for QuestManager
     if (this.characterId === 'raven') {
       const lines = npc.linesForCharacter(this.characterId);
       lines.forEach(line => {
         if (typeof line === 'object' && line.dutch) {
-          const word = line.dutch.split(' ')[0].replace(/[^a-zA-Z]/g,'').toLowerCase();
-          if (word && !this.player.dutchWords?.find(w => w.dutch === line.dutch)) {
+          const alreadyHave = this.player.dutchWords?.find(w => w.dutch === line.dutch);
+          if (!alreadyHave) {
             this.player.dutchWords = this.player.dutchWords || [];
-            this.player.dutchWords.push({ dutch: line.dutch, en: line.en || '' });
+            this.player.dutchWords.push({ dutch: line.dutch, en: line.en || '', era: this._eraId });
+            // Fire quest event — QuestManager learning_dutch listens for this
+            this.events.emit('dutch_word_found', { era: this._eraId, word: line.dutch });
           }
         }
       });

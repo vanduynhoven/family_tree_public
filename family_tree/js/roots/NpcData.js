@@ -184,9 +184,9 @@ export const NPC_DATA = {
           'Take the prayer book — it connects your family across the centuries.',
         ],
         knoxley: [
-          { dutch:'De Gouden Eeuw, jongen. [The Golden Age, lad.]', en:'The most prosperous time our country has ever known.' },
-          'And yet we in the south remain Catholic, careful, and quiet.',
-          'Your ancestors kept the faith here. Remember that.',
+          { dutch:'De Gouden Eeuw — en kijk, het jongste kind is het meest nieuwsgierig! [The Golden Age — and look, the youngest child is the most curious!]', en:'' },
+          'Most children your age want to play. You want to know who came before you.',
+          'Your ancestors kept the faith here. That spirit clearly runs in the family.',
         ],
         isabella: [
           { dutch:'Welkom in de zeventiende eeuw. [Welcome to the seventeenth century.]', en:'' },
@@ -433,7 +433,7 @@ export const NPC_DATA = {
           { dutch:'Alles begint hier. [Everything begins here.]', en:'' },
         ],
         knoxley: [
-          'Knoxley — always digging to the bottom of things.',
+          'Look at you — the youngest one, and already searching for the deepest roots.',
           'This is the moment everything changed. Before 1950 — Dutch. After 1950 — American.',
           { dutch:'Maar wij vergeten nooit waar we vandaan komen. [But we never forget where we come from.]', en:'' },
           'That is the promise of this whole journey.',
@@ -634,7 +634,7 @@ export const NPC_DATA = {
           'And don\'t forget Grandpa Peter John. He\'s the one who brought us all together.',
         ],
         knoxley: [
-          'Knoxley — always digging deeper! That\'s my kid.',
+          'My youngest — and already asking the biggest questions! That\'s my kid.',
           'You want to know how far back it goes? Your grandfather Peter John knew the whole story.',
           'Go to Era 5 — find Grandpa. He has answers that go all the way back to 1539.',
         ],
@@ -701,7 +701,7 @@ export const NPC_DATA = {
           'She is the strongest woman I know. Ask her everything.',
         ],
         knoxley: [
-          'Knoxley! You have your grandfather\'s curiosity. I like that.',
+          'My youngest grandchild — and you came the furthest back to find me! I\'m amazed.',
           'You want the deepest roots? Go find Johan — my father — at Era 4. On the ship.',
           'And then find Marianus — his father — at Era 3. The answers go all the way back.',
         ],
@@ -797,8 +797,8 @@ export const NPC_DATA = {
           'Our grandparents in the Netherlands — I wish I could have talked to them.',
         ],
         knoxley: [
-          'Knoxley! Looking for the deep history? You should talk to Peter John.',
-          'I\'m still on "hello" and "thank you" in Dutch — I\'ll leave the research to you two.',
+          'Knoxley! The littlest one asking the biggest questions — that is so you!',
+          'I\'m still on "hello" and "thank you" in Dutch — I\'ll leave the deep research to you.',
           { dutch:'Dank je wel! [Thank you!]', en:'See? I\'m getting there!' },
         ],
         isabella: [
@@ -875,8 +875,8 @@ export const NPC_DATA = {
           'The women of this family kept everything going. You\'ll find that out.',
         ],
         knoxley: [
-          'Knoxley — always looking for the deepest roots!',
-          'Your grandfather Peter John had the same curiosity. He would be so proud.',
+          'You are the youngest one, Knoxley — and you want to go the furthest back. I love that.',
+          'Your grandfather Peter John had the same spirit. He would be so proud of you.',
           'There is more history here than any of us could ever imagine.',
         ],
         isabella: [
@@ -1126,6 +1126,12 @@ export const NPC_DATA = {
           'Raven — it makes me so happy that both of you are doing this together.',
           'You and Starling are always better as a team.',
           { dutch:'Jullie zijn geweldig. [You two are amazing.]', en:'I mean it.' },
+        ],
+        raven_heart3: [
+          'Raven — you and Starling have been on the most incredible adventure.',
+          'When you both come back, I want to hear every single story.',
+          { dutch:'Beloof je dat je alles vertelt? [Promise you\'ll tell me everything?]', en:'' },
+          'All the way back to 1539. That is honestly the coolest thing I have ever heard.',
         ],
       },
     },
@@ -1461,4 +1467,26 @@ export const CROP_ITEMS = [
   { id:'corn',    label:'Corn',       emoji:'🌽', era:5 },
   { id:'tomato',  label:'Tomato',     emoji:'🍅', era:6 },
   { id:'coffee',  label:'Coffee Bean',emoji:'☕', era:7 },
+];
+
+// ── Static screen drops ─────────────────────────────────
+// Items guaranteed to appear on specific screens (Knoxley quest stones,
+// collectible curiosities). Format: { screenKey, r, c, item }
+// Each stone appears once in a different Era 0 screen quadrant.
+export const STATIC_SCREEN_DROPS = [
+  // Knoxley: deep_roots quest — ancient stones hidden in Era 0 screens
+  { screenKey:'0_0_0', r:8, c:6,  item:{ id:'ancient_stone_1', label:'Ancient Stone I',   emoji:'🪨' } },
+  { screenKey:'0_0_2', r:6, c:14, item:{ id:'ancient_stone_2', label:'Ancient Stone II',  emoji:'🪨' } },
+  { screenKey:'0_2_0', r:9, c:5,  item:{ id:'ancient_stone_3', label:'Ancient Stone III', emoji:'🪨' } },
+  { screenKey:'0_3_3', r:7, c:13, item:{ id:'ancient_stone_4', label:'Ancient Stone IV',  emoji:'🪨' } },
+  // Previous fishing curiosities — now findable on the ground in their era
+  { screenKey:'0_1_0', r:8, c:8,  item:{ id:'old_boot',     label:'Old Boot',        emoji:'👢' } },
+  { screenKey:'1_2_1', r:7, c:12, item:{ id:'voc_coin',     label:'VOC Coin',        emoji:'🪙' } },
+  { screenKey:'2_1_2', r:9, c:9,  item:{ id:'fr_button',    label:'French Button',   emoji:'🔘' } },
+  { screenKey:'3_1_3', r:6, c:10, item:{ id:'iron_gear',    label:'Iron Gear',       emoji:'⚙️' } },
+  { screenKey:'4_2_2', r:8, c:11, item:{ id:'flotsam',      label:'Flotsam',         emoji:'🪵' } },
+  { screenKey:'5_0_3', r:7, c:8,  item:{ id:'old_lure',     label:'Old Lure',        emoji:'🎣' } },
+  { screenKey:'6_3_0', r:6, c:7,  item:{ id:'retro_lure',   label:'Retro Lure',      emoji:'🎣' } },
+  { screenKey:'7_2_1', r:9, c:10, item:{ id:'smart_buoy',   label:'Smart Buoy',      emoji:'📡' } },
+  { screenKey:'8_2_3', r:8, c:6,  item:{ id:'old_coin',     label:'Old Dutch Coin',  emoji:'🪙' } },
 ];

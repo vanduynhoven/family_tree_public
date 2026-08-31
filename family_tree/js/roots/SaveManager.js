@@ -33,6 +33,10 @@ export class SaveManager {
         npcFriendship: Object.fromEntries(game._npcFriendship || []),
         npcTalkCount:  Object.fromEntries(game._npcTalkCount  || []),
         unlockedEras:  Array.from(game.unlockedEras || []),
+        // Music variant state — preserve A/B cycle across sessions
+        eraVisitCount: { ...(game._eraVisitCount || {}) },
+        // Dutch vocabulary collected during play (Raven's quest)
+        dutchWords:    JSON.parse(JSON.stringify(game.player.dutchWords || [])),
         savedAt:       new Date().toISOString(),
       };
       localStorage.setItem(`${PREFIX}${slot}`, JSON.stringify(data));

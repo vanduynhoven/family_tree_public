@@ -748,6 +748,7 @@ export class Music {
   // Schedule a single voice — loops indefinitely
   _scheduleVoice(bpm, voiceDef) {
     const totalBeats = voiceDef.notes.reduce((s, [, d]) => s + d, 0);
+    if (totalBeats <= 0) return;   // guard against empty voice (would loop at 0ms)
     const loopDur    = beat(bpm, totalBeats);
 
     const schedule = (loopStart) => {

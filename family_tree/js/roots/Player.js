@@ -33,15 +33,59 @@ export const ITEM_INFO = {
   courthouse_record:{ desc: 'The courthouse record that changed the family name spelling. History in one stroke.',useLabel: 'Key item — story clue' },
   marriage_record:  { desc: 'A marriage record from 1858. Two Van Duijnhoven brothers married two Verwegen sisters the same year!', useLabel: 'Key item — story clue' },
   // ── Fishing curiosities (no use effect) ─────────────────
-  old_boot:    { desc: 'Someone\'s old boot from the bottom of a 1539 river. Very old. Very smelly.',             useLabel: 'No use — just a curiosity' },
-  voc_coin:    { desc: 'A VOC trading company coin from 1660. The Dutch East India Company was everywhere!',      useLabel: 'No use — collectible' },
-  fr_button:   { desc: 'A button from a French soldier\'s coat, 1799. Someone left it in the river.',            useLabel: 'No use — collectible' },
-  iron_gear:   { desc: 'An iron gear that fell into the canal near the factory in 1872.',                         useLabel: 'No use — collectible' },
-  flotsam:     { desc: 'A piece of driftwood from the Atlantic crossing. A memory of the journey.',               useLabel: 'No use — collectible' },
-  old_lure:    { desc: 'An old fishing lure from a Minnesota lake. Somebody lost their best one.',                useLabel: 'No use — collectible' },
-  retro_lure:  { desc: 'A 1984 fishing lure. Neon colours — very fashionable at the time.',                      useLabel: 'No use — collectible' },
-  smart_buoy:  { desc: 'A modern GPS smart buoy from 2020. Tracks fish with WiFi. Welcome to the future.',       useLabel: 'No use — collectible' },
-  old_coin:    { desc: 'An old Dutch coin from the Leidsevaart canal. Could be hundreds of years old!',          useLabel: 'No use — collectible' },
+  // ── Forage items (random ground finds per era) ───────────
+  herb:         { desc: 'A wild healing herb from the fields. Used in folk medicine for centuries.',                useLabel: 'Eat — restores +12 HP',     heal: 12 },
+  mushroom:     { desc: 'A forest mushroom from 1539 Brabant. Hopefully not the poisonous kind.',                  useLabel: 'Eat — restores +10 HP',     heal: 10 },
+  flower:       { desc: 'A pretty wildflower. Cheer yourself up!',                                                  useLabel: 'Smell — restores +8 Stamina', stamina: 8 },
+  wood:         { desc: 'A piece of good firewood. Useful for warmth on cold nights.',                              useLabel: 'Use — restores +15 Stamina',  stamina: 15 },
+  coin:         { desc: 'A coin from this era. Currency changed with every ruler.',                                  useLabel: 'Give to an NPC for +2 friendship!', special: 'npc_gift' },
+  franc:        { desc: 'A French franc from 1799. Napoleon\'s currency spread everywhere his army marched.',        useLabel: 'Give to an NPC for +2 friendship!', special: 'npc_gift' },
+  coal:         { desc: 'A lump of coal from an 1872 factory. Fuelled the industrial revolution.',                  useLabel: 'Use — restores +20 Stamina (warmth)', stamina: 20 },
+  iron:         { desc: 'A piece of raw iron from an 1872 factory. Heavy and strong.',                              useLabel: 'Give to Marianus — he can use it!', special: 'npc_gift' },
+  rope:         { desc: 'A coil of ship rope from the 1950 Atlantic crossing.',                                     useLabel: 'Use — restores +18 Stamina',  stamina: 18 },
+  fish_ration:  { desc: 'A salted fish ration from the ship\'s stores. Not delicious but very filling.',            useLabel: 'Eat — restores +22 HP',     heal: 22 },
+  // ── Fishing curiosities — each now has a real use ────────
+  old_boot:    { desc: 'Someone\'s old boot from the bottom of a 1539 river. Very old. Very smelly.',
+                 useLabel: 'Throw — stuns the nearest enemy for 3 seconds!',
+                 special: 'stun_enemy' },
+  voc_coin:    { desc: 'A VOC trading company coin from 1660. The Dutch East India Company was everywhere!',
+                 useLabel: 'Give to Johannes (Era 1) — he\'ll share a secret story. Or sell for +5 friendship with any NPC.',
+                 special: 'npc_gift' },
+  fr_button:   { desc: 'A button from a French soldier\'s coat, 1799. Someone left it in the river.',
+                 useLabel: 'Give to Petrus (Era 2) — he recognises it and shares a hidden story.',
+                 special: 'npc_gift' },
+  iron_gear:   { desc: 'An iron gear that fell into the canal near the factory in 1872.',
+                 useLabel: 'Give to Marianus (Era 3) — he repairs something and rewards you.',
+                 special: 'npc_gift' },
+  flotsam:     { desc: 'A piece of driftwood from the Atlantic crossing. A memory of the journey.',
+                 useLabel: 'Drop in water — step on it to cross one deep-water tile!',
+                 special: 'water_step', stamina: 10 },
+  old_lure:    { desc: 'An old fishing lure from a Minnesota lake. Still sharp!',
+                 useLabel: 'Use before fishing — doubles your chance of a rare catch!',
+                 special: 'fishing_boost' },
+  retro_lure:  { desc: 'A 1984 fishing lure. Neon colours, but fish love them.',
+                 useLabel: 'Use before fishing — doubles your chance of a rare catch!',
+                 special: 'fishing_boost' },
+  smart_buoy:  { desc: 'A modern GPS smart buoy from 2020. Tracks fish with WiFi.',
+                 useLabel: 'Use before fishing — the fish bites faster (half the wait time)!',
+                 special: 'fishing_fast' },
+  old_coin:    { desc: 'An old Dutch coin from the Leidsevaart canal. Could be centuries old!',
+                 useLabel: 'Show to Paul at Tierney\'s or Henk at the market — they\'ll give you something special.',
+                 special: 'npc_gift' },
+  // ── Starling youngest_voyager quest items (rare fishing catches) ──
+  pebble:          { desc: 'A perfectly smooth pebble from a 1539 Brabant river. Starling finds it beautiful.',              useLabel: 'Quest item — keep for Starling\'s voyage collection' },
+  dried_tulip:     { desc: 'A dried tulip pressed flat. Someone kept it from a 1660 Golden Age market stall.',               useLabel: 'Quest item — keep for Starling\'s voyage collection' },
+  copper_coin:     { desc: 'A copper Napoleonic coin from 1799. Still shiny after 200 years in the water.',                  useLabel: 'Quest item — keep for Starling\'s voyage collection' },
+  iron_bolt:       { desc: 'An iron bolt from a 1872 factory. Heavy and solid — made to last a hundred years.',              useLabel: 'Quest item — keep for Starling\'s voyage collection' },
+  driftwood:       { desc: 'A piece of driftwood from the 1950 Atlantic crossing. Floated all this way.',                    useLabel: 'Quest item — keep for Starling\'s voyage collection' },
+  corn_husk_doll:  { desc: 'A little corn husk doll made by a child on a 1955 Minnesota farm.',                              useLabel: 'Quest item — keep for Starling\'s voyage collection' },
+  cassette_tape:   { desc: 'A 1984 cassette tape. Someone recorded their favourite songs on it.',                            useLabel: 'Quest item — keep for Starling\'s voyage collection' },
+  usb_drive:       { desc: 'A USB drive from 2020. Someone saved the whole family tree on it.',                              useLabel: 'Quest item — keep for Starling\'s voyage collection' },
+  // ── Knoxley deep_roots quest items (hidden in Era 0 screens) ──
+  ancient_stone_1: { desc: 'A carved stone from before 1539. Someone scratched a name on it: V-D.',                         useLabel: 'Collect all 4 stones and bring them to the Ancient Shrine!' },
+  ancient_stone_2: { desc: 'Another ancient carved stone. The carving looks like a family tree.',                            useLabel: 'Collect all 4 stones and bring them to the Ancient Shrine!' },
+  ancient_stone_3: { desc: 'A third ancient stone with a sun symbol carved into it.',                                        useLabel: 'Collect all 4 stones and bring them to the Ancient Shrine!' },
+  ancient_stone_4: { desc: 'The fourth ancient stone. Together the four stones reveal a secret message.',                    useLabel: 'Collect all 4 stones and bring them to the Ancient Shrine!' },
 };
 
 /** Return a formatted tooltip string for an inventory item */
@@ -76,6 +120,8 @@ export class Player extends Entity {
     this.fishWindowSecs = 0.7;
     this.bobberX        = 0;
     this.bobberY        = 0;
+    this.fishingBoostRare = false;  // old_lure / retro_lure active
+    this.fishingBoostFast = false;  // smart_buoy active
     this.pose           = 'idle'; // idle | reading | sleeping | pointing | surprised
 
     // Appearance from CharacterData
@@ -115,12 +161,34 @@ export class Player extends Entity {
     if (!item) return null;
 
     const fx = ITEM_INFO[id];
-    if (!fx?.heal && !fx?.stamina) return { used: false, reason: 'no effect' };
+    if (!fx) return { used: false, reason: 'unknown item' };
 
+    // ── Special-only effects (no heal/stamina) ─────────────
+    // These are handled by Game._useItem which reads the `special` field.
+    // Player just sets the appropriate state flag.
+    if (fx.special === 'fishing_boost') {
+      this.fishingBoostRare = true;
+      this.removeItem(id, 1);
+      return { used: true, special: fx.special, label: fx.useLabel, emoji: item.emoji };
+    }
+    if (fx.special === 'fishing_fast') {
+      this.fishingBoostFast = true;
+      this.removeItem(id, 1);
+      return { used: true, special: fx.special, label: '⚡ Fish will bite faster!', emoji: item.emoji };
+    }
+    if (fx.special && !fx.heal && !fx.stamina) {
+      // stun_enemy, npc_gift, water_step — handled externally by Game._useItem
+      return { used: true, special: fx.special, label: fx.useLabel, emoji: item.emoji, keepItem: true };
+    }
+
+    // ── Consumable effects ─────────────────────────────────
+    if (!fx.heal && !fx.stamina) return { used: false, reason: 'no effect' };
     if (fx.heal)    this.heal(fx.heal);
     if (fx.stamina) this.restoreStamina(fx.stamina);
-    this.removeItem(id, 1);
-    return { used: true, label: fx.useLabel, emoji: item.emoji };
+    // flotsam also has stamina but its special is handled below
+    if (!fx.special) this.removeItem(id, 1);
+    return { used: true, label: fx.useLabel, emoji: item.emoji,
+             special: fx.special || null };
   }
 
   takeDamage(amt) {
@@ -227,10 +295,10 @@ export class Player extends Entity {
     const footBottom = this.y + this.h - pad;   // bottom edge
 
     if (dx !== 0 &&
-        !world.solidAt(nx + pad,            footTop) &&
-        !world.solidAt(nx + this.w - pad,   footTop) &&
-        !world.solidAt(nx + pad,            footBottom) &&
-        !world.solidAt(nx + this.w - pad,   footBottom)) {
+        !world.solidAt(nx + pad,            footTop, this) &&
+        !world.solidAt(nx + this.w - pad,   footTop, this) &&
+        !world.solidAt(nx + pad,            footBottom, this) &&
+        !world.solidAt(nx + this.w - pad,   footBottom), this) {
       this.x = nx;
     }
 
@@ -238,10 +306,10 @@ export class Player extends Entity {
     const newFootBottom = ny + this.h - pad;
 
     if (dy !== 0 &&
-        !world.solidAt(this.x + pad,          newFootTop) &&
-        !world.solidAt(this.x + this.w - pad, newFootTop) &&
-        !world.solidAt(this.x + pad,          newFootBottom) &&
-        !world.solidAt(this.x + this.w - pad, newFootBottom)) {
+        !world.solidAt(this.x + pad,          newFootTop, this) &&
+        !world.solidAt(this.x + this.w - pad, newFootTop, this) &&
+        !world.solidAt(this.x + pad,          newFootBottom, this) &&
+        !world.solidAt(this.x + this.w - pad, newFootBottom), this) {
       this.y = ny;
     }
   }
