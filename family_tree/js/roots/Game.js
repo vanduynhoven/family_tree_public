@@ -617,17 +617,25 @@ export class Game {
 
     // 3. Dropped item?
     for (const drop of this.world.activeDrops) {
-      if (drop.alive && !drop.decorOnly && Math.hypot(drop.cx - wx, drop.cy - wy) < TILE * 1.0) {
-        this._navigateTo(drop.cx, drop.cy, () => {
-          if (!drop.decorOnly && this.player.collectItem(drop.item)) {
-            this.ui.showItemToast(drop.item);
-            this.ui.renderInventory(this.player.inventory, (id) => this._useItem(id));
-            drop.alive = false;
-            this.events.emit('item_collected', { itemId: drop.item.id });
-            this.music.sfxCollect?.();
-          }
-        });
-        return;
+      if (!drop.alive) continue;
+      if (Math.hypot(drop.cx - wx, drop.cy - wy) < TILE * 1.0) {
+        if (drop.decorOnly && drop.item.id?.startsWith('decor_')) {
+          // Decor animal — navigate close then butcher on arrival
+          this._navigateTo(drop.cx, drop.cy, () => this.interact());
+          return;
+        }
+        if (!drop.decorOnly) {
+          this._navigateTo(drop.cx, drop.cy, () => {
+            if (!drop.decorOnly && this.player.collectItem(drop.item)) {
+              this.ui.showItemToast(drop.item);
+              this.ui.renderInventory(this.player.inventory, (id) => this._useItem(id));
+              drop.alive = false;
+              this.events.emit('item_collected', { itemId: drop.item.id });
+              this.music.sfxCollect?.();
+            }
+          });
+          return;
+        }
       }
     }
 
