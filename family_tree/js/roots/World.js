@@ -154,7 +154,7 @@ export class World {
       const fx = fc * TILE + 4;
       const fy = fr * TILE + 4;
       if (!this.solidAt(fx, fy) && !this.solidAt(fx + 20, fy + 20)) {
-        const item = _randomForage(eraId);
+        const item = _randomForage(eraId, this._location || 'haarlem');
         this._drops.push(new DroppedItem(item, fx, fy));
       }
     }
@@ -167,6 +167,8 @@ export class World {
     const screenKey2 = `${eraId}_${this.screenRow}_${this.screenCol}`;
     for (const sd of STATIC_SCREEN_DROPS) {
       if (sd.screenKey !== screenKey2) continue;
+      // Skip location-restricted drops when location doesn't match
+      if (sd.location && sd.location !== (this._location || 'haarlem')) continue;
       const sx = sd.c * TILE + 8;
       const sy = sd.r * TILE + 8;
       if (!this.solidAt(sx, sy)) {
@@ -441,7 +443,7 @@ function _eraEnemies(eraId) {
   return map[eraId] || map[0];
 }
 
-function _randomForage(eraId) {
+function _randomForage(eraId, loc = 'haarlem') {
   const tables = [
     [{id:'herb',label:'Healing Herb',emoji:'🌿'},{id:'mushroom',label:'Mushroom',emoji:'🍄'},{id:'flower',label:'Flower',emoji:'🌸'},{id:'wood',label:'Wood',emoji:'🪵'}],
     [{id:'tulip',label:'Tulip',emoji:'🌷'},{id:'coin',label:'Coin',emoji:'🪙'},{id:'herb',label:'Herb',emoji:'🌿'},{id:'flower',label:'Flower',emoji:'🌸'}],
@@ -449,10 +451,22 @@ function _randomForage(eraId) {
     [{id:'coal',label:'Coal',emoji:'⬛'},{id:'iron',label:'Iron',emoji:'🔩'},{id:'herb',label:'Herb',emoji:'🌿'},{id:'potato',label:'Potato',emoji:'🥔'}],
     [{id:'rope',label:'Rope',emoji:'🪢'},{id:'fish_ration',label:'Fish Ration',emoji:'🐟'},{id:'coin',label:'Dollar',emoji:'💵'},{id:'wood',label:'Driftwood',emoji:'🪵'}],
     [{id:'corn',label:'Corn',emoji:'🌽'},{id:'coin',label:'Dollar',emoji:'💵'},{id:'flower',label:'Prairie Flower',emoji:'🌻'},{id:'herb',label:'Herb',emoji:'🌿'}],
-    [{id:'coin',label:'Guilder',emoji:'🪙'},{id:'flower',label:'Tulip',emoji:'🌷'},{id:'cassette_tape',label:'Cassette',emoji:'📼'},{id:'herb',label:'Herb',emoji:'🌿'}],
-    [{id:'coin',label:'Euro',emoji:'💶'},{id:'flower',label:'Flower',emoji:'🌸'},{id:'usb_drive',label:'USB Drive',emoji:'💾'},{id:'herb',label:'Herb',emoji:'🌿'}],
+    // Era 6: Dutch side has Guilder/Tulip; US (Wisconsin) side has Dollar/Flower
+    // Era 7: NL side has Euro; US (Minnesota) side has Dollar
   ];
-  const t = tables[eraId] || tables[0];
+
+  // Era 6 (1984): Dutch Netherlands has Guilder + Tulip; Wisconsin USA has Dollar + Flower
+  const era6NL = [{id:'coin',label:'Guilder',emoji:'🪙'},{id:'flower',label:'Tulip',emoji:'🌷'},{id:'cassette_tape',label:'Cassette',emoji:'📼'},{id:'herb',label:'Herb',emoji:'🌿'}];
+  const era6US = [{id:'coin',label:'Dollar',emoji:'💵'}, {id:'flower',label:'Flower',emoji:'🌸'},{id:'cassette_tape',label:'Cassette',emoji:'📼'},{id:'herb',label:'Herb',emoji:'🌿'}];
+
+  // Era 7 (2020): NL Haarlem has Euro; Minnesota USA has Dollar
+  const era7NL = [{id:'coin',label:'Euro',emoji:'💶'},{id:'flower',label:'Flower',emoji:'🌸'},{id:'usb_drive',label:'USB Drive',emoji:'💾'},{id:'herb',label:'Herb',emoji:'🌿'}];
+  const era7US = [{id:'coin',label:'Dollar',emoji:'💵'},{id:'flower',label:'Flower',emoji:'🌸'},{id:'usb_drive',label:'USB Drive',emoji:'💾'},{id:'herb',label:'Herb',emoji:'🌿'}];
+
+  let t;
+  if (eraId === 6) t = (loc === 'haarlem') ? era6NL : era6US;
+  else if (eraId === 7) t = (loc === 'haarlem') ? era7NL : era7US;
+  else t = tables[eraId] || tables[0];
   return t[Math.floor(Math.random() * t.length)];
 }
 

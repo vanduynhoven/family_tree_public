@@ -1183,6 +1183,7 @@ export const NPC_DATA = {
       gedcomId: null,
       name: 'Henk',
       given: 'Henk',
+      location: 'haarlem',
       era: 8, spawnR: 7, spawnC: 9,
       bodyColor: '#4a3820', hairColor: '#2a1808', skinColor: '#c8a060',
       lines: {
@@ -1227,6 +1228,7 @@ export const NPC_DATA = {
     {
       gedcomId: null,
       name: 'Paul — Tierney\'s',
+      location: 'haarlem',   // Tierney's is in Haarlem
       given: 'Paul',
       era: 8, spawnR: 11, spawnC: 4,
       bodyColor: '#2a6020', hairColor: '#d03010', skinColor: '#d4a880',
@@ -1526,5 +1528,5 @@ export const STATIC_SCREEN_DROPS = [
   { screenKey:'5_0_3', r:7, c:8,  item:{ id:'old_lure',     label:'Old Lure',        emoji:'🎣' } },
   { screenKey:'6_3_0', r:6, c:7,  item:{ id:'retro_lure',   label:'Retro Lure',      emoji:'🎣' } },
   { screenKey:'7_2_1', r:9, c:10, item:{ id:'smart_buoy',   label:'Smart Buoy',      emoji:'📡' } },
-  { screenKey:'8_2_3', r:8, c:6,  item:{ id:'old_coin',     label:'Old Dutch Coin',  emoji:'🪙' } },
+  { screenKey:'8_2_3', r:8, c:6,  item:{ id:'old_coin',     label:'Old Dutch Coin',  emoji:'🪙' }, location:'haarlem' },
 ];
