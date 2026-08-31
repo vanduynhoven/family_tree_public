@@ -13,7 +13,7 @@ export const CHARACTERS = [
     branch:   '—',
     hook:     "You don't know this family — yet.",
     startEra: 0,
-    questIds: [],
+    questIds: ['great_journey'],
     sprite:   { hairColor:'#806040', bodyColor:'#503040', skinColor:'#d0a070' },
     ending:   "You close the journal and place it back on the shelf. Outside, the world looks different now.",
     intro: [

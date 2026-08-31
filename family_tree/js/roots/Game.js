@@ -98,8 +98,10 @@ export class Game {
       // ── NEW GAME: reset all state ───────────────────
       this._npcFriendship = new Map();
       this._npcTalkCount  = new Map();
-      this.unlockedEras   = new Set([0, 8]);
-      // Delete any existing save so it doesn't carry over
+      // Generic Traveller gets all eras unlocked from the start — free open travel
+      this.unlockedEras = charId === 'traveller'
+        ? new Set([0, 1, 2, 3, 4, 5, 6, 7, 8])
+        : new Set([0, 8]);
       this.save.deleteSave(charId);
     }
 
@@ -270,6 +272,7 @@ export class Game {
     this.engine.cameraY = 0;
     this._dialogNPC = null;
     this._clickTarget = null;   // cancel any in-flight click navigation
+    this._portalHintShown = false;  // reset portal hint for new era
     document.getElementById('rt-dialog').style.display = 'none';
     this.music.playTrack(eraId, this._eraVisitCount?.[eraId] % 2 === 1 ? 'b' : 'a');
     // Track visit count so next visit plays the other variant
@@ -973,6 +976,50 @@ export class Game {
     const entities = [...this.world.activeNPCs, ...this.world.activeEnemies, this.player];
     entities.sort((a, b) => a.cy - b.cy);
     for (const e of entities) e.draw(ctx, ox, oy, frame);
+
+    // ── Onboarding arrow — points to nearest NPC for first 30s of play ──
+    if (!this._dialogNPC && !this.player.collectedFacts.length) {
+      if (this._onboardingSecs === undefined) this._onboardingSecs = 30;
+      if (this._onboardingSecs > 0) {
+        this._onboardingSecs -= dt;
+        const nearNPC = this.world.nearestNPC(this.player, TILE * 8);
+        if (nearNPC) {
+          const px = this.player.cx - ox, py = this.player.cy - oy;
+          const nx = nearNPC.cx - ox,    ny = nearNPC.cy - oy;
+          const ang = Math.atan2(ny - py, nx - px);
+          const dist = Math.hypot(nx - px, ny - py);
+          // Only draw arrow when NPC is more than 1.5 tiles away
+          if (dist > TILE * 1.5) {
+            const pulse = 0.7 + Math.sin(frame / 10) * 0.3;
+            const r = 38;  // radius from player centre
+            const ax = px + Math.cos(ang) * r;
+            const ay = py + Math.sin(ang) * r;
+            ctx.save();
+            ctx.globalAlpha = pulse;
+            ctx.translate(ax, ay);
+            ctx.rotate(ang);
+            ctx.fillStyle = '#f0e040';
+            ctx.strokeStyle = '#806010';
+            ctx.lineWidth = 1.5;
+            ctx.beginPath();
+            ctx.moveTo(14, 0); ctx.lineTo(-6, -8); ctx.lineTo(-6, 8); ctx.closePath();
+            ctx.fill(); ctx.stroke();
+            ctx.restore();
+            ctx.globalAlpha = 1;
+          }
+        }
+      }
+    } else {
+      this._onboardingSecs = undefined;  // reset when player talks to first ancestor
+    }
+
+    // ── Portal nearby hint ─────────────────────────────────────────────
+    if (this.world.portalOnScreen() && !this._dialogNPC && !this.ui.eraSelOpen) {
+      if (!this._portalHintShown) {
+        this._portalHintShown = true;
+        this.ui.showToast('🌀 Find the Time Portal on this screen — E to travel through time!', '#c060ff');
+      }
+    }
 
     // Fishing bobber
     if (this.player.fishTimer > 0) {

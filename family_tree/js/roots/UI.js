@@ -563,7 +563,12 @@ export class UI {
           ? f.text
           : 'You met this ancestor on your travels. Talk to them again to learn more of their story.';
         div.innerHTML = `
-          <div class="rt-je-name">👤 <strong>${f.name}</strong> <span style="color:#666;font-weight:normal;font-size:0.85em">· #${i + 1}</span></div>
+          <div class="rt-je-name">👤 <strong>${f.name}</strong> <span style="color:#666;font-weight:normal;font-size:0.85em">· #${i + 1}</span>
+            <span style="margin-left:6px;font-size:12px">${(() => {
+              const h = this.game._npcFriendship?.get(f.npcId) || 0;
+              return h > 0 ? '❤️'.repeat(h) + '<span style="opacity:0.25">' + '❤️'.repeat(5-h) + '</span>' : '<span style="opacity:0.3;font-size:10px">chat again ↩</span>';
+            })()}</span>
+          </div>
           <div class="rt-je-text">${story}</div>`;
         content.appendChild(div);
       });
@@ -580,11 +585,34 @@ export class UI {
       });
     } else if (tab === 'dutch') {
       const words = this.game.player?.dutchWords || [];
-      if (!words.length) { content.innerHTML = '<p style="color:#888">No Dutch words found yet.</p>'; return; }
+      const target = 8;  // one word per era (0-7)
+      // Count unique eras covered
+      const erasCovered = new Set(words.map(w => w.era)).size;
+      if (!words.length) {
+        content.innerHTML = `
+          <div style="text-align:center;padding:20px;color:#888">
+            <div style="font-size:2em;margin-bottom:8px">🇳🇱</div>
+            <div>No Dutch words yet.</div>
+            <div style="font-size:0.85em;margin-top:6px;color:#666">Talk to Dutch ancestors — they'll teach you words!</div>
+          </div>`;
+        return;
+      }
+      // Progress header
+      const pct = Math.round((erasCovered / target) * 100);
+      const hdr = document.createElement('div');
+      hdr.style.cssText = 'text-align:center;padding:10px 0 14px;border-bottom:1px solid #333;margin-bottom:12px';
+      hdr.innerHTML = `
+        <div style="font-size:1em;color:#c9820a;margin-bottom:6px">🇳🇱 ${words.length} Dutch words · ${erasCovered}/${target} eras</div>
+        <div style="background:#1a1a1a;border-radius:6px;height:7px;overflow:hidden">
+          <div style="background:linear-gradient(90deg,#c9820a,#f0c040);width:${pct}%;height:100%;border-radius:6px;transition:width .5s"></div>
+        </div>
+        <div style="font-size:0.75em;color:#666;margin-top:4px">${pct < 100 ? `Find words in more eras to complete Raven's language quest!` : '✅ All eras covered!'}</div>`;
+      content.appendChild(hdr);
       words.forEach(w => {
         const div = document.createElement('div');
         div.className = 'rt-journal-entry';
-        div.innerHTML = `<span style="color:#c9820a">${w.dutch}</span> — ${w.en}`;
+        const eraLabel = w.era !== undefined ? `<span style="color:#555;font-size:10px;margin-left:6px">Era ${w.era}</span>` : '';
+        div.innerHTML = `<span style="color:#c9820a">${w.dutch}</span> — ${w.en || ''}${eraLabel}`;
         content.appendChild(div);
       });
     }

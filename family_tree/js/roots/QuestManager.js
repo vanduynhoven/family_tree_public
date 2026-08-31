@@ -87,13 +87,30 @@ const QUEST_DEFS = {
     ],
   },
 
-  // Henry — talk to everyone
+  // Henry — talk to everyone (milestones scale to actual NPC count)
   the_reunion: {
     id: 'the_reunion', title: 'The Reunion',
     character: 'henry',
     steps: [
-      { id:'halfway',  trigger:'facts_milestone', milestone:65,  desc:'Meet 65 ancestors' },
-      { id:'complete', trigger:'facts_milestone', milestone:130, desc:'Meet all 130 ancestors' },
+      { id:'first_10',  trigger:'facts_milestone', milestone:10,  desc:'Meet your first 10 ancestors' },
+      { id:'halfway',   trigger:'facts_milestone', milestone:25,  desc:'Meet 25 ancestors' },
+      { id:'complete',  trigger:'facts_milestone', milestone:50,  desc:'Meet 50 ancestors — you\'re becoming a true family historian!' },
+    ],
+  },
+
+  // Generic Traveller — explore every era, collect one fact from each
+  great_journey: {
+    id: 'great_journey', title: 'The Great Journey',
+    character: 'traveller',
+    steps: [
+      { id:'era0', trigger:'npc_talked', npcTarget:'@I001@',  desc:'Meet an ancestor in 1539 (Era 0)' },
+      { id:'era1', trigger:'npc_talked', npcTarget:'@I010@',  desc:'Meet an ancestor in 1660 (Era 1)' },
+      { id:'era2', trigger:'npc_talked', npcTarget:'@I020@',  desc:'Meet an ancestor in 1799 (Era 2)' },
+      { id:'era3', trigger:'npc_talked', npcTarget:'@I042@',  desc:'Meet an ancestor in 1872 (Era 3)' },
+      { id:'era4', trigger:'npc_talked', npcTarget:'@I060@',  desc:'Meet an ancestor on the ship (Era 4)' },
+      { id:'era5', trigger:'npc_talked', npcTarget:'@I023@',  desc:'Meet Peter John in Minnesota (Era 5)' },
+      { id:'era6', trigger:'npc_talked', npcTarget:'@I080@',  desc:'Meet Chuck in 1984 (Era 6)' },
+      { id:'era7', trigger:'npc_talked', npcTarget:'@I090@',  desc:'Meet Arthur in 2020 (Era 7)' },
     ],
   },
 

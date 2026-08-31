@@ -301,6 +301,16 @@ export class World {
     return probes.some(([wx, wy]) => this.tileAt(wx, wy) === T.PORTAL);
   }
 
+  /** True if there is a portal tile anywhere on the current screen */
+  portalOnScreen() {
+    const map = this.map;
+    if (!map) return false;
+    for (let r = 0; r < SCREEN_ROWS; r++)
+      for (let c = 0; c < SCREEN_COLS; c++)
+        if (map[r]?.[c] === T.PORTAL) return true;
+    return false;
+  }
+
   /** True when player overlaps a ready crop tile, returns tile position */
   atCrop(player) {
     const cx = Math.floor(player.cx / TILE);
