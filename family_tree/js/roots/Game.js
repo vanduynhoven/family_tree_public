@@ -356,9 +356,19 @@ export class Game {
       this.world.harvestCrop(crop.r, crop.c);
       this.player.drainStamina(1);
       if (cropItem) {
-        const offX = Math.cos({'left':-Math.PI,'right':0,'up':-Math.PI/2,'down':Math.PI/2}[this.player.facing]||0) * TILE * 0.6;
-        const offY = Math.sin({'left':-Math.PI,'right':0,'up':-Math.PI/2,'down':Math.PI/2}[this.player.facing]||0) * TILE * 0.6;
-        this.world.spawnDrop(cropItem, 0, 0, this.player.cx + offX - TILE*0.25, this.player.cy + offY - TILE*0.25);
+        // Spawn item slightly in front of player; if that position is outside screen or solid,
+        // spawnDrop will fall back to the crop's own tile position
+        const facing = this.player.facing;
+        const angleMap = { left: -Math.PI, right: 0, up: -Math.PI / 2, down: Math.PI / 2 };
+        const angle = angleMap[facing] ?? 0;
+        const offX = Math.cos(angle) * TILE * 0.6;
+        const offY = Math.sin(angle) * TILE * 0.6;
+        this.world.spawnDrop(
+          cropItem,
+          crop.r, crop.c,   // fallback tile position
+          this.player.cx + offX - TILE * 0.25,
+          this.player.cy + offY - TILE * 0.25
+        );
         this.ui.showToast(`${cropItem.emoji} Harvested ${cropItem.label}! Walk over to pick it up.`, '#a0e080');
         this.music.sfxCollect?.();
       }
@@ -873,7 +883,7 @@ export class Game {
       }
       // If still empty or very short, use a friendlier fallback
       if (!text || text.length < 8) text = `You met ${npc.data?.given || npc.name.split(' ')[0]} on your travels.`;
-      this.player.collectedFacts.push({ npcId: npc.gedcomId || npc.name, name: npc.name, text });
+      this.player.collectedFacts.push({ npcId: npc.gedcomId || npc.name, name: npc.name, text, era: this._eraId });
       this.events.emit('npc_talked', { npcId: npc.gedcomId });
       this.events.emit('facts_milestone', { count: this.player.collectedFacts.length });
       this._checkEraAncestorCompletion();
@@ -1479,30 +1489,40 @@ export class Game {
 
   /** Fire a celebration when all ancestors in the current era have been met */
   _checkEraAncestorCompletion() {
-    // Collect all NPC gedcomIds in the current era from NPC_DATA
     const eraId = this._eraId;
+
+    // Count all ancestors the player has MET in this era (facts stamped with era)
+    const metThisEra = this.player.collectedFacts.filter(f => f.era === eraId && f.npcId?.startsWith('@')).length;
+    if (metThisEra === 0) return;
+
+    // Count how many unique ancestors exist in this era:
+    // NPC_DATA entries + any GEDCOM NPCs the player has talked to this era session
     const eraKeys = Object.keys(NPC_DATA).filter(k => k.startsWith(`${eraId}_`));
-    const eraAncestorIds = new Set();
+    const staticIds = new Set();
     for (const key of eraKeys) {
       for (const npc of (NPC_DATA[key] || [])) {
-        if (npc.gedcomId) eraAncestorIds.add(npc.gedcomId);
+        if (npc.gedcomId) staticIds.add(npc.gedcomId);
       }
     }
-    if (eraAncestorIds.size === 0) return;
+    // Total = static NPC_DATA + GEDCOM-auto-generated ones tracked in _npcTalkCount for this era
+    // We identify GEDCOM NPCs for this era from collectedFacts with era stamp (more accurate than
+    // trying to re-run _buildNpcData)
+    const allEraAncestorIds = new Set([...staticIds]);
+    for (const f of this.player.collectedFacts) {
+      if (f.era === eraId && f.npcId?.startsWith('@')) allEraAncestorIds.add(f.npcId);
+    }
 
-    // Check how many of those have been met (are in collectedFacts)
-    const metInEra = this.player.collectedFacts.filter(f => eraAncestorIds.has(f.npcId)).length;
-    if (metInEra >= eraAncestorIds.size) {
-      // All hand-authored ancestors in this era met!
-      if (!this._eraAncestorsComplete?.has(eraId)) {
-        if (!this._eraAncestorsComplete) this._eraAncestorsComplete = new Set();
-        this._eraAncestorsComplete.add(eraId);
-        const eraYear = ERAS[eraId]?.year || '';
-        setTimeout(() => {
-          this.music.sfxCollect?.();
-          this.ui.showToast(`🎊 You met every ancestor in ${eraYear}! Era complete!`, '#f0c040');
-        }, 600);
-      }
+    if (allEraAncestorIds.size === 0) return;
+    if (metThisEra < allEraAncestorIds.size) return;  // haven't met all yet
+
+    if (!this._eraAncestorsComplete?.has(eraId)) {
+      if (!this._eraAncestorsComplete) this._eraAncestorsComplete = new Set();
+      this._eraAncestorsComplete.add(eraId);
+      const eraYear = ERAS[eraId]?.year || '';
+      setTimeout(() => {
+        this.music.sfxCollect?.();
+        this.ui.showToast(`🎊 You met every ancestor in ${eraYear}! Era complete!`, '#f0c040');
+      }, 600);
     }
   }
 

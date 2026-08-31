@@ -341,8 +341,17 @@ export class World {
 
   /** Spawn a collectible DroppedItem. Pass r,c for tile position OR r=0,c=0,x,y for explicit coords */
   spawnDrop(item, r, c, explicitX, explicitY) {
-    const x = explicitX ?? (c * TILE + TILE * 0.25);
-    const y = explicitY ?? (r * TILE + TILE * 0.25);
+    let x = explicitX ?? (c * TILE + TILE * 0.25);
+    let y = explicitY ?? (r * TILE + TILE * 0.25);
+    // Clamp to screen so item doesn't spawn outside bounds
+    const margin = TILE * 0.5;
+    x = Math.max(margin, Math.min(SCREEN_COLS * TILE - margin, x));
+    y = Math.max(margin, Math.min(SCREEN_ROWS * TILE - margin, y));
+    // If clamped position is solid, try the item's source tile as fallback
+    if (this.solidAt(x + 4, y + 4) && r > 0) {
+      x = c * TILE + TILE * 0.25;
+      y = r * TILE + TILE * 0.25;
+    }
     this._drops.push(new DroppedItem({ ...item, decorOnly: false }, x, y, -1));
   }
 

@@ -546,9 +546,9 @@ export const NPC_DATA = {
       item: { id:'boterkoek', label:'Boterkoek Recipe', emoji:'🍪' },
       lines: {
         generic: [
-          'Moorhead, Minnesota. We came here from Boekel in 1950 — and this is home now.',
-          'The Dutch community here is strong. We pray together, farm together.',
-          { dutch:'Amerika is anders, maar goed. [America is different, but good.]', en:'The children are learning English.' },
+          'Moorhead, Minnesota. My parents brought us here from Boekel in 1950 — and this is home now.',
+          'I was a grown man when we crossed. But my children? Born right here in Minnesota. True Americans.',
+          { dutch:'Wij zijn nu Amerikaans. [We are American now.]', en:'But we remember where we came from.' },
           'Mother\'s boterkoek recipe — she made me memorize it. Take it, keep it going.',
         ],
         maxwell: [
@@ -687,8 +687,8 @@ export const NPC_DATA = {
         // Generic parent for non-Chuck children
         isabella: [
           'Isabella! Your dad is William — my brother. So I\'m your uncle Chuck.',
-          'The whole family gets the same story — we came from the Netherlands in 1950.',
-          'Find your grandfather Peter John. He was there when it all began in America.',
+          'Our grandparents came from the Netherlands in 1950 — we were born here in America.',
+          'Find your grandfather Peter John. He was there when it all began.',
         ],
         henry: [
           'Henry! Looking to meet everyone? That\'s the spirit.',

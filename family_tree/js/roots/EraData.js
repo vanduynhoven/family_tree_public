@@ -1098,13 +1098,15 @@ export function buildEraWorld(eraId, location = 'haarlem') {
         // Helm wheel
         set(m,4,9,T.ROCK); set(m,4,10,T.ROCK);
         // PORTAL — navigation chart glows with time energy
-        set(m,3,9,T.PORTAL); set(m,3,10,T.PORTAL); set(m,3,11,T.PORTAL);
+        // (set AFTER the interior fill so it isn't overwritten)
         // Clear walkable interior of bridge room so player can reach the portal
         fill(m,2,4,5,14,T.COBBLE);   // interior floor
         set(m,2,4,T.STEEL); set(m,2,14,T.STEEL); // side wall details stay
         // Restore helm wheel and instruments on the cobble floor
         set(m,4,9,T.ROCK); set(m,4,10,T.ROCK);
         set(m,5,6,T.ROCK); set(m,5,12,T.ROCK);
+        // Portal placed AFTER fill so it isn't overwritten
+        set(m,3,9,T.PORTAL); set(m,3,10,T.PORTAL); set(m,3,11,T.PORTAL);
         clearZone(m,9,9,2);
         grid[0][3]=makeScreen(m,{left:{pos:7},down:{pos:10}},'1950 · Captain\'s Bridge',{r:9,c:9}); }
 
@@ -1244,10 +1246,10 @@ export function buildEraWorld(eraId, location = 'haarlem') {
       // [0,2] Minnesota lake — fishing spot
       { const m=blank(T.GRASS); border(m,T.TREE);
         fill(m,3,3,H-4,W-4,T.WATER);
-        m[HP][3]=T.BRIDGE; m[HP][2]=T.BRIDGE; m[HP][1]=T.BRIDGE;
+        m[7][3]=T.BRIDGE; m[7][2]=T.BRIDGE; m[7][1]=T.BRIDGE;
         fill(m,1,1,2,W-2,T.GRASS); fill(m,H-3,1,H-2,W-2,T.GRASS);
         for(let c=3;c<W-3;c+=3) set(m,1,c,T.TREE);
-        grid[0][2]=makeScreen(m,{left:{pos:7},right:{pos:7},down:{pos:10}},'1955 · Minnesota Lake',{r:HP,c:4}); }
+        grid[0][2]=makeScreen(m,{left:{pos:7},right:{pos:7},down:{pos:10}},'1955 · Minnesota Lake',{r:7,c:4}); }
 
       // [0,3] Farm road north — endless flat
       { const m=blank(T.CORN); border(m,T.TREE);
@@ -1375,10 +1377,10 @@ export function buildEraWorld(eraId, location = 'haarlem') {
       // [2,3] Lake east — walleye fishing
       { const m=blank(T.GRASS); border(m,T.TREE);
         fill(m,4,1,H-4,W-4,T.WATER);
-        m[HP][1]=T.BRIDGE; m[HP][2]=T.BRIDGE; m[HP][3]=T.BRIDGE;
+        m[7][1]=T.BRIDGE; m[7][2]=T.BRIDGE; m[7][3]=T.BRIDGE;
         fill(m,1,1,3,W-2,T.GRASS);
         for(let c=3;c<W-3;c+=3) set(m,2,c,T.TREE);
-        grid[2][3]=makeScreen(m,{left:{pos:7},up:{pos:10},down:{pos:10}},'1955 · Walleye Lake',{r:HP,c:4}); }
+        grid[2][3]=makeScreen(m,{left:{pos:7},up:{pos:10},down:{pos:10}},'1955 · Walleye Lake',{r:7,c:4}); }
 
       // [3,0] Old farmstead — innkeeper
       { const m=blank(T.GRASS); border(m,T.TREE);
@@ -1449,7 +1451,7 @@ export function buildEraWorld(eraId, location = 'haarlem') {
       // [0,3] Netherlands windmill + canal
       { const m=blank(T.GRASS); border(m,T.TREE);
         fill(m,1,1,H-3,5,T.WATER); // canal
-        m[HP][5]=T.BRIDGE; m[HP][6]=T.BRIDGE;
+        m[7][5]=T.BRIDGE; m[7][6]=T.BRIDGE;
         fill(m,1,7,H-3,W-3,T.FLOWER);
         // Windmill
         fill(m,2,12,8,14,T.WALL);
@@ -1488,7 +1490,7 @@ export function buildEraWorld(eraId, location = 'haarlem') {
       // [1,2] Netherlands farm / Van Duynhoven NL side
       { const m=blank(T.GRASS); border(m,T.TREE);
         fill(m,1,1,H-3,5,T.WATER);
-        m[HP][5]=T.BRIDGE; m[HP][6]=T.BRIDGE;
+        m[7][5]=T.BRIDGE; m[7][6]=T.BRIDGE;
         fill(m,1,7,H-3,W-3,T.WHEAT);
         houseEra(m, 2,9,5,8, 1);
         fill(m,4,9,4,15,T.CROP_READY);
@@ -1539,7 +1541,7 @@ export function buildEraWorld(eraId, location = 'haarlem') {
       // [2,3] Netherlands canal + boat (fishing)
       { const m=blank(T.COBBLE);
         fill(m,3,0,8,W-1,T.WATER);
-        m[HP][9]=T.BRIDGE; m[HP][10]=T.BRIDGE; m[HP][11]=T.BRIDGE;
+        m[7][9]=T.BRIDGE; m[7][10]=T.BRIDGE; m[7][11]=T.BRIDGE;
         fill(m,0,0,2,W-1,T.HOUSE_WALL); fill(m,9,0,H-1,W-1,T.HOUSE_WALL);
         for(let c=2;c<W-2;c+=4){ set(m,2,c,T.DOOR); set(m,9,c,T.DOOR); }
         grid[2][3]=makeScreen(m,{left:{pos:7},up:{pos:10},down:{pos:10}},'1984 · Dutch Canal Street',{r:5,c:9}); }
@@ -1632,7 +1634,7 @@ export function buildEraWorld(eraId, location = 'haarlem') {
         fill(m,3,3,H-4,W-4,T.FLOWER);
         for(let c=5;c<W-4;c+=3) set(m,4,c,T.TREE);
         fill(m,7,6,10,13,T.WATER); // park pond
-        m[HP][6]=T.BRIDGE; m[HP][7]=T.BRIDGE;
+        m[7][6]=T.BRIDGE; m[7][7]=T.BRIDGE;
         grid[0][3]=makeScreen(m,{left:{pos:7},down:{pos:10}},'2020 · Haarlem Park',{r:5,c:9}); }
 
       // [1,0] Work-from-home street — home offices lit up
@@ -1725,7 +1727,7 @@ export function buildEraWorld(eraId, location = 'haarlem') {
         fill(m,1,1,H-3,W-3,T.COBBLE);
         fill(m,0,4,H-1,6,T.WATER); // canal
         set(m,2,8,T.BRICK); set(m,2,11,T.BRICK); set(m,2,14,T.BRICK); // shuttered brick shops
-        m[HP][6]=T.BRIDGE; m[HP][7]=T.BRIDGE;
+        m[7][6]=T.BRIDGE; m[7][7]=T.BRIDGE;
         for(let r=2;r<H-2;r+=2) set(m,r,3,T.FLOWER);
         grid[2][3]=makeScreen(m,{left:{pos:7},up:{pos:10},down:{pos:10}},'2020 · Empty Haarlem Street',{r:7,c:10}); }
 
