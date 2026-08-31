@@ -43,9 +43,9 @@ const QUEST_DEFS = {
     character: 'charlotte',
     steps: [
       { id:'spelling_1539', trigger:'npc_talked', npcTarget:'@I001@',    desc:'Learn the original name from Dirck (Era 0)' },
+      { id:'spelling_1660', trigger:'npc_talked', npcTarget:'@I010@',    desc:'See "Van Duijnhoven" written in the Golden Age (Era 1)' },
       { id:'spelling_1799', trigger:'npc_talked', npcTarget:'@I020@',    desc:'See the French-era spelling (Era 2)' },
       { id:'spelling_1984', trigger:'npc_talked', npcTarget:'@I080@',    desc:'Get the courthouse record from Wisconsin (Era 6)' },
-      { id:'motto',         trigger:'npc_talked', npcTarget:'@I001@_2',  desc:'Learn the family motto from Dirck' },
     ],
   },
 

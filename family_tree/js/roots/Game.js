@@ -917,6 +917,12 @@ export class Game {
     const exitDir = this.world.checkScreenExit(this.player);
     if (exitDir && this.world.canExitDir(exitDir)) {
       this.world.startTransition(exitDir, this.player, this._eraId, this._buildNpcData(this._eraId), this._startLocation || 'haarlem');
+      // Cancel any active fishing — walking off screen while fishing would freeze the player
+      if (this.player.fishTimer > 0) {
+        this.player.fishTimer  = 0;
+        this.player.fishDipped = false;
+        this.player.pose       = 'idle';
+      }
     }
 
     // ── World update ───────────────────────────────────
