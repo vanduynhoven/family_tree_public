@@ -1267,23 +1267,28 @@ export function drawMinimap(ctx, worldCols, worldRows, visitedSet, currentR, cur
     const key=`${r},${c}`, cur=r===currentR&&c===currentC;
     const hasPortal = portalSet?.has(key);
     const visited   = visitedSet.has(key);
-    // Three states: current (yellow), visited (single warm green), unknown (dark)
+    // Cell fill: portal screens get distinct purple background
     let fill;
-    if (cur)          fill = '#f0c040';       // current screen — gold
-    else if (visited) fill = '#5a8a50';       // visited — single muted green
-    else              fill = '#252525';       // unknown — dark
+    if (cur && hasPortal)   fill = '#cc44ff';  // current portal — vivid purple
+    else if (cur)           fill = '#f0c040';  // current non-portal — gold
+    else if (hasPortal && visited) fill = '#7020a0'; // visited portal — dark purple
+    else if (visited)       fill = '#5a8a50';  // visited — muted green
+    else                    fill = '#252525';  // unknown — dark
     ctx.fillStyle = fill;
     ctx.beginPath(); ctx.roundRect(x+c*cellSize,y+r*cellSize,cellSize-1,cellSize-1,1); ctx.fill();
-    // Portal star — purple glow on visited portal screens
+
+    // Portal screen: draw ★ centered, sized to fill the cell
     if (hasPortal && (visited || cur)) {
-      ctx.fillStyle = '#d060ff';
-      ctx.font = `bold ${Math.max(cellSize-2,6)}px sans-serif`;
+      ctx.fillStyle = cur ? '#ffffff' : '#e080ff';
+      ctx.font = `bold ${Math.max(cellSize-1,7)}px sans-serif`;
       ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
       ctx.fillText('★', x+c*cellSize+(cellSize-1)/2, y+r*cellSize+(cellSize-1)/2+0.5);
     }
-    // Current screen outline
+
+    // Current screen: white border
     if (cur) {
-      ctx.strokeStyle='rgba(255,255,255,0.6)'; ctx.lineWidth=1;
+      ctx.strokeStyle = hasPortal ? '#ffffff' : 'rgba(255,255,255,0.7)';
+      ctx.lineWidth = hasPortal ? 1.5 : 1;
       ctx.beginPath(); ctx.roundRect(x+c*cellSize,y+r*cellSize,cellSize-1,cellSize-1,1); ctx.stroke();
     }
   }

@@ -879,6 +879,7 @@ export class Game {
       this.player.collectedFacts.push({ npcId: npc.gedcomId || npc.name, name: npc.name, text });
       this.events.emit('npc_talked', { npcId: npc.gedcomId });
       this.events.emit('facts_milestone', { count: this.player.collectedFacts.length });
+      this._checkEraAncestorCompletion();
 
       if (isAncestor) {
         // 🎉 Celebrate discovering a new ancestor — kid-friendly big toast
@@ -1477,6 +1478,35 @@ export class Game {
     // Only count eligible family members + spouses
     if (!this._familyMemberSet) this._familyMemberSet = this._buildFamilyMemberSet();
     return this._familyMemberSet.size;
+  }
+
+  /** Fire a celebration when all ancestors in the current era have been met */
+  _checkEraAncestorCompletion() {
+    // Collect all NPC gedcomIds in the current era from NPC_DATA
+    const eraId = this._eraId;
+    const eraKeys = Object.keys(NPC_DATA).filter(k => k.startsWith(`${eraId}_`));
+    const eraAncestorIds = new Set();
+    for (const key of eraKeys) {
+      for (const npc of (NPC_DATA[key] || [])) {
+        if (npc.gedcomId) eraAncestorIds.add(npc.gedcomId);
+      }
+    }
+    if (eraAncestorIds.size === 0) return;
+
+    // Check how many of those have been met (are in collectedFacts)
+    const metInEra = this.player.collectedFacts.filter(f => eraAncestorIds.has(f.npcId)).length;
+    if (metInEra >= eraAncestorIds.size) {
+      // All hand-authored ancestors in this era met!
+      if (!this._eraAncestorsComplete?.has(eraId)) {
+        if (!this._eraAncestorsComplete) this._eraAncestorsComplete = new Set();
+        this._eraAncestorsComplete.add(eraId);
+        const eraYear = ERAS[eraId]?.year || '';
+        setTimeout(() => {
+          this.music.sfxCollect?.();
+          this.ui.showToast(`🎊 You met every ancestor in ${eraYear}! Era complete!`, '#f0c040');
+        }, 600);
+      }
+    }
   }
 
   _checkFriendshipMilestones() {
