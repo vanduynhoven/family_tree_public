@@ -73,11 +73,13 @@ export class UI {
         <div class="rt-ab" id="ab-attack" onclick="G?.interact()">⚔️💬<span>Act</span></div>
         <div class="rt-ab rt-ab-fish" id="ab-fish" style="display:none">🎣<span>Fish</span></div>
         <div class="rt-ab" id="ab-era">⏰<span>Time</span></div>
-        <div class="rt-ab" id="ab-journal">📚<span>Family</span></div>
+        <div class="rt-ab" id="ab-journal" style="position:relative">📚<span>Family</span><span id="rt-quest-badge">!</span></div>
       </div>
 
       <!-- Damage flash -->
       <div id="rt-damage-flash"></div>
+      <!-- Wall bump flash -->
+      <div id="rt-wall-flash"></div>
 
       <!-- Toast -->
       <div id="rt-toast"></div>
@@ -330,9 +332,20 @@ export class UI {
     const eraYear = [1539,1660,1799,1872,1950,1955,1984,2020,2026][era] || '';
     const nameEl = document.getElementById('rt-dlg-name');
     if (nameEl) {
+      let relLabel = '';
+      if (!npc.gedcomId) {
+        // Non-family NPC (Romijn, Liv, Paul, Henk) — show as Friend
+        relLabel = eraYear ? `🤝 Friend · ${eraYear}` : '';
+      } else if (era >= 7) {
+        // Era 7/8 — living family members, not historical ancestors
+        relLabel = eraYear ? `👨‍👩‍👧 Family · ${eraYear}` : '';
+      } else {
+        // Historical ancestor
+        relLabel = `👨‍👩‍👧 Your ancestor · ${eraYear}`;
+      }
       nameEl.innerHTML = `${npc.name || ''}
         <span style="font-size:0.75em;color:#80c0ff;font-weight:normal;margin-left:8px">
-          ${npc.gedcomId ? `👨‍👩‍👧 Your ancestor · ${eraYear}` : eraYear ? `📍 ${eraYear}` : ''}
+          ${relLabel}
         </span>`;
     }
     document.getElementById('rt-dlg-hearts').textContent = npc.friendship > 0 ? '♥'.repeat(npc.friendship) : '';
@@ -390,9 +403,25 @@ export class UI {
     this.journalOpen ? this.closeJournal() : this.openJournal();
   }
 
+  showQuestBadge() {
+    const el = document.getElementById('rt-quest-badge');
+    if (el) el.style.display = 'block';
+  }
+  hideQuestBadge() {
+    const el = document.getElementById('rt-quest-badge');
+    if (el) el.style.display = 'none';
+  }
+
   openJournal() {
     this.journalOpen = true;
     document.getElementById('rt-journal-overlay').style.display = 'flex';
+    this.hideQuestBadge();
+    // Hide Dutch Words tab for non-Raven players (they never collect words)
+    const dutchTab = document.querySelector('[data-tab="dutch"]');
+    if (dutchTab) {
+      const isRaven = this.game?.characterId === 'raven';
+      dutchTab.style.display = isRaven ? '' : 'none';
+    }
     this._renderJournalTab('stories');
   }
 
@@ -496,6 +525,8 @@ export class UI {
       const desc = era.id === 8 ? 'Present Day · 2026' : (eraDesc[era.id] || '');
       const btn = document.createElement('button');
       btn.className = 'rt-era-btn' + (locked ? ' locked' : '');
+      btn.setAttribute('aria-label', `${era.year} — ${locLabel}${locked ? ' (locked)' : ''}`);
+      if (locked) btn.setAttribute('aria-disabled', 'true');
       btn.innerHTML = `
         <span class="rt-era-year">${era.year}</span> ${locLabel} ${locked ? '🔒' : ''}
         ${desc ? `<div style="font-size:0.78em;color:#7f9db0;margin-top:2px">${desc}</div>` : ''}`;
@@ -532,16 +563,18 @@ export class UI {
       const saveExists = hasSave(char.id);
       const card = document.createElement('div');
       card.className = 'rt-char-card';
+      card.setAttribute('role', 'group');
+      card.setAttribute('aria-label', `${char.name} — ${char.hook}`);
       card.innerHTML = `
-        <div class="rt-char-emoji">${char.emoji}</div>
+        <div class="rt-char-emoji" aria-hidden="true">${char.emoji}</div>
         <div class="rt-char-name">${char.name}</div>
         <div class="rt-char-branch">${char.branch}</div>
         <div class="rt-char-hook">"${char.hook}"</div>
         <div class="rt-char-actions">
           ${saveExists
-            ? `<button class="rt-char-btn rt-char-continue" data-id="${char.id}" data-mode="continue">▶ Continue</button>
-               <button class="rt-char-btn rt-char-newgame" data-id="${char.id}" data-mode="new">✦ New Game</button>`
-            : `<button class="rt-char-btn rt-char-continue" data-id="${char.id}" data-mode="new">▶ Start</button>`
+            ? `<button class="rt-char-btn rt-char-continue" data-id="${char.id}" data-mode="continue" aria-label="Continue as ${char.name}">▶ Continue</button>
+               <button class="rt-char-btn rt-char-newgame" data-id="${char.id}" data-mode="new" aria-label="New game as ${char.name}">✦ New Game</button>`
+            : `<button class="rt-char-btn rt-char-continue" data-id="${char.id}" data-mode="new" aria-label="Start as ${char.name}">▶ Start</button>`
           }
         </div>
       `;

@@ -914,4 +914,5 @@ export class Music {
   sfxEraUnlock()    { [523,659,784,1047,1318].forEach((f,i) => setTimeout(() => this._sfxTone(f, 0.2, 'square', 0.18), i*100)); }
   sfxQuestComplete(){ this._sfxTone(523, 0.4, 'sine', 0.16); setTimeout(() => this._sfxTone(784, 0.4, 'sine', 0.16), 30); }
   sfxHurt()         { this._sfxTone(880, 0.09, 'square', 0.24); }
+  sfxBump()         { this._sfxTone(120, 0.06, 'square', 0.14); setTimeout(() => this._sfxTone(100, 0.05, 'square', 0.08), 30); }
 }

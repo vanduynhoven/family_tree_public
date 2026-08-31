@@ -66,12 +66,12 @@ const QUEST_DEFS = {
     id: 'deep_roots', title: 'The Deep Roots',
     character: 'knoxley',
     steps: [
-      { id:'meet_dirck',     trigger:'npc_talked', npcTarget:'@I001@',         desc:'Get Dirck to name his father (Era 0)' },
-      { id:'stone_1',        trigger:'item_collected', itemTarget:'ancient_stone_1', desc:'Find ancient stone 1 (Era 0)' },
-      { id:'stone_2',        trigger:'item_collected', itemTarget:'ancient_stone_2', desc:'Find ancient stone 2 (Era 0)' },
-      { id:'stone_3',        trigger:'item_collected', itemTarget:'ancient_stone_3', desc:'Find ancient stone 3 (Era 0)' },
-      { id:'stone_4',        trigger:'item_collected', itemTarget:'ancient_stone_4', desc:'Find ancient stone 4 (Era 0)' },
-      { id:'hidden_era',     trigger:'portal_activated', eraTarget:-1,              desc:'Bring all 4 stones to the Ancient Shrine' },
+      { id:'meet_dirck', trigger:'npc_talked',      npcTarget:'@I001@',           desc:'Talk to Dirck van Duinhoven in 1539 (Era 0)' },
+      { id:'stone_1',    trigger:'item_collected',  itemTarget:'ancient_stone_1', desc:'Find Ancient Stone I (hidden in Era 0)' },
+      { id:'stone_2',    trigger:'item_collected',  itemTarget:'ancient_stone_2', desc:'Find Ancient Stone II (hidden in Era 0)' },
+      { id:'stone_3',    trigger:'item_collected',  itemTarget:'ancient_stone_3', desc:'Find Ancient Stone III (hidden in Era 0)' },
+      { id:'stone_4',    trigger:'item_collected',  itemTarget:'ancient_stone_4', desc:'Find Ancient Stone IV (hidden in Era 0)' },
+      { id:'oldest_era', trigger:'npc_talked',      npcTarget:'@I002@',           desc:'Speak with Aelken — the oldest known relative' },
     ],
   },
 
@@ -83,7 +83,7 @@ const QUEST_DEFS = {
       { id:'young_johan', trigger:'npc_talked', npcTarget:'@I042@',  desc:'Meet Marianus and ask about young Johan (Era 3)' },
       { id:'ship_johan',  trigger:'npc_talked', npcTarget:'@I060@',  desc:'Talk to Johan on the ship (Era 4)' },
       { id:'ship_anna',   trigger:'npc_talked', npcTarget:'@I061@',  desc:'Talk to Anna on the ship (Era 4)' },
-      { id:'all_aboard',  trigger:'era_full_npc_talked', eraTarget:4, desc:'Talk to all 7 family members aboard (Era 4)' },
+      { id:'fish_ocean',  trigger:'item_collected', itemTarget:'flying', desc:'Catch a flying fish from the Atlantic Ocean (Era 4)' },
     ],
   },
 
@@ -97,19 +97,19 @@ const QUEST_DEFS = {
     ],
   },
 
-  // Maxwell — complete all side quests
+  // Maxwell — complete daily life encounters in every era
   day_in_their_life: {
     id: 'day_in_their_life', title: 'A Day in Their Life',
     character: 'maxwell',
     steps: [
-      { id:'era0_sidequest', trigger:'sidequest_complete', eraTarget:0, desc:'Complete Era 0 side quest: The Church Roof' },
-      { id:'era1_sidequest', trigger:'sidequest_complete', eraTarget:1, desc:'Complete Era 1 side quest: The Lost Tulip' },
-      { id:'era2_sidequest', trigger:'sidequest_complete', eraTarget:2, desc:'Complete Era 2 side quest: The Deserter' },
-      { id:'era3_sidequest', trigger:'sidequest_complete', eraTarget:3, desc:'Complete Era 3 side quest: The Strike' },
-      { id:'era4_sidequest', trigger:'sidequest_complete', eraTarget:4, desc:'Complete Era 4 side quest: The Sick Child' },
-      { id:'era5_sidequest', trigger:'sidequest_complete', eraTarget:5, desc:'Complete Era 5 side quest: The Church Picnic' },
-      { id:'era6_sidequest', trigger:'sidequest_complete', eraTarget:6, desc:'Complete Era 6 side quest: The Pen Pal' },
-      { id:'era7_sidequest', trigger:'sidequest_complete', eraTarget:7, desc:'Complete Era 7 side quest: The Family Zoom' },
+      { id:'era0_crop',    trigger:'item_collected', itemTarget:'wheat',      desc:'Harvest wheat in the 1539 fields (Era 0)' },
+      { id:'era1_npc',     trigger:'npc_talked',     npcTarget:'@I010@',      desc:'Talk to Johannes about Golden Age life (Era 1)' },
+      { id:'era2_crop',    trigger:'item_collected', itemTarget:'rye',        desc:'Find rye grain in Napoleonic times (Era 2)' },
+      { id:'era3_npc',     trigger:'npc_talked',     npcTarget:'@I042@',      desc:'Hear Marianus describe a day on the farm (Era 3)' },
+      { id:'era4_fish',    trigger:'item_collected', itemTarget:'flying',     desc:'Catch a flying fish on the Atlantic crossing (Era 4)' },
+      { id:'era5_crop',    trigger:'item_collected', itemTarget:'corn',       desc:'Pick corn from Grandpa\'s Minnesota farm (Era 5)' },
+      { id:'era6_npc',     trigger:'npc_talked',     npcTarget:'@I080@',      desc:'Ask Chuck what daily life was like in 1984 (Era 6)' },
+      { id:'era7_npc',     trigger:'npc_talked',     npcTarget:'@I090@',      desc:'Talk to Arthur about daily life in 2020 (Era 7)' },
     ],
   },
 };

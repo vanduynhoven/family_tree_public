@@ -170,6 +170,9 @@ export class Enemy extends Entity {
     if (!this.alive && this.state !== STATE.DEAD) return;
     if (this.state === STATE.DEAD) ctx.globalAlpha = Math.max(0, this.deathTimer / 0.5);
     if (this.hurtTimer > 0 && Math.sin(frame * 25) > 0) ctx.globalAlpha = 0.2;
+    // Low HP flicker — red tint when below 20% health (battle enemies only)
+    const lowHp = !this.peaceful && this.hp > 0 && (this.hp / this.maxHp) < 0.2;
+    if (lowHp && Math.sin(frame * 18) > 0.3) ctx.globalAlpha = Math.min(ctx.globalAlpha, 0.55);
     // Steal flash — gold tint on peaceful enemies stealing
     if (this.stealFlash > 0 && Math.sin(frame * 30) > 0) {
       ctx.globalAlpha = 0.7;

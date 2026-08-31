@@ -865,7 +865,18 @@ export class Game {
     const inputBlocked = this._dialogNPC || this.ui.journalOpen || this.ui.eraSelOpen;
 
     if (!inputBlocked) {
+      const prevX = this.player.x, prevY = this.player.y;
       this.player.update(dt, engine.keys, this.world);
+      // Detect wall bump: movement keys held but player didn't move
+      const moved = Math.hypot(this.player.x - prevX, this.player.y - prevY) > 0.5;
+      const moving = engine.keys.left || engine.keys.right || engine.keys.up || engine.keys.down;
+      if (moving && !moved && !this._bumpCd) {
+        this._bumpCd = 0.25;   // 250ms cooldown so it doesn't fire every frame
+        this.music.sfxBump?.();
+        const flash = document.getElementById('rt-wall-flash');
+        if (flash) { flash.style.opacity = '1'; setTimeout(() => { flash.style.opacity = '0'; }, 90); }
+      }
+      if (this._bumpCd > 0) this._bumpCd -= dt;
     }
 
     // Dialog advance: E / Space always works during dialog
@@ -1286,6 +1297,7 @@ export class Game {
   _bindQuestEvents() {
     this.events.on('quest_step_done', ({ questId, stepId, desc }) => {
       this.ui.showToast(`📋 Quest progress: ${desc}`, '#a0c0ff');
+      this.ui.showQuestBadge();   // pulse red dot on journal button
     });
     this.events.on('quest_complete', ({ questId, title }) => {
       this.ui.showToast(`✅ Quest complete: ${title}!`, '#80ff80');
