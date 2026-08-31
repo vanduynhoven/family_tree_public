@@ -36,30 +36,42 @@ export class NPC extends Entity {
   linesForCharacter(charId) {
     // Lines can be an array (flat) or an object with keys:
     //   generic, <charId>, repeat1, repeat2, repeat3, heart2, heart3, heart5
-    // Priority: charId > generic, then repeat based on talkCount, then heart-gated
+    //   <charId>_repeat1, <charId>_repeat2, <charId>_heart2  (character-specific repeats)
+    // Priority: charId-specific > generic, then repeat based on talkCount, then heart-gated
     const pool = this.lines;
 
     // 1. Pick base set: charId-specific or generic
     const base = pool[charId] || pool.generic || [];
 
-    // 2. On repeat visits, try friendship-gated or numbered repeat sets
+    // 2. On repeat visits, check charId-prefixed keys first, then generic ones
     if (this.talkCount > 0) {
+      // Character-specific heart/repeat keys (e.g. 'raven_heart2', 'starling_repeat1')
       const heartKey = this.friendship >= 5 ? 'heart5'
                      : this.friendship >= 3 ? 'heart3'
                      : this.friendship >= 2 ? 'heart2' : null;
-      if (heartKey && pool[heartKey]) return pool[heartKey];
 
-      const repeatKey = `repeat${this.talkCount}`;  // repeat1, repeat2, repeat3
-      if (pool[repeatKey]) return pool[repeatKey];
-
-      // If no specific repeat key, cycle through repeatX keys that exist
-      const repeatKeys = Object.keys(pool).filter(k => k.startsWith('repeat'));
-      if (repeatKeys.length) {
-        const idx = (this.talkCount - 1) % repeatKeys.length;
-        return pool[repeatKeys[idx]] || base;
+      if (heartKey) {
+        const charHeartKey = charId ? `${charId}_${heartKey}` : null;
+        if (charHeartKey && pool[charHeartKey]) return pool[charHeartKey];
+        if (pool[heartKey]) return pool[heartKey];
       }
 
-      // Fall back to a short "already-talked" line so it's never fully silent
+      const repeatKey = `repeat${this.talkCount}`;
+      const charRepeatKey = charId ? `${charId}_${repeatKey}` : null;
+      if (charRepeatKey && pool[charRepeatKey]) return pool[charRepeatKey];
+      if (pool[repeatKey]) return pool[repeatKey];
+
+      // Cycle through character-specific repeat keys, then generic
+      const charRepeatKeys = charId
+        ? Object.keys(pool).filter(k => k.startsWith(`${charId}_repeat`))
+        : [];
+      const genericRepeatKeys = Object.keys(pool).filter(k => /^repeat\d+$/.test(k));
+      const allRepeatKeys = [...charRepeatKeys, ...genericRepeatKeys];
+      if (allRepeatKeys.length) {
+        const idx = (this.talkCount - 1) % allRepeatKeys.length;
+        return pool[allRepeatKeys[idx]] || base;
+      }
+
       return pool.repeat_default || [
         `${this.data?.given || this.name.split(' ')[0]} smiles at you warmly. ♥`,
         'It is good to talk again. Come back any time.',

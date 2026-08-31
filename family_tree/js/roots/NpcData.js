@@ -498,13 +498,41 @@ export const NPC_DATA = {
         ],
         heart2: [
           'Can I tell you a secret?',
-          'When Raven first got here from America she didn\'t speak any Dutch at all.',
-          { dutch:'Nu spreekt ze beter dan ik! [Now she speaks better than me!]', en:'I\'m a bit jealous.' },
+          'Raven has always been curious about her family — even when we were little she would ask her dad questions about the old photos.',
+          { dutch:'Nu spreekt ze beter dan ik! [Now she speaks better than me!]', en:'At Dutch at school I mean — she\'s really good!' },
         ],
+        heart3: [
+          { dutch:'Jij bent ook een vriend van de familie. [You are also a friend of the family.]', en:'' },
+          'Raven said you are on a big adventure through her family history.',
+          'I hope you find all the answers. She deserves to know where she comes from.',
+        ],
+        // ── Raven-specific dialog ──
+        // Romijn knows Raven was born in Haarlem, grew up here together
         raven: [
           { dutch:'RAVEN! Eindelijk! [RAVEN! Finally!]', en:'I\'ve been waiting at the canal for twenty minutes!' },
-          'The tulips are in at the flower stall. She saved the purple ones for you.',
-          { dutch:'We gaan toch naar Tierney\'s na de markt? [We\'re still going to Tierney\'s after the market?]', en:'' },
+          'The purple tulips are in at Lies\'s stall. She saved them for you!',
+          { dutch:'We gaan toch naar Tierney\'s na de markt? [We\'re still going to Tierney\'s after the market?]', en:'Your usual — hot chocolate and a cheese toastie!' },
+        ],
+        raven_repeat1: [
+          { dutch:'Goedemorgen, Raven! [Good morning, Raven!]', en:'Ready for school?' },
+          'I was at your house yesterday but you were already out with your dad. He was buying sausages from Henk again.',
+          { dutch:'Jouw vader en die worst! [Your dad and those sausages!]', en:'Every single Saturday!' },
+        ],
+        raven_heart2: [
+          'Raven — I\'ve been thinking about your school project on the family history.',
+          { dutch:'Jij bent zo slim. [You are so smart.]', en:'Finding all those ancestors going back hundreds of years.' },
+          'My oma says your family is famous in Haarlem for being Dutch-American. That\'s really special.',
+        ],
+        // ── Starling-specific dialog ──
+        starling: [
+          { dutch:'Starling! Waar is je zusje? [Starling! Where is your sister?]', en:'Is Raven coming to the market too?' },
+          'I made a drawing for you! A beetle — because we found that one in the garden.',
+          { dutch:'Voor jou! [For you!]', en:'It\'s in my bag.' },
+        ],
+        starling_repeat1: [
+          'Starling! The courtyard is free. Do you want to play?',
+          { dutch:'We kunnen verstoppertje spelen. [We can play hide and seek.]', en:'' },
+          'Last time you hid in the big flower pot and nobody found you for twenty minutes!',
         ],
       },
     },
@@ -546,10 +574,38 @@ export const NPC_DATA = {
           'Starling told me she wants to go see where her family is from one day.',
           { dutch:'Ik ga mee! [I\'m coming too!]', en:'She said we can go together when we\'re bigger.' },
         ],
+        heart3: [
+          { dutch:'Jij bent ook vrienden met haar familie? [Are you also friends with her family?]', en:'' },
+          'Then you must be a good person. Starling only has good friends.',
+          { dutch:'Pas goed op haar, hè? [Take good care of her, okay?]', en:'' },
+        ],
+        // ── Starling-specific dialog ──
+        // Liv and Starling were born and grew up in Haarlem together
         starling: [
           { dutch:'STARLING! Daar ben je! [STARLING! There you are!]', en:'I\'ve been looking everywhere for you!' },
           'I found a really shiny stone by the canal. I kept it for you.',
           { dutch:'Wil je spelen? [Do you want to play?]', en:'We could go to the courtyard!' },
+        ],
+        starling_repeat1: [
+          { dutch:'Starling! Ik heb een idee! [Starling! I have an idea!]', en:'' },
+          'Let\'s make a map of all the places your ancestors lived. I have coloured pencils!',
+          { dutch:'Jij tekent de schepen, ik teken de huizen. [You draw the ships, I\'ll draw the houses.]', en:'' },
+        ],
+        starling_repeat2: [
+          'Remember last winter when you told me about Johan sailing across the ocean?',
+          { dutch:'Dat was zo spannend! [That was so exciting!]', en:'I went home and told my mum.' },
+          'She looked it up and said it\'s all real! Ten days on a ship! Can you imagine?',
+        ],
+        starling_heart2: [
+          'Starling — you know what I like best about being your friend?',
+          'You always have the most amazing stories. But they\'re all TRUE.',
+          { dutch:'Jouw familie is echt bijzonder. [Your family is really special.]', en:'Not everyone can trace their family back 500 years.' },
+        ],
+        // ── Raven-specific dialog ──
+        raven: [
+          { dutch:'Raven! Is Starling bij jou? [Raven! Is Starling with you?]', en:'We were supposed to meet at the fountain!' },
+          'Tell her I have the drawings I made of the family tree. I used all my best pencils.',
+          { dutch:'Voor jullie allebei! [For both of you!]', en:'One each.' },
         ],
       },
     },
