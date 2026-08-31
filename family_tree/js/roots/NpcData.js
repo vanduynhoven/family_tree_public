@@ -634,7 +634,7 @@ export const NPC_DATA = {
           'And don\'t forget Grandpa Peter John. He\'s the one who brought us all together.',
         ],
         knoxley: [
-          'My youngest — and already asking the biggest questions! That\'s my kid.',
+          'My youngest — and already asking the biggest questions! That\'s my girl.',
           'You want to know how far back it goes? Your grandfather Peter John knew the whole story.',
           'Go to Era 5 — find Grandpa. He has answers that go all the way back to 1539.',
         ],
@@ -701,7 +701,7 @@ export const NPC_DATA = {
           'She is the strongest woman I know. Ask her everything.',
         ],
         knoxley: [
-          'My youngest grandchild — and you came the furthest back to find me! I\'m amazed.',
+          'My youngest granddaughter — and she came the furthest back to find me! I\'m amazed.',
           'You want the deepest roots? Go find Johan — my father — at Era 4. On the ship.',
           'And then find Marianus — his father — at Era 3. The answers go all the way back.',
         ],

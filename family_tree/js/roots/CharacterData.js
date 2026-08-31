@@ -117,12 +117,12 @@ export const CHARACTERS = [
     startLocation: 'mankato',
     questIds: ['deep_roots'],
     sprite:   { hairColor:'#404030', bodyColor:'#304050', skinColor:'#c89060' },
-    ending:   '"Before the Name" glows in your journal. 1450. The youngest one found the very beginning.',
+    ending:   '"Before the Name" glows in her journal. 1450. The youngest one found the very beginning.',
     intro: [
       { bg:'mn_office', pose:'pointing', caption:'"Dirck van Duinhoven, ~1450." Five hundred and seventy years ago. The oldest name anyone could find.' },
-      { bg:'mn_office', pose:'idle',     caption:'"FAMILY PAPERS — DO NOT THROW." Everyone else said they were too young to look. Not Knoxley.' },
-      { bg:'closeup',   pose:'reading',  caption:'A circle drawn on the map: Aarle-Rixtel. The youngest in the family. The one who asked the oldest question.' },
-      { bg:'sleep',     pose:'sleeping', caption:'1450. I\'m going to find out what was there before anything else.' },
+      { bg:'mn_office', pose:'idle',     caption:'"FAMILY PAPERS — DO NOT THROW." Everyone said she was too young to look. She looked anyway.' },
+      { bg:'closeup',   pose:'reading',  caption:'A circle drawn on the map: Aarle-Rixtel. The youngest girl in the family. The one who asked the oldest question.' },
+      { bg:'sleep',     pose:'sleeping', caption:'1450. She\'s going to find out what was there before anything else.' },
     ],
   },
 

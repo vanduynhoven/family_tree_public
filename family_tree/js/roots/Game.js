@@ -1501,6 +1501,7 @@ function _situationLine(eraId, loc, isFemale) {
 }
 
 function _lifeSpanLine(given, year, died, age, eraId, loc) {
+  if (age <= 0) return `Born ${year}. The records are a little unclear about the rest.`;
   if (age < 5)  return `${given} died very young — only ${age} years old. So many children were lost in those days.`;
   if (age < 20) return `${given} did not reach adulthood. Born ${year}, gone by ${died}. A short life, but remembered.`;
   if (age > 80) return `I will live to ${died}${eraId <= 3 ? ' — a very long life for these times' : ''}. ${age} years. Much to see.`;
