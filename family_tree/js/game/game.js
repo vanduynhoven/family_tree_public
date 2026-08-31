@@ -32,10 +32,48 @@ export class Game {
   start() {
     document.getElementById('title').style.display='none';
     this._running = true;
-    this.loadEra(0);
-    this.music.playTrack(0);
+    this._loadSave();          // restore items + facts from previous session
+    const startEra = this._eraId || 0;
+    this.loadEra(startEra);
+    this.ui.renderInventory(this.player.inventory);  // show restored items
+    this.music.playTrack(startEra);
     this.engine.start((dt, frame) => this._tick(dt, frame));
-    this.ui.showToast('Find your ancestors! Walk to them and press E 💬');
+    const hasSave = this.player.inventory.length > 0 || this.player.collectedFacts.length > 0;
+    this.ui.showToast(hasSave
+      ? `📖 Save restored — ${this.player.collectedFacts.length} facts, ${this.player.inventory.length} items`
+      : 'Find your ancestors! Walk to them and press E 💬');
+  }
+
+  // ── Persistence ────────────────────────────────────────────
+  _saveKey = 'roots_save_v1';
+
+  _saveState() {
+    try {
+      const state = {
+        inventory:      this.player.inventory,
+        collectedFacts: this.player.collectedFacts,
+        eraId:          this._eraId,
+      };
+      localStorage.setItem(this._saveKey, JSON.stringify(state));
+    } catch(e) { /* localStorage unavailable */ }
+  }
+
+  _loadSave() {
+    try {
+      const raw = localStorage.getItem(this._saveKey);
+      if(!raw) return;
+      const state = JSON.parse(raw);
+      if(Array.isArray(state.inventory))      this.player.inventory      = state.inventory;
+      if(Array.isArray(state.collectedFacts)) this.player.collectedFacts = state.collectedFacts;
+      if(typeof state.eraId === 'number')     this._eraId = state.eraId;
+    } catch(e) { /* corrupt save — ignore */ }
+  }
+
+  _clearSave() {
+    try { localStorage.removeItem(this._saveKey); } catch(e) {}
+    this.player.inventory      = [];
+    this.player.collectedFacts = [];
+    this._eraId = 0;
   }
 
   loadEra(idx) {
@@ -61,7 +99,11 @@ export class Game {
     const ctx = this.engine.ctx;
     ctx.fillStyle='rgba(100,80,200,0.85)';
     ctx.fillRect(0,0,this.engine.width,this.engine.height);
-    setTimeout(() => { this.loadEra(idx); this.ui.showToast(`⏰ ${ERAS[idx]?.year} — ${ERAS[idx]?.name}`); }, 350);
+    setTimeout(() => {
+      this.loadEra(idx);
+      this._saveState();   // persist era progress
+      this.ui.showToast(`⏰ ${ERAS[idx]?.year} — ${ERAS[idx]?.name}`);
+    }, 350);
   }
 
   interact() {
@@ -80,6 +122,7 @@ export class Game {
           this.ui.renderInventory(this.player.inventory);
           d.alive = false;
           this.world.drops = this.world.drops.filter(x=>x.alive!==false);
+          this._saveState();
         }
         return;
       }
@@ -95,12 +138,14 @@ export class Game {
       // Collect fact
       if(!this.player.collectedFacts.find(f=>f.name===npc.name)) {
         this.player.collectedFacts.push({name:npc.name,fact:`${npc.data?.name||npc.name} (${npc.data?.year||''}) — ${npc.data?.place||''}`});
+        this._saveState();
       }
       // Give item
       if(npc.item && !this.player.hasItem(npc.item.id)) {
         if(this.player.collectItem(npc.item)) {
           this.ui.showItemToast(npc.item);
           this.ui.renderInventory(this.player.inventory);
+          this._saveState();
         }
       }
     }
