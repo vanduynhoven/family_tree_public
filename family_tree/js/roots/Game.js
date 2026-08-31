@@ -994,10 +994,11 @@ export class Game {
     }
 
     // ── Prompt ────────────────────────────────────────
-    const nearNPC = this.world.nearestNPC(this.player);
-    const atPortal = this.world.atPortal(this.player);
-    const atCrop   = this.world.atCrop(this.player);
-    const fishable = this.world.isFishable(this.player);
+    const nearNPC   = this.world.nearestNPC(this.player);
+    const nearEnemy = this._nearestEnemy(TILE * 1.6);
+    const atPortal  = this.world.atPortal(this.player);
+    const atCrop    = this.world.atCrop(this.player);
+    const fishable  = this.world.isFishable(this.player);
 
     // Track portal discovery for minimap ★ marker
     if (atPortal) {
@@ -1006,7 +1007,8 @@ export class Game {
 
     if (nearNPC && !this._dialogNPC) {
       this.ui.showPrompt(`💬 Talk to ${nearNPC.data?.given || nearNPC.name} — E`);
-    } else if (this._nearestEnemy(TILE * 1.6)) {
+    } else if (nearEnemy && nearEnemy.hp === nearEnemy.maxHp) {
+      // Only show attack prompt before combat starts — once the enemy is hurt the auto-chain handles it
       this.ui.showPrompt('⚔️ Enemy nearby — E to attack');
     } else if (atPortal) {
       this.ui.showPrompt('⏰ Time Portal — E to travel');

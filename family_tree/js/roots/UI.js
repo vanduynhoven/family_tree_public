@@ -60,12 +60,13 @@ export class UI {
       <!-- Inventory bar -->
       <div id="rt-inv"></div>
 
-      <!-- D-pad -->
+      <!-- D-pad (collapsable — tap 🕹️ to toggle) -->
       <div id="rt-dpad">
         <button id="dp-u">▲</button>
         <button id="dp-l">◀</button>
         <button id="dp-r">▶</button>
         <button id="dp-d">▼</button>
+        <button id="dp-toggle" title="Toggle D-pad">🕹️</button>
       </div>
 
       <!-- Action buttons -->
@@ -147,6 +148,15 @@ export class UI {
       btn.addEventListener('pointerup',   () => this.game.engine.dpadUp(dir));
       btn.addEventListener('pointerleave',() => this.game.engine.dpadUp(dir));
     }
+    // D-pad collapse toggle — tap 🕹️ to hide/show directional buttons
+    const dpad = $('rt-dpad'), dpToggle = $('dp-toggle');
+    if (dpad && dpToggle) {
+      if (localStorage.getItem('vdh_dpad_collapsed') === '1') dpad.classList.add('collapsed');
+      dpToggle.addEventListener('click', () => {
+        const collapsed = dpad.classList.toggle('collapsed');
+        localStorage.setItem('vdh_dpad_collapsed', collapsed ? '1' : '0');
+      });
+    }
 
     // Journal tabs
     document.querySelectorAll('.rt-jtab').forEach(tab => {
@@ -219,8 +229,22 @@ export class UI {
       const tip = itemTooltip(item);
       slot.addEventListener('mouseenter', (e) => this._showItemTip(e.currentTarget, tip));
       slot.addEventListener('mouseleave', () => this._hideItemTip());
-      slot.addEventListener('touchstart', (e) => { e.preventDefault(); this._showItemTip(e.currentTarget, tip); }, { passive: false });
-      slot.addEventListener('touchend', () => setTimeout(() => this._hideItemTip(), 1800));
+      // Touch: first tap shows tooltip with Use button; second tap on same slot uses the item
+      slot.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        if (this._itemTipTarget === slot) {
+          // Second tap on same slot → use immediately
+          this._hideItemTip();
+          this._itemTipTarget = null;
+          if (onUse) onUse(item.id);
+        } else {
+          this._itemTipTarget = slot;
+          this._showItemTip(e.currentTarget, tip, item.id, onUse);
+          // Auto-hide after 3s if not acted on
+          clearTimeout(this._tipAutoHide);
+          this._tipAutoHide = setTimeout(() => { this._hideItemTip(); this._itemTipTarget = null; }, 3000);
+        }
+      }, { passive: false });
 
       // Tap/click to use
       slot.addEventListener('click', () => {
@@ -235,49 +259,79 @@ export class UI {
     });
   }
 
-  _showItemTip(anchor, text) {
+  _showItemTip(anchor, text, itemId = null, onUse = null) {
     this._hideItemTip();
     const tip = document.createElement('div');
     tip.id = 'rt-item-tip';
 
     // Parse the tooltip: "Label ×N\nDesc\n\n💡 Use"
     const [header, ...rest] = text.split('\n');
-    // findLastIndex not available on iOS < 15.4 — use manual loop
     let useIdx = -1;
     for (let i = rest.length - 1; i >= 0; i--) { if (rest[i].startsWith('💡')) { useIdx = i; break; } }
     const desc = rest.slice(0, useIdx < 0 ? rest.length : useIdx).filter(Boolean).join(' ');
     const useLine = useIdx >= 0 ? rest[useIdx] : '';
 
+    // On touch devices, add a tappable Use button
+    const isTouchDevice = navigator.maxTouchPoints > 0;
+    const canUse = onUse && itemId && useLine && !useLine.includes('cannot be picked up') && !useLine.includes('Key item');
+    const useBtn = (isTouchDevice && canUse)
+      ? `<button id="rt-tip-use-btn" style="margin-top:8px;width:100%;padding:6px 0;background:#27ae60;color:#fff;border:none;border-radius:5px;font-size:13px;font-weight:bold;cursor:pointer;touch-action:manipulation">✅ Use it</button>`
+      : '';
+
     tip.innerHTML = `
       <div style="font-weight:bold;color:#f0e080;margin-bottom:4px">${header}</div>
       ${desc ? `<div style="color:#d0d0b0;font-size:11px;line-height:1.4;margin-bottom:6px">${desc}</div>` : ''}
       ${useLine ? `<div style="color:#80ff80;font-size:11px">${useLine}</div>` : ''}
+      ${useBtn}
     `;
     tip.style.cssText = `
       position:fixed;z-index:9999;
       background:rgba(20,16,10,0.96);
       border:1px solid #806040;border-radius:6px;
-      padding:8px 10px;max-width:220px;
+      padding:8px 10px;max-width:230px;
       font-family:inherit;font-size:12px;
-      pointer-events:none;box-shadow:0 3px 12px rgba(0,0,0,0.7);
+      ${useBtn ? 'pointer-events:auto;' : 'pointer-events:none;'}
+      box-shadow:0 3px 12px rgba(0,0,0,0.7);
     `;
 
     document.body.appendChild(tip);
 
-    // Position above the anchor slot
+    // Wire the Use button if present
+    if (useBtn) {
+      const btn = document.getElementById('rt-tip-use-btn');
+      btn?.addEventListener('touchstart', (e) => {
+        e.stopPropagation();
+        clearTimeout(this._tipAutoHide);
+        this._hideItemTip();
+        this._itemTipTarget = null;
+        if (onUse) onUse(itemId);
+      }, { passive: true });
+      // Also wire click for hybrid desktop+touch
+      btn?.addEventListener('click', (e) => {
+        e.stopPropagation();
+        clearTimeout(this._tipAutoHide);
+        this._hideItemTip();
+        this._itemTipTarget = null;
+        if (onUse) onUse(itemId);
+      });
+    }
+
+    // Position above the anchor slot, higher on mobile to clear thumb
     const rect = anchor.getBoundingClientRect();
-    const tipW = 220;
+    const tipW = 230;
     let left = rect.left + rect.width / 2 - tipW / 2;
     left = Math.max(4, Math.min(left, window.innerWidth - tipW - 4));
-    const top = rect.top - tip.offsetHeight - 8;
+    const clearance = useBtn ? 16 : 8;  // more space when button present
+    const top = Math.max(4, rect.top - (tip.offsetHeight || 120) - clearance);
     tip.style.left = left + 'px';
-    tip.style.top  = Math.max(4, top) + 'px';
+    tip.style.top  = top + 'px';
 
     this._itemTip = tip;
   }
 
   _hideItemTip() {
     if (this._itemTip) { this._itemTip.remove(); this._itemTip = null; }
+    clearTimeout(this._tipAutoHide);
   }
 
   // ── Prompts ──────────────────────────────────────────
