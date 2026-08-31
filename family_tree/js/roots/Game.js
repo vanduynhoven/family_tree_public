@@ -11,7 +11,7 @@ import { SaveManager }   from './SaveManager.js';
 import { QuestManager }  from './QuestManager.js';
 import { CHARACTERS, getCharacter } from './CharacterData.js';
 import { NPC_DATA, CROP_ITEMS, STATIC_SCREEN_DROPS } from './NpcData.js';
-import { ERAS, FISH_TABLES, SCREEN_COLS, SCREEN_ROWS } from './EraData.js';
+import { ERAS, FISH_TABLES, SCREEN_COLS, SCREEN_ROWS, WORLD_ROWS, WORLD_COLS } from './EraData.js';
 import {
   TILE, T, setEra, loadSprites,
   drawSky, drawTiles, drawBobber,
