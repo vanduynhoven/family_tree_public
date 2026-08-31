@@ -731,16 +731,122 @@ export function drawEnemy(ctx, x, y, opts = {}) {
 }
 
 // ── Dropped item ──────────────────────────────────────────
-export function drawDroppedItem(ctx, x, y, emoji, frame) {
+export function drawDroppedItem(ctx, x, y, emoji, frame, itemId) {
   const s=TILE*.5, bob=Math.sin(frame/28)*3, glow=.32+Math.sin(frame/18)*.15;
   const gg=ctx.createRadialGradient(x+s/2,y+s/2+bob,0,x+s/2,y+s/2+bob,s*.5);
   gg.addColorStop(0,`rgba(255,220,80,${glow})`); gg.addColorStop(1,'rgba(255,220,80,0)');
   ctx.fillStyle=gg; ctx.fillRect(x,y-4,s,s+8);
-  ctx.font=`${Math.floor(s*.62)}px serif`;
-  ctx.textAlign='center'; ctx.textBaseline='middle';
-  ctx.fillText(emoji, x+s/2, y+s/2+bob);
-  ctx.textBaseline='alphabetic';
+
+  // Draw distinct pixel fish for fish items
+  if (itemId && _FISH_DRAW[itemId]) {
+    _FISH_DRAW[itemId](ctx, x + s/2, y + s/2 + bob, s);
+  } else {
+    ctx.font=`${Math.floor(s*.62)}px serif`;
+    ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.fillText(emoji, x+s/2, y+s/2+bob);
+    ctx.textBaseline='alphabetic';
+  }
 }
+
+// ── Distinct fish shapes per fish type ────────────────────
+const _FISH_DRAW = {
+  perch(ctx, cx, cy, s) {
+    const r = s * 0.38;
+    // Orange-striped perch
+    ctx.fillStyle = '#e8720a'; _fishBody(ctx, cx, cy, r, r*0.55); ctx.fill();
+    ctx.fillStyle = '#a04000';
+    for (let i = 0; i < 3; i++) {
+      ctx.fillRect(cx - r*0.3 + i*r*0.25, cy - r*0.45, r*0.08, r*0.9);
+    }
+    _fishFin(ctx, cx, cy, r, '#c05000');
+  },
+  bream(ctx, cx, cy, s) {
+    const r = s * 0.38;
+    // Silver-blue bream
+    ctx.fillStyle = '#8ab4d8'; _fishBody(ctx, cx, cy, r, r*0.48); ctx.fill();
+    ctx.fillStyle = '#5080a0';
+    ctx.beginPath(); ctx.ellipse(cx - r*0.1, cy, r*0.85, r*0.38, 0, 0, Math.PI*2); ctx.stroke();
+    _fishFin(ctx, cx, cy, r, '#607090');
+  },
+  carp(ctx, cx, cy, s) {
+    const r = s * 0.40;
+    // Golden-brown carp — bigger and fatter
+    ctx.fillStyle = '#c8880a'; _fishBody(ctx, cx, cy, r, r*0.65); ctx.fill();
+    ctx.fillStyle = '#906000';
+    // Scales pattern
+    for (let row = -1; row <= 1; row++)
+      for (let col = -1; col <= 1; col++)
+        if ((row + col) % 2 === 0) {
+          ctx.beginPath(); ctx.arc(cx + col*r*0.3, cy + row*r*0.22, r*0.15, 0, Math.PI*2); ctx.stroke();
+        }
+    _fishFin(ctx, cx, cy, r, '#a07000');
+  },
+  eel(ctx, cx, cy, s) {
+    const r = s * 0.38;
+    // Dark green-grey eel — long and thin
+    ctx.fillStyle = '#3a5a3a';
+    ctx.beginPath();
+    ctx.ellipse(cx, cy, r*1.3, r*0.25, Math.PI*0.08, 0, Math.PI*2);
+    ctx.fill();
+    ctx.fillStyle = '#506050';
+    ctx.beginPath();
+    ctx.ellipse(cx + r*0.4, cy - r*0.05, r*0.3, r*0.2, 0, 0, Math.PI*2);
+    ctx.fill();
+  },
+  flying(ctx, cx, cy, s) {
+    const r = s * 0.35;
+    // Blue flying fish with wing fins
+    ctx.fillStyle = '#3080d0'; _fishBody(ctx, cx, cy, r, r*0.42); ctx.fill();
+    // Wing fins
+    ctx.fillStyle = 'rgba(80,160,240,0.7)';
+    ctx.beginPath(); ctx.ellipse(cx, cy - r*0.6, r*0.6, r*0.2, -Math.PI*0.2, 0, Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.ellipse(cx, cy + r*0.6, r*0.6, r*0.2, Math.PI*0.2, 0, Math.PI*2); ctx.fill();
+    _fishFin(ctx, cx, cy, r, '#2060b0');
+  },
+  walleye(ctx, cx, cy, s) {
+    const r = s * 0.40;
+    // Brown-olive walleye
+    ctx.fillStyle = '#7a6030'; _fishBody(ctx, cx, cy, r, r*0.55); ctx.fill();
+    ctx.fillStyle = '#504020';
+    ctx.beginPath(); ctx.ellipse(cx - r*0.15, cy, r*0.8, r*0.42, 0, 0, Math.PI*2); ctx.stroke();
+    // Walleye distinctive glassy eye
+    ctx.fillStyle = '#e0d060';
+    ctx.beginPath(); ctx.arc(cx + r*0.55, cy - r*0.05, r*0.2, 0, Math.PI*2); ctx.fill();
+    ctx.fillStyle = '#1a1000';
+    ctx.beginPath(); ctx.arc(cx + r*0.55, cy - r*0.05, r*0.1, 0, Math.PI*2); ctx.fill();
+    _fishFin(ctx, cx, cy, r, '#604018');
+  },
+  bass(ctx, cx, cy, s) {
+    const r = s * 0.38;
+    // Green-black bass
+    ctx.fillStyle = '#2a5a28'; _fishBody(ctx, cx, cy, r, r*0.52); ctx.fill();
+    ctx.fillStyle = '#1a3a18';
+    ctx.beginPath(); ctx.ellipse(cx - r*0.1, cy, r*0.82, r*0.40, 0, 0, Math.PI*2); ctx.stroke();
+    _fishFin(ctx, cx, cy, r, '#1a4a18');
+  },
+  pike(ctx, cx, cy, s) {
+    const r = s * 0.42;
+    // Green-grey pike — long pointed snout
+    ctx.fillStyle = '#5a7840'; _fishBody(ctx, cx, cy, r*1.2, r*0.42); ctx.fill();
+    // Pointed snout
+    ctx.fillStyle = '#4a6830';
+    ctx.beginPath(); ctx.moveTo(cx + r*1.1, cy); ctx.lineTo(cx + r*0.6, cy - r*0.2); ctx.lineTo(cx + r*0.6, cy + r*0.2); ctx.closePath(); ctx.fill();
+    _fishFin(ctx, cx, cy, r, '#405828');
+  },
+};
+
+function _fishBody(ctx, cx, cy, rx, ry) {
+  ctx.beginPath(); ctx.ellipse(cx, cy, rx, ry, 0, 0, Math.PI*2);
+}
+
+function _fishFin(ctx, cx, cy, r, color) {
+  // Dorsal fin
+  ctx.fillStyle = color;
+  ctx.beginPath(); ctx.moveTo(cx - r*0.1, cy - ry(r)); ctx.lineTo(cx + r*0.3, cy - r*0.7); ctx.lineTo(cx - r*0.4, cy - ry(r)); ctx.closePath(); ctx.fill();
+  // Tail
+  ctx.beginPath(); ctx.moveTo(cx - r*0.8, cy); ctx.lineTo(cx - r*1.15, cy - r*0.5); ctx.lineTo(cx - r*1.15, cy + r*0.5); ctx.closePath(); ctx.fill();
+}
+function ry(r) { return r * 0.52; }
 
 // ── Fishing bobber ────────────────────────────────────────
 export function drawBobber(ctx, x, y, dipped, frame, handX, handY) {

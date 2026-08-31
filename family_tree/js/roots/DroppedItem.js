@@ -19,6 +19,6 @@ export class DroppedItem extends Entity {
   }
 
   draw(ctx, ox, oy, frame) {
-    drawDroppedItem(ctx, this.x - ox, this.y - oy, this.item.emoji || '📦', frame);
+    drawDroppedItem(ctx, this.x - ox, this.y - oy, this.item.emoji || '📦', frame, this.item.id);
   }
 }

@@ -296,7 +296,7 @@ export class Game {
       const cropItem = CROP_ITEMS.find(c => c.era === this._eraId);
       if (cropItem && this.player.collectItem(cropItem)) {
         this.ui.showItemToast(cropItem);
-        this.ui.renderInventory(this.player.inventory);
+        this.ui.renderInventory(this.player.inventory, (id) => this._useItem(id));
         this.player.drainStamina(1);
         this.events.emit('item_collected', { itemId: cropItem.id });
         this.music.sfxCollect?.();
@@ -309,7 +309,7 @@ export class Game {
       if (this.player.distTo(drop) < TILE * 1.5) {
         if (this.player.collectItem(drop.item)) {
           this.ui.showItemToast(drop.item);
-          this.ui.renderInventory(this.player.inventory);
+          this.ui.renderInventory(this.player.inventory, (id) => this._useItem(id));
           drop.alive = false;
           this.events.emit('item_collected', { itemId: drop.item.id });
           this.music.sfxCollect?.();
@@ -337,8 +337,28 @@ export class Game {
         const len = Math.hypot(dx, dy) || 1;
         e.takeDamage(25, dx/len, dy/len);
         this.music.sfxHit?.();
+
+        // If battle enemy is still alive and in range, queue another auto-attack
+        if (e.alive && e.isBattle) {
+          setTimeout(() => {
+            if (e.alive && this.player.distTo(e) < TILE * 2.2) this._doAttack(e);
+          }, 350);
+        }
       }
     }
+  }
+
+  _useItem(id) {
+    const result = this.player.useItem(id);
+    if (!result) return;
+    if (!result.used) {
+      this.ui.showToast(`Can't use ${id} right now.`, '#888');
+      return;
+    }
+    this.ui.showToast(`${result.emoji} Used! ${result.label}`, '#80ff80');
+    this.music.sfxCollect?.();
+    this.ui.renderInventory(this.player.inventory, (id) => this._useItem(id));
+    this.save.save(this);
   }
 
   _nearestEnemy(maxDist) {
@@ -421,7 +441,7 @@ export class Game {
         this._navigateTo(drop.cx, drop.cy, () => {
           if (this.player.collectItem(drop.item)) {
             this.ui.showItemToast(drop.item);
-            this.ui.renderInventory(this.player.inventory);
+            this.ui.renderInventory(this.player.inventory, (id) => this._useItem(id));
             drop.alive = false;
             this.events.emit('item_collected', { itemId: drop.item.id });
             this.music.sfxCollect?.();
@@ -563,7 +583,7 @@ export class Game {
     if (!pick) return;
     if (this.player.collectItem(pick)) {
       this.ui.showItemToast(pick);
-      this.ui.renderInventory(this.player.inventory);
+      this.ui.renderInventory(this.player.inventory, (id) => this._useItem(id));
       this.events.emit('item_collected', { itemId: pick.id });
     }
     this.music.sfxFishCaught?.();
@@ -624,7 +644,7 @@ export class Game {
     if (npc.item && !this.player.hasItem(npc.item.id)) {
       if (this.player.collectItem(npc.item)) {
         this.ui.showItemToast(npc.item);
-        this.ui.renderInventory(this.player.inventory);
+        this.ui.renderInventory(this.player.inventory, (id) => this._useItem(id));
         this.music.sfxCollect?.();
         // Unlock next era if this is the gate item
         const era = ERAS[this._eraId];

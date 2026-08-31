@@ -11,24 +11,24 @@ export const WORLD_ROWS  = 4;    // screens down
 
 // ── Enemy definitions ────────────────────────────────────
 export const ENEMY_DEFS = {
-  tax_collector:   { name:'Tax Collector',   emoji:'💰', color:'#8a6020', accent:'#c09030', hp:4, speed:55, damage:20, chaseRange:190 },
+  tax_collector:   { name:'Tax Collector',   emoji:'💰', color:'#8a6020', accent:'#c09030', hp:4, speed:55, damage:20, chaseRange:190, peaceful:true,  steal:15 },
   plague_rat:      { name:'Plague Rat',      emoji:'🐀', color:'#3a3020', accent:'#607020', hp:2, speed:90, damage:12, chaseRange:150 },
   inquisitor:      { name:'Inquisitor',      emoji:'⛪', color:'#1a1040', accent:'#4030a0', hp:6, speed:45, damage:25, chaseRange:220 },
   spanish_soldier: { name:'Spanish Soldier', emoji:'⚔️', color:'#7a1010', accent:'#c02020', hp:5, speed:60, damage:22, chaseRange:190 },
-  pickpocket:      { name:'Pickpocket',      emoji:'🤏', color:'#404040', accent:'#808080', hp:2, speed:100,damage:8,  chaseRange:160 },
-  debt_collector:  { name:'Debt Collector',  emoji:'📜', color:'#503010', accent:'#806020', hp:3, speed:50, damage:15, chaseRange:170 },
+  pickpocket:      { name:'Pickpocket',      emoji:'🤏', color:'#404040', accent:'#808080', hp:2, speed:100,damage:8,  chaseRange:160, peaceful:true,  steal:8  },
+  debt_collector:  { name:'Debt Collector',  emoji:'📜', color:'#503010', accent:'#806020', hp:3, speed:50, damage:15, chaseRange:170, peaceful:true,  steal:12 },
   fr_conscript:    { name:'French Conscript',emoji:'🪖', color:'#2a3a6a', accent:'#4a6aaa', hp:4, speed:65, damage:20, chaseRange:190 },
   deserter:        { name:'Deserter',        emoji:'🏃', color:'#5a5020', accent:'#8a8040', hp:3, speed:85, damage:18, chaseRange:170 },
   overseer:        { name:'Factory Overseer',emoji:'🏭', color:'#2a1a0a', accent:'#5a3a1a', hp:5, speed:55, damage:22, chaseRange:180 },
   steam_machine:   { name:'Steam Machine',   emoji:'⚙️', color:'#4a4040', accent:'#8a8080', hp:8, speed:40, damage:30, chaseRange:150 },
   storm_wave:      { name:'Storm Wave',      emoji:'🌊', color:'#1a3a5a', accent:'#2a6a9a', hp:3, speed:80, damage:25, chaseRange:200 },
   u_boat:          { name:'U-Boat Ghost',    emoji:'🛸', color:'#1a2a1a', accent:'#3a5a3a', hp:5, speed:50, damage:28, chaseRange:220 },
-  mccarthyist:     { name:'McCarthyist',     emoji:'🔍', color:'#2a2050', accent:'#5a4a90', hp:4, speed:55, damage:20, chaseRange:180 },
+  mccarthyist:     { name:'McCarthyist',     emoji:'🔍', color:'#2a2050', accent:'#5a4a90', hp:4, speed:55, damage:20, chaseRange:180, peaceful:true, steal:10 },
   tornado:         { name:'Tornado',         emoji:'🌪️', color:'#4a4a5a', accent:'#7a7a9a', hp:6, speed:70, damage:30, chaseRange:260 },
-  cold_war_spy:    { name:'Cold War Spy',    emoji:'🕵️', color:'#1a1a2a', accent:'#3a3a5a', hp:5, speed:65, damage:22, chaseRange:200 },
+  cold_war_spy:    { name:'Cold War Spy',    emoji:'🕵️', color:'#1a1a2a', accent:'#3a3a5a', hp:5, speed:65, damage:22, chaseRange:200, peaceful:true, steal:18 },
   computer_virus:  { name:'Computer Virus',  emoji:'💻', color:'#0a2a0a', accent:'#0a6a0a', hp:4, speed:75, damage:18, chaseRange:180 },
   virus_cloud:     { name:'Virus Cloud',     emoji:'🦠', color:'#1a0a2a', accent:'#4a1a6a', hp:5, speed:60, damage:25, chaseRange:220 },
-  misinfo_bot:     { name:'Misinfo Bot',     emoji:'📱', color:'#0a1a2a', accent:'#1a3a5a', hp:3, speed:70, damage:15, chaseRange:200 },
+  misinfo_bot:     { name:'Misinfo Bot',     emoji:'📱', color:'#0a1a2a', accent:'#1a3a5a', hp:3, speed:70, damage:15, chaseRange:200, peaceful:true, steal:5  },
 };
 
 // ── Era metadata ─────────────────────────────────────────

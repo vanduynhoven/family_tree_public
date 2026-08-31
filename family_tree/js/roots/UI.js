@@ -5,6 +5,7 @@
 import { drawMinimap } from './Renderer.js';
 import { ERAS } from './EraData.js';
 import { SCREEN_COLS, SCREEN_ROWS, WORLD_COLS, WORLD_ROWS } from './EraData.js';
+import { itemTooltip } from './Player.js';
 
 export class UI {
   constructor(game) {
@@ -174,7 +175,7 @@ export class UI {
     if (fishBtn) fishBtn.style.display = isFishable ? 'flex' : 'none';
   }
 
-  renderInventory(inventory) {
+  renderInventory(inventory, onUse) {
     const bar = document.getElementById('rt-inv');
     if (!bar) return;
     bar.innerHTML = '';
@@ -185,10 +186,79 @@ export class UI {
     inventory.forEach(item => {
       const slot = document.createElement('div');
       slot.className = 'rt-inv-slot';
-      slot.textContent = item.emoji || '📦';
-      slot.title = item.label;
+      slot.style.position = 'relative';
+      slot.style.cursor = 'pointer';
+
+      const emojiEl = document.createElement('span');
+      emojiEl.textContent = item.emoji || '📦';
+      emojiEl.style.fontSize = '20px';
+      slot.appendChild(emojiEl);
+
+      // Count badge
+      if ((item.count || 1) > 1) {
+        const badge = document.createElement('span');
+        badge.textContent = item.count;
+        badge.style.cssText = 'position:absolute;bottom:1px;right:2px;font-size:9px;font-weight:bold;color:#fff;background:rgba(0,0,0,0.6);border-radius:6px;padding:0 3px;line-height:12px;';
+        slot.appendChild(badge);
+      }
+
+      // Rich tooltip on hover
+      const tip = itemTooltip(item);
+      slot.addEventListener('mouseenter', (e) => this._showItemTip(e.currentTarget, tip));
+      slot.addEventListener('mouseleave', () => this._hideItemTip());
+      slot.addEventListener('touchstart', (e) => { e.preventDefault(); this._showItemTip(e.currentTarget, tip); }, { passive: false });
+      slot.addEventListener('touchend', () => setTimeout(() => this._hideItemTip(), 1800));
+
+      // Tap/click to use
+      slot.addEventListener('click', () => {
+        if (onUse) onUse(item.id);
+      });
+
       bar.appendChild(slot);
     });
+  }
+
+  _showItemTip(anchor, text) {
+    this._hideItemTip();
+    const tip = document.createElement('div');
+    tip.id = 'rt-item-tip';
+
+    // Parse the tooltip: "Label ×N\nDesc\n\n💡 Use"
+    const [header, ...rest] = text.split('\n');
+    const useIdx = rest.findLastIndex(l => l.startsWith('💡'));
+    const desc = rest.slice(0, useIdx < 0 ? rest.length : useIdx).filter(Boolean).join(' ');
+    const useLine = useIdx >= 0 ? rest[useIdx] : '';
+
+    tip.innerHTML = `
+      <div style="font-weight:bold;color:#f0e080;margin-bottom:4px">${header}</div>
+      ${desc ? `<div style="color:#d0d0b0;font-size:11px;line-height:1.4;margin-bottom:6px">${desc}</div>` : ''}
+      ${useLine ? `<div style="color:#80ff80;font-size:11px">${useLine}</div>` : ''}
+    `;
+    tip.style.cssText = `
+      position:fixed;z-index:9999;
+      background:rgba(20,16,10,0.96);
+      border:1px solid #806040;border-radius:6px;
+      padding:8px 10px;max-width:220px;
+      font-family:inherit;font-size:12px;
+      pointer-events:none;box-shadow:0 3px 12px rgba(0,0,0,0.7);
+    `;
+
+    document.body.appendChild(tip);
+
+    // Position above the anchor slot
+    const rect = anchor.getBoundingClientRect();
+    const tipW = 220;
+    let left = rect.left + rect.width / 2 - tipW / 2;
+    left = Math.max(4, Math.min(left, window.innerWidth - tipW - 4));
+    const top = rect.top - tip.offsetHeight - 8;
+    tip.style.left = left + 'px';
+    tip.style.top  = Math.max(4, top) + 'px';
+
+    this._itemTip = tip;
+  }
+
+  _hideItemTip() {
+    if (this._itemTip) { this._itemTip.remove(); this._itemTip = null; }
   }
 
   // ── Prompts ──────────────────────────────────────────

@@ -1,5 +1,7 @@
 // ═══════════════════════════════════════════════════════════
 //  Enemy — patrol/chase/attack AI with knockback & death anim
+//  Peaceful enemies steal gold on contact instead of fighting.
+//  Battle enemies continue attacking as long as the player is adjacent.
 // ═══════════════════════════════════════════════════════════
 import { Entity } from './Entity.js';
 import { TILE, drawEnemy } from './Renderer.js';
@@ -31,10 +33,17 @@ export class Enemy extends Entity {
     this.wanderDy     = 0;
     this.hurtTimer    = 0;
     this.deathTimer   = 0;
+    // Peaceful enemy state
+    this.peaceful     = !!def.peaceful;
+    this.stealAmt     = def.steal || 0;
+    this.stealCd      = 0;       // cooldown between steals
+    this.stealFlash   = 0;       // visual flash timer
   }
 
   takeDamage(amt, kdx = 0, kdy = 0) {
     if (this.hurtTimer > 0 || this.state === STATE.DEAD) return;
+    // Peaceful enemies become aggressive when attacked
+    if (this.peaceful) this.peaceful = false;
     this.hp -= amt;
     this.hurtTimer = 0.3;
     this.knockbackX = kdx * 130;
@@ -46,6 +55,10 @@ export class Enemy extends Entity {
     }
   }
 
+  /** Called by Game when the player chooses to keep attacking this enemy */
+  get isBattle()  { return !this.peaceful; }
+  get inAttackRange() { return this.state === STATE.ATTACK; }
+
   update(dt, world, game) {
     if (this.state === STATE.DEAD) {
       this.deathTimer -= dt;
@@ -55,6 +68,8 @@ export class Enemy extends Entity {
 
     if (this.hurtTimer > 0) this.hurtTimer -= dt;
     if (this.attackCd > 0)  this.attackCd  -= dt;
+    if (this.stealCd > 0)   this.stealCd   -= dt;
+    if (this.stealFlash > 0) this.stealFlash -= dt;
 
     // Apply knockback
     const kspeed = Math.hypot(this.knockbackX, this.knockbackY);
@@ -79,9 +94,39 @@ export class Enemy extends Entity {
       case STATE.CHASE:  this._moveToward(player, dt, world); break;
       case STATE.ATTACK:
         this.faceToward(player);
-        if (this.attackCd <= 0) { player.takeDamage(this.damage); this.attackCd = 1.2; }
+        if (this.attackCd <= 0) {
+          if (this.peaceful && this.stealCd <= 0) {
+            // Peaceful: steal gold/items instead of dealing HP damage
+            this._steal(player, game);
+            this.stealCd = 2.5;
+            this.attackCd = 2.5;
+          } else if (!this.peaceful) {
+            // Battle: deal damage — auto-continues each attackCd cycle
+            player.takeDamage(this.damage);
+            this.attackCd = 1.2;
+          }
+        }
         break;
     }
+  }
+
+  _steal(player, game) {
+    // Try to steal gold (represented as coin items) or just drain stamina
+    const goldItem = player.inventory.find(i => i.id === 'coin' || i.id === 'gold' || i.tags?.includes('coin'));
+    if (goldItem) {
+      const take = Math.min(goldItem.count || 1, this.stealAmt);
+      goldItem.count = (goldItem.count || 1) - take;
+      if (goldItem.count <= 0) {
+        player.inventory = player.inventory.filter(i => i !== goldItem);
+      }
+      game?.ui?.showToast(`💸 ${this.name} stole ${take} coins!`, '#ff8040');
+    } else {
+      // No coins — steal stamina as a softer penalty
+      player.drainStamina(this.stealAmt);
+      game?.ui?.showToast(`😰 ${this.name} drained your energy!`, '#ff8040');
+    }
+    this.stealFlash = 0.4;
+    game?.music?.sfxHurt?.();
   }
 
   _moveToward(target, dt, world) {
@@ -125,19 +170,34 @@ export class Enemy extends Entity {
     if (!this.alive && this.state !== STATE.DEAD) return;
     if (this.state === STATE.DEAD) ctx.globalAlpha = Math.max(0, this.deathTimer / 0.5);
     if (this.hurtTimer > 0 && Math.sin(frame * 25) > 0) ctx.globalAlpha = 0.2;
+    // Steal flash — gold tint on peaceful enemies stealing
+    if (this.stealFlash > 0 && Math.sin(frame * 30) > 0) {
+      ctx.globalAlpha = 0.7;
+    }
 
     drawEnemy(ctx, this.x - ox, this.y - oy, {
-      color: this.color, accent: this.accent, emoji: this.emoji, size: this.w,
+      color: this.peaceful ? '#c8a020' : this.color,  // gold tint for peaceful
+      accent: this.accent, emoji: this.emoji, size: this.w,
     });
 
-    // HP bar
-    if (this.hp < this.maxHp && this.hp > 0) {
+    // HP bar (battle enemies only)
+    if (!this.peaceful && this.hp < this.maxHp && this.hp > 0) {
       const bw = this.w * 0.9;
       const bx = this.x - ox + this.w * 0.05;
       const by = this.y - oy - 7;
       ctx.fillStyle = '#500'; ctx.fillRect(bx, by, bw, 4);
       ctx.fillStyle = '#f40'; ctx.fillRect(bx, by, bw * (this.hp / this.maxHp), 4);
     }
+
+    // Peaceful label (💰)
+    if (this.peaceful && this.state !== STATE.DEAD) {
+      ctx.globalAlpha = 0.9;
+      ctx.font = '11px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillStyle = '#ffd700';
+      ctx.fillText('💸', this.x - ox + this.w / 2, this.y - oy - 4);
+    }
+
     ctx.globalAlpha = 1;
   }
 }
