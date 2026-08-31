@@ -327,7 +327,7 @@ export class Game {
     // 5. Dropped item nearby? → pick up
     for (const drop of this.world.activeDrops) {
       if (this.player.distTo(drop) < TILE * 1.5) {
-        if (this.player.collectItem(drop.item)) {
+        if (!drop.decorOnly && this.player.collectItem(drop.item)) {
           this.ui.showItemToast(drop.item);
           this.ui.renderInventory(this.player.inventory, (id) => this._useItem(id));
           drop.alive = false;
@@ -588,9 +588,9 @@ export class Game {
 
     // 3. Dropped item?
     for (const drop of this.world.activeDrops) {
-      if (drop.alive && Math.hypot(drop.cx - wx, drop.cy - wy) < TILE * 1.0) {
+      if (drop.alive && !drop.decorOnly && Math.hypot(drop.cx - wx, drop.cy - wy) < TILE * 1.0) {
         this._navigateTo(drop.cx, drop.cy, () => {
-          if (this.player.collectItem(drop.item)) {
+          if (!drop.decorOnly && this.player.collectItem(drop.item)) {
             this.ui.showItemToast(drop.item);
             this.ui.renderInventory(this.player.inventory, (id) => this._useItem(id));
             drop.alive = false;

@@ -44,6 +44,13 @@ export const ITEM_INFO = {
   iron:         { desc: 'A piece of raw iron from an 1872 factory. Heavy and strong.',                              useLabel: 'Give to Marianus — he can use it!', special: 'npc_gift' },
   rope:         { desc: 'A coil of ship rope from the 1950 Atlantic crossing.',                                     useLabel: 'Use — restores +18 Stamina',  stamina: 18 },
   fish_ration:  { desc: 'A salted fish ration from the ship\'s stores. Not delicious but very filling.',            useLabel: 'Eat — restores +22 HP',     heal: 22 },
+  // ── Farm animal decorations (decorOnly — cannot be picked up) ───────────
+  decor_cow:     { desc: 'A dairy cow. Essential for milk, cheese, and butter on the farm.',     useLabel: 'Part of the scenery — cannot be picked up' },
+  decor_pig:     { desc: 'A farmyard pig. Every Brabant farm had several. Very useful animals.', useLabel: 'Part of the scenery — cannot be picked up' },
+  decor_sheep:   { desc: 'A woolly sheep. Sheep provided wool for clothing and milk for cheese.', useLabel: 'Part of the scenery — cannot be picked up' },
+  decor_chicken: { desc: 'A farmyard chicken. Eggs every morning for the whole family.',         useLabel: 'Part of the scenery — cannot be picked up' },
+  decor_goat:    { desc: 'A goat. Goats are hardy and survived on rough heathland.',             useLabel: 'Part of the scenery — cannot be picked up' },
+  decor_horse:   { desc: 'A workhorse. Horses pulled ploughs and carts before tractors existed.',useLabel: 'Part of the scenery — cannot be picked up' },
   // ── Fishing curiosities — each now has a real use ────────
   old_boot:    { desc: 'Someone\'s old boot from the bottom of a 1539 river. Very old. Very smelly.',
                  useLabel: 'Throw — stuns the nearest enemy for 3 seconds!',

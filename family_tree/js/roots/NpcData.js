@@ -1513,6 +1513,7 @@ export const CROP_ITEMS = [
 // Items guaranteed to appear on specific screens (Knoxley quest stones,
 // collectible curiosities). Format: { screenKey, r, c, item }
 // Each stone appears once in a different Era 0 screen quadrant.
+// decorOnly:true items are visual only — they cannot be picked up.
 export const STATIC_SCREEN_DROPS = [
   // Knoxley: deep_roots quest — ancient stones hidden in Era 0 screens
   { screenKey:'0_0_0', r:8, c:6,  item:{ id:'ancient_stone_1', label:'Ancient Stone I',   emoji:'🪨' } },
@@ -1529,4 +1530,33 @@ export const STATIC_SCREEN_DROPS = [
   { screenKey:'6_3_0', r:6, c:7,  item:{ id:'retro_lure',   label:'Retro Lure',      emoji:'🎣' } },
   { screenKey:'7_2_1', r:9, c:10, item:{ id:'smart_buoy',   label:'Smart Buoy',      emoji:'📡' } },
   { screenKey:'8_2_3', r:8, c:6,  item:{ id:'old_coin',     label:'Old Dutch Coin',  emoji:'🪙' }, location:'haarlem' },
+
+  // ── Era 0 · 1539 Brabant — farm animals ─────────────────────────────────
+  { screenKey:'0_1_2', r:9,  c:14, item:{ id:'decor_cow',    label:'Cow',      emoji:'🐄', decorOnly:true } },
+  { screenKey:'0_1_2', r:10, c:13, item:{ id:'decor_sheep',  label:'Sheep',    emoji:'🐑', decorOnly:true } },
+  { screenKey:'0_1_3', r:7,  c:13, item:{ id:'decor_goat',   label:'Goat',     emoji:'🐐', decorOnly:true } },
+  { screenKey:'0_1_3', r:8,  c:15, item:{ id:'decor_chicken',label:'Chicken',  emoji:'🐔', decorOnly:true } },
+  { screenKey:'0_2_1', r:6,  c:6,  item:{ id:'decor_pig',    label:'Pig',      emoji:'🐖', decorOnly:true } },
+  { screenKey:'0_2_1', r:7,  c:7,  item:{ id:'decor_chicken',label:'Chicken',  emoji:'🐔', decorOnly:true } },
+
+  // ── Era 3 · 1872 Noord-Brabant — potato fields + farm animals ───────────
+  { screenKey:'3_2_3', r:5,  c:4,  item:{ id:'potato',       label:'Potato',   emoji:'🥔' } },  // harvestable
+  { screenKey:'3_2_3', r:6,  c:7,  item:{ id:'potato',       label:'Potato',   emoji:'🥔' } },
+  { screenKey:'3_1_2', r:5,  c:4,  item:{ id:'potato',       label:'Potato',   emoji:'🥔' } },  // farm screen
+  { screenKey:'3_1_2', r:6,  c:8,  item:{ id:'decor_cow',    label:'Cow',      emoji:'🐄', decorOnly:true } },
+  { screenKey:'3_1_2', r:7,  c:8,  item:{ id:'decor_pig',    label:'Pig',      emoji:'🐖', decorOnly:true } },
+  { screenKey:'3_2_1', r:9,  c:13, item:{ id:'decor_horse',  label:'Workhorse',emoji:'🐎', decorOnly:true } },
+  { screenKey:'3_2_1', r:10, c:14, item:{ id:'decor_cow',    label:'Cow',      emoji:'🐄', decorOnly:true } },
+  { screenKey:'3_1_3', r:7,  c:5,  item:{ id:'decor_sheep',  label:'Sheep',    emoji:'🐑', decorOnly:true } },
+  { screenKey:'3_1_3', r:8,  c:6,  item:{ id:'decor_sheep',  label:'Sheep',    emoji:'🐑', decorOnly:true } },
+
+  // ── Era 5 · 1955 Minnesota — corn + farm animals ─────────────────────────
+  { screenKey:'5_1_1', r:7,  c:6,  item:{ id:'corn',         label:'Corn',     emoji:'🌽' } },  // harvestable
+  { screenKey:'5_1_1', r:8,  c:6,  item:{ id:'decor_cow',    label:'Dairy Cow',emoji:'🐄', decorOnly:true } },
+  { screenKey:'5_1_1', r:9,  c:6,  item:{ id:'decor_cow',    label:'Dairy Cow',emoji:'🐄', decorOnly:true } },
+  { screenKey:'5_1_2', r:6,  c:13, item:{ id:'decor_horse',  label:'Horse',    emoji:'🐎', decorOnly:true } },
+  { screenKey:'5_1_2', r:7,  c:14, item:{ id:'decor_pig',    label:'Pig',      emoji:'🐖', decorOnly:true } },
+  { screenKey:'5_1_2', r:8,  c:13, item:{ id:'decor_chicken',label:'Chicken',  emoji:'🐔', decorOnly:true } },
+  { screenKey:'5_0_0', r:8,  c:7,  item:{ id:'decor_sheep',  label:'Sheep',    emoji:'🐑', decorOnly:true } },
+  { screenKey:'5_0_0', r:9,  c:8,  item:{ id:'decor_sheep',  label:'Sheep',    emoji:'🐑', decorOnly:true } },
 ];

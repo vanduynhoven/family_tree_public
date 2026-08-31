@@ -111,20 +111,81 @@ export class Enemy extends Entity {
   }
 
   _steal(player, game) {
-    // Try to steal gold (represented as coin items) or just drain stamina
-    const goldItem = player.inventory.find(i => i.id === 'coin' || i.id === 'gold' || i.tags?.includes('coin'));
-    if (goldItem) {
-      const take = Math.min(goldItem.count || 1, this.stealAmt);
-      goldItem.count = (goldItem.count || 1) - take;
-      if (goldItem.count <= 0) {
-        player.inventory = player.inventory.filter(i => i !== goldItem);
-      }
-      game?.ui?.showToast(`💸 ${this.name} stole ${take} coins!`, '#ff8040');
-    } else {
-      // No coins — steal stamina as a softer penalty
-      player.drainStamina(this.stealAmt);
-      game?.ui?.showToast(`😰 ${this.name} drained your energy!`, '#ff8040');
+    // Each peaceful enemy targets the items most relevant to their era and nature.
+    // If they can't find the preferred item they fall back to stamina drain.
+    const id = this.def?.id || '';
+
+    // Build priority steal list per enemy type
+    const stealTargets = {
+      tax_collector:  ['wheat', 'rye', 'potato', 'coin', 'franc', 'herb', 'corn'],
+      pickpocket:     null,  // null = take whatever is first in inventory
+      debt_collector: ['coin', 'franc', 'voc_coin', 'guilder', 'euro'],
+      mccarthyist:    ['usb_drive', 'cassette_tape', 'coin'],
+      cold_war_spy:   ['cassette_tape', 'usb_drive', 'floppy_disk', 'coin'],
+      misinfo_bot:    [],  // always drains stamina (attention/energy)
+    };
+
+    const targets = stealTargets[id];
+
+    // misinfo_bot always takes stamina — it steals your attention
+    if (id === 'misinfo_bot' || (targets && targets.length === 0)) {
+      player.drainStamina(this.stealAmt * 2);
+      game?.ui?.showToast(`📱 ${this.name} stole your attention! 😵‍💫`, '#ff8040');
+      this.stealFlash = 0.4;
+      game?.music?.sfxHurt?.();
+      game?.ui?.renderInventory(player.inventory, (itemId) => game._useItem(itemId));
+      return;
     }
+
+    // pickpocket: grab any item from inventory (first slot)
+    if (targets === null) {
+      const any = player.inventory.find(i => (i.count || 1) > 0 && !i.id.startsWith('decor_'));
+      if (any) {
+        const taken = any.label;
+        player.removeItem(any.id, 1);
+        game?.ui?.showToast(`🤏 ${this.name} swiped your ${taken}! Watch your pockets!`, '#ff8040');
+        this.stealFlash = 0.4;
+        game?.music?.sfxHurt?.();
+        game?.ui?.renderInventory(player.inventory, (itemId) => game._useItem(itemId));
+        return;
+      }
+      // Nothing to steal — drain stamina instead
+      player.drainStamina(this.stealAmt);
+      game?.ui?.showToast(`🤏 ${this.name} found nothing — but grabbed your energy anyway!`, '#ff8040');
+      this.stealFlash = 0.4;
+      game?.music?.sfxHurt?.();
+      return;
+    }
+
+    // Try to find and steal a priority item
+    for (const target of targets) {
+      const slot = player.inventory.find(i => i.id === target && (i.count || 1) > 0);
+      if (slot) {
+        const taken = slot.label;
+        player.removeItem(target, 1);
+        const msgs = {
+          tax_collector:  `💰 Tax Collector took your ${taken}! Pay your dues!`,
+          debt_collector: `📜 Debt Collector collected your ${taken}! Debt paid.`,
+          mccarthyist:    `🔍 McCarthyist confiscated your ${taken} as "evidence"!`,
+          cold_war_spy:   `🕵️ Cold War Spy stole your ${taken}! Top secret now.`,
+        };
+        game?.ui?.showToast(msgs[id] || `💸 ${this.name} took your ${taken}!`, '#ff8040');
+        this.stealFlash = 0.4;
+        game?.music?.sfxHurt?.();
+        game?.ui?.renderInventory(player.inventory, (itemId) => game._useItem(itemId));
+        return;
+      }
+    }
+
+    // Nothing relevant found — drain stamina as fallback
+    player.drainStamina(this.stealAmt);
+    const fallbackMsgs = {
+      tax_collector:  `💰 Tax Collector found no crops — drained your energy instead!`,
+      debt_collector: `📜 Debt Collector found no coins — took your stamina!`,
+      mccarthyist:    `🔍 McCarthyist found nothing suspicious — but tired you out!`,
+      cold_war_spy:   `🕵️ Cold War Spy found nothing useful — but left you exhausted!`,
+    };
+    game?.ui?.showToast(fallbackMsgs[id] || `😰 ${this.name} drained your energy!`, '#ff8040');
     this.stealFlash = 0.4;
     game?.music?.sfxHurt?.();
   }
