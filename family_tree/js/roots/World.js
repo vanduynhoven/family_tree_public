@@ -31,7 +31,7 @@ export class World {
   get activeNPCs()   { return this._npcs.filter(n => n.alive); }
   get activeEnemies(){ return this._enemies.filter(e => e.alive); }
   get activeDrops()  { return this._drops.filter(d => d.alive); }
-  get activeLivestock() { return this._livestock || []; }
+  get activeLivestock() { return (this._livestock || []).filter(l => l.alive !== false); }
 
   // ── Load an era ────────────────────────────────────────
 

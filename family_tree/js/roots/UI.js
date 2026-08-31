@@ -200,8 +200,9 @@ export class UI {
   renderKeyItems(keyItems) {
     const bar = document.getElementById('rt-artifacts');
     if (!bar) return;
-    if (!keyItems?.length) { bar.style.display = 'none'; return; }
+    if (!keyItems?.length) { bar.style.display = 'none'; document.body.classList.remove('has-artifacts'); return; }
     bar.style.display = 'flex';
+    document.body.classList.add('has-artifacts');
     bar.innerHTML = '<span style="font-size:9px;color:#c9820a;margin-right:4px;align-self:center">📜</span>';
     keyItems.forEach(item => {
       const slot = document.createElement('div');

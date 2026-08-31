@@ -101,6 +101,11 @@ export const NPC_DATA = {
           'Tend the fields until noon. Eat bread and cheese under the oak. Work until dark.',
           'That is every day. A good life. Take the Family Seal — it will open doors ahead.',
         ],
+        traveller: [
+          'A traveller, are you? Welcome to Aarle-Rixtel.',
+          'Not family, but curious about us? I respect that.',
+          'Take the Family Seal — even a traveller can carry our story forward.',
+        ],
       },
     },
   ],
@@ -389,6 +394,11 @@ export const NPC_DATA = {
           'The factory in Veghel is new. Before that, only farming.',
           { dutch:'Wij werken van zonsopgang tot zonsondergang. [We work from sunrise to sunset.]', en:'Every day, every season.' },
           'But in the evening — family, food, and stories. That is what matters.',
+        ],
+        traveller: [
+          'A traveller! Welcome to Boekel, 1872.',
+          'You are not family, but you are curious about us. That is enough for me.',
+          'Here — take the train ticket. One day someone will use it to cross an ocean.',
         ],
       },
     },
@@ -1713,4 +1723,16 @@ export const STATIC_SCREEN_DROPS = [
   { screenKey:'5_1_2', r:8,  c:13, item:{ id:'decor_chicken',label:'Chicken',  emoji:'🐔', decorOnly:true } },
   { screenKey:'5_0_0', r:8,  c:7,  item:{ id:'decor_sheep',  label:'Sheep',    emoji:'🐑', decorOnly:true } },
   { screenKey:'5_0_0', r:9,  c:8,  item:{ id:'decor_sheep',  label:'Sheep',    emoji:'🐑', decorOnly:true } },
+
+  // ── Era 1 · 1660 Dutch Golden Age — Polder Farm + Fishermen's Wharf ───────
+  { screenKey:'1_3_2', r:7,  c:6,  item:{ id:'decor_cow',     label:'Cow',      emoji:'🐄', decorOnly:true } },
+  { screenKey:'1_3_2', r:8,  c:7,  item:{ id:'decor_sheep',   label:'Sheep',    emoji:'🐑', decorOnly:true } },
+  { screenKey:'1_3_2', r:9,  c:5,  item:{ id:'decor_chicken', label:'Chicken',  emoji:'🐔', decorOnly:true } },
+  { screenKey:'1_2_0', r:7,  c:8,  item:{ id:'decor_horse',   label:'Dray Horse',emoji:'🐎', decorOnly:true } },
+
+  // ── Era 2 · 1799 Napoleonic — farmland animals ────────────────────────────
+  { screenKey:'2_1_2', r:10, c:12, item:{ id:'decor_cow',     label:'Cow',      emoji:'🐄', decorOnly:true } },
+  { screenKey:'2_1_2', r:11, c:11, item:{ id:'decor_sheep',   label:'Sheep',    emoji:'🐑', decorOnly:true } },
+  { screenKey:'2_3_1', r:6,  c:6,  item:{ id:'decor_cow',     label:'Cow',      emoji:'🐄', decorOnly:true } },
+  { screenKey:'2_3_1', r:7,  c:5,  item:{ id:'decor_chicken', label:'Chicken',  emoji:'🐔', decorOnly:true } },
 ];

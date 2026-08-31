@@ -132,7 +132,7 @@ export class Player extends Entity {
     this.swingTimer     = 0;
     this.fishTimer      = 0;    // >0 = bobber in water
     this.fishDipped     = false;
-    this.fishWindowSecs = 0.7;
+    this.fishWindowSecs = 1.5;  // generous window for kids
     this.bobberX        = 0;
     this.bobberY        = 0;
     this.fishingBoostRare = false;  // old_lure / retro_lure active
