@@ -64,6 +64,9 @@ export class World {
     const screenKey = `${eraId}_${this.screenRow}_${this.screenCol}`;
     const npcsHere  = (npcData[screenKey] || []);
     npcsHere.forEach(d => {
+      // Skip NPCs whose location doesn't match current world location
+      // (e.g. Romijn/Liv are Haarlem-only and shouldn't appear in Mankato)
+      if (d.location && d.location !== (this._location || 'haarlem')) return;
       // Deduplicate: skip if a named NPC with this key already exists
       const npcKey = d.gedcomId || d.name;
       if (namedNpcKeys.has(npcKey)) return;

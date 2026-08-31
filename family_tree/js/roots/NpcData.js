@@ -977,6 +977,7 @@ export const NPC_DATA = {
       gedcomId: null,
       name: 'Romijn',
       given: 'Romijn',
+      location: 'haarlem',   // only spawns in Haarlem, not Mankato
       era: 8, spawnR: 7, spawnC: 12,
       bodyColor: '#c06040', hairColor: '#d4a020', skinColor: '#d8b890',
       schedule: [
@@ -1078,6 +1079,7 @@ export const NPC_DATA = {
       gedcomId: null,
       name: 'Liv',
       given: 'Liv',
+      location: 'haarlem',   // only spawns in Haarlem, not Mankato
       era: 8, spawnR: 8, spawnC: 11,
       bodyColor: '#e06080', hairColor: '#c03040', skinColor: '#d8c0a0',
       schedule: [

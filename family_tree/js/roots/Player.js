@@ -250,21 +250,25 @@ export class Player extends Entity {
     if (this.hurtTimer > 0) this.hurtTimer -= dt;
     if (this.swingTimer > 0) this.swingTimer -= dt;
 
-    // Stamina recharge when stationary
-    if (!keys.up && !keys.down && !keys.left && !keys.right) {
-      this.stamina = Math.min(this.maxStamina, this.stamina + dt * 8);
+    // ── Stamina ───────────────────────────────────────────
+    // Drains while walking (3/sec), recharges when resting (12/sec).
+    // Low stamina slows movement so food items become genuinely useful.
+    const moving = keys.left || keys.right || keys.up || keys.down;
+    if (moving) {
+      this.stamina = Math.max(0, this.stamina - dt * 3);
+    } else {
+      this.stamina = Math.min(this.maxStamina, this.stamina + dt * 12);
     }
 
     // Fishing tick
     if (this.fishTimer > 0) {
       this.fishTimer -= dt;
-      // Random dip trigger in second half of wait
       if (!this.fishDipped && this.fishTimer < 2 && Math.random() < dt * 0.8) {
         this.fishDipped = true;
         setTimeout(() => { this.fishDipped = false; this.fishTimer = 0; this.pose = 'idle'; },
                    this.fishWindowSecs * 1000);
       }
-      return; // no movement while fishing
+      return;
     }
 
     // Movement
@@ -282,23 +286,28 @@ export class Player extends Entity {
 
     if (dx !== 0 || dy !== 0) this.walkCycle += dt * 9;
 
-    const spd = this.speed * dt;
+    // Speed scales with stamina:
+    //   > 30% stamina → full speed
+    //   0–30%         → 65–100% (gradual slowdown)
+    //   0%            → 40% (tired shuffle — still playable, but very slow)
+    const stPct = this.stamina / this.maxStamina;
+    const speedMult = stPct > 0.3 ? 1.0
+                    : stPct > 0   ? 0.65 + (stPct / 0.3) * 0.35
+                    : 0.4;
+    const spd = this.speed * speedMult * dt;
     const nx  = this.x + dx * spd;
     const ny  = this.y + dy * spd;
     const pad = 3;
 
     // ── Foot-based collision ──────────────────────────────
-    // Only the bottom ~35% of the sprite (where the feet are) checks for
-    // solid tiles. The head and torso can overlap tree canopies, roof tiles,
-    // and building tops — matching standard top-down RPG behaviour.
-    const footTop    = this.y + this.h * 0.65;  // top edge of foot hitbox
-    const footBottom = this.y + this.h - pad;   // bottom edge
+    const footTop    = this.y + this.h * 0.65;
+    const footBottom = this.y + this.h - pad;
 
     if (dx !== 0 &&
-        !world.solidAt(nx + pad,            footTop, this) &&
-        !world.solidAt(nx + this.w - pad,   footTop, this) &&
-        !world.solidAt(nx + pad,            footBottom, this) &&
-        !world.solidAt(nx + this.w - pad,   footBottom), this) {
+        !world.solidAt(nx + pad,          footTop,    this) &&
+        !world.solidAt(nx + this.w - pad, footTop,    this) &&
+        !world.solidAt(nx + pad,          footBottom, this) &&
+        !world.solidAt(nx + this.w - pad, footBottom, this)) {
       this.x = nx;
     }
 
@@ -306,10 +315,10 @@ export class Player extends Entity {
     const newFootBottom = ny + this.h - pad;
 
     if (dy !== 0 &&
-        !world.solidAt(this.x + pad,          newFootTop, this) &&
-        !world.solidAt(this.x + this.w - pad, newFootTop, this) &&
+        !world.solidAt(this.x + pad,          newFootTop,    this) &&
+        !world.solidAt(this.x + this.w - pad, newFootTop,    this) &&
         !world.solidAt(this.x + pad,          newFootBottom, this) &&
-        !world.solidAt(this.x + this.w - pad, newFootBottom), this) {
+        !world.solidAt(this.x + this.w - pad, newFootBottom, this)) {
       this.y = ny;
     }
   }

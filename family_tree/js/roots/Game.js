@@ -91,10 +91,6 @@ export class Game {
       if (savedData.eraVisitCount) {
         this._eraVisitCount = { ...savedData.eraVisitCount };
       }
-      // Restore Dutch vocabulary (Raven's language quest)
-      if (savedData.dutchWords) {
-        this.player.dutchWords = savedData.dutchWords;
-      }
     } else {
       // ── NEW GAME: reset all state ───────────────────
       this._npcFriendship = new Map();
@@ -114,6 +110,8 @@ export class Game {
       this.player.collectedFacts = savedData.collectedFacts || [];
       this.player.hp             = savedData.playerHP      || 100;
       this.player.stamina        = savedData.playerStamina || 100;
+      // Dutch vocabulary (Raven's language quest) — restored here, after player exists
+      if (savedData.dutchWords) this.player.dutchWords = savedData.dutchWords;
     }
 
     // Initialise quest manager
@@ -351,6 +349,7 @@ export class Game {
   _doAttack(enemy) {
     if (!enemy || this.player.swingTimer > 0) return;
     this.player.swingTimer = 0.25;
+    this.player.drainStamina(5);   // swinging costs energy
     this.player.faceToward(enemy);
     const hb = this.player.getSwingHitbox();
     for (const e of this.world.activeEnemies) {

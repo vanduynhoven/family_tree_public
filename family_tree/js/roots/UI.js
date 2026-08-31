@@ -163,7 +163,15 @@ export class UI {
   updateHUD(eraId, hp, maxHp, stamina, maxStamina, storiesCount, totalNpcs, isFishable, screenTitle) {
     const hpHearts = Math.ceil(hp / 20);
     document.getElementById('rt-hp').textContent = '❤️'.repeat(Math.max(0,hpHearts)) + (hp <= 0 ? ' 💀' : '');
-    document.getElementById('rt-stamina').textContent = `⚡ ${Math.floor(stamina)}`;
+    const stEl = document.getElementById('rt-stamina');
+    if (stEl) {
+      const stPct = stamina / maxStamina;
+      stEl.textContent = stPct > 0.3 ? `⚡ ${Math.floor(stamina)}` : stPct > 0 ? `😓 ${Math.floor(stamina)}` : `😴 0`;
+      stEl.style.color = stPct > 0.5 ? '#a0c8a0'
+                       : stPct > 0.3 ? '#d4c040'
+                       : stPct > 0   ? '#e08020'
+                       : '#e04040';
+    }
     const era = ERAS[eraId];
     document.getElementById('rt-era').textContent = era ? `⏰ ${era.year}` : '';
     // Screen title — strip the year prefix (e.g. "1539 · Church" → "Church")
