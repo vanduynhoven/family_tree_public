@@ -142,6 +142,11 @@ export const NPC_DATA = {
           'Every hand has a job. The fields feed the family. The family keeps the fields.',
           'Find Dirck — he has been at this longer than anyone.',
         ],
+      },
+    },
+  ],
+
+  // ── Era 1 · 1660 · Dutch Golden Age ──────────────────
 
   '1_1_1': [
     {
@@ -198,6 +203,9 @@ export const NPC_DATA = {
           'Sit a moment. The church is quiet at this hour.',
           'Life here is simple — prayer, work, family. The same as your time, I imagine.',
         ],
+      },
+    },
+  ],
 
   '2_1_1': [
     {
@@ -254,6 +262,9 @@ export const NPC_DATA = {
           'Conscription, taxes, French everywhere. But the family kept going.',
           'Here — take the birth record. Proof we were here.',
         ],
+      },
+    },
+  ],
 
   '3_2_1': [  // South fields — Marianus works here mornings
     {
@@ -593,6 +604,9 @@ export const NPC_DATA = {
           'Sunday afternoon: fishing. Monday to Saturday: work. That was the life.',
           { dutch:'Simpel maar goed. [Simple but good.]', en:'The walleye was excellent.' },
         ],
+      },
+    },
+  ],
 
   '6_1_1': [
     {
@@ -656,6 +670,8 @@ export const NPC_DATA = {
       era: 5, spawnR: 8, spawnC: 8,
       bodyColor: '#5a4830', hairColor: '#2a1808', skinColor: '#c89050',
       lines: {
+        // Peter John came to America as a child — he speaks English, not Dutch.
+        // He knows a few Dutch words his parents used at home, but does not use them himself.
         generic: [
           'Peter John van Duynhoven — that\'s me. We came over from the Netherlands in 1950.',
           'My parents Johan and Anna brought us on a ship called the Queen Elizabeth. Ten days at sea.',
@@ -670,11 +686,11 @@ export const NPC_DATA = {
         heart2: [
           'I keep a photo of Boekel on the kitchen wall. The village where my father was born.',
           'He told me: never forget where you come from.',
-          { dutch:'Vergeet niet waar je vandaan komt. [Never forget where you come from.]', en:'I never have.' },
+          'My father always said that — in Dutch of course. I understood it even if I couldn\'t say it back.',
         ],
         // ── Grandchild-specific dialog ──
         charlotte: [
-          { dutch:'Charlotte! Mijn kleinkind! [Charlotte! My grandchild!]', en:'You came all this way to find me!' },
+          'Charlotte! My grandchild! You came all this way to find me!',
           'Your father Charles — he is a good boy. Very proud of this family.',
           'Now you are learning our history too. That makes me so happy.',
           'Every ancestor you find is a gift. Keep going.',
@@ -705,16 +721,100 @@ export const NPC_DATA = {
           'Simple life. Good life. Everything we needed right here.',
         ],
         raven: [
-          { dutch:'Raven! Mijn achterkleinkind! [Raven! My great-grandchild!]', en:'' },
+          'Raven! My great-grandchild! You came all the way back to find me!',
           'You are Arthur\'s daughter — I can see it in your eyes.',
           'You were born in Haarlem — the country we left in 1950! The family came full circle.',
-          'I am so proud of you for learning where we all came from.',
+          'I am so proud of you. Go find all of us. We are all waiting for you.',
         ],
         starling: [
-          { dutch:'Starling! Wat een mooie naam. [Starling! What a beautiful name.]', en:'' },
-          'You are Arthur\'s youngest. You were born in Haarlem, just like your great-great-grandparents were Dutch.',
-          'The family went to America and came back. That is something remarkable.',
-          'Go find all of us. We are all waiting for you.',
+          'Starling! What a beautiful name. You must be Arthur\'s youngest.',
+          'Your father told me — you were born in Haarlem, back in the old country!',
+          'The family went to America and then came back. That is something remarkable.',
+          'My father Johan would not believe it. Go find him — he\'s on the ship at Era 4.',
+        ],
+      },
+    },
+    // ── Carolyn — Peter John's sister, learning Dutch ──
+    // Born American after Johan and Anna emigrated. Growing up in Minnesota.
+    // She never learned Dutch at home but has been practicing basic phrases on her own.
+    {
+      gedcomId: '@I101@',
+      name: 'Carolyn Kay van Duynhoven',
+      given: 'Carolyn',
+      era: 5, spawnR: 6, spawnC: 11,
+      bodyColor: '#a04060', hairColor: '#6a2010', skinColor: '#d8b080',
+      lines: {
+        generic: [
+          'Hi! I\'m Carolyn — Peter John\'s sister. We all grew up here in Moorhead.',
+          'Mom and Dad spoke Dutch sometimes at home, but we kids never really learned it.',
+          'I\'ve been trying to pick up a few words though. It feels important, you know?',
+          'I keep a little notebook. I write down the Dutch words I learn.',
+        ],
+        repeat1: [
+          'Oh, you\'re back! I just learned a new word today.',
+          'My brother Peter John says I\'ll never be fluent. But I don\'t care — even a few words matter.',
+          'Our parents would be so happy knowing someone still cares about the language.',
+        ],
+        heart2: [
+          'Can I try something? I\'ve been practicing.',
+          { dutch:'Goedemorgen! [Good morning!]', en:'Ha! I did it! Was that right?' },
+          'I\'ve also been learning the numbers. Een, twee, drie — that\'s one, two, three!',
+          'Mom used to count things in Dutch when she thought we weren\'t listening.',
+        ],
+        // ── Raven-specific: Carolyn is amazed and wants to practice with her ──
+        raven: [
+          { dutch:'Oh! Jij spreekt echt Nederlands! [Oh! You actually speak real Dutch!]', en:'' },
+          'Wait — was that right? Did I say it right?',
+          'You really speak it! Can you teach me something? A real sentence?',
+          { dutch:'Ik oefen elke dag. Is dat goed? [I practice every day. Is that good?]', en:'Please say yes!' },
+        ],
+        raven_repeat1: [
+          'You came back! Okay — I have been practicing.',
+          { dutch:'Ik heet Carolyn. Hoe heet jij? [My name is Carolyn. What is your name?]', en:'Did I get it?' },
+          'My brother says the Dutch "g" sound is impossible for Americans. He\'s probably right.',
+          'But you — you grew up with it. That\'s amazing.',
+        ],
+        // ── Starling-specific: same excitement, slightly simpler ──
+        starling: [
+          { dutch:'Hallo! Goede... goede... dag? [Hello! Good... good... day?]', en:'Was that right?' },
+          'You actually speak Dutch! Like real Dutch! You grew up in Haarlem!',
+          'Oh I have so many questions. How do you say "family"? Is it "familie"?',
+          { dutch:'Familie! [Family!]', en:'I knew it! Mom used that word.' },
+        ],
+        starling_repeat1: [
+          'Starling! I learned a new one.',
+          { dutch:'Ik hou van mijn familie. [I love my family.]', en:'That\'s the one I wanted most.' },
+          'Mom used to whisper it to us when we were little. I finally know what it means.',
+        ],
+        charlotte: [
+          'Charlotte! Are you exploring the whole family history?',
+          'I\'m just learning a few Dutch words. Nothing like what your cousins know.',
+          'But even saying "goedemorgen" to myself in the morning makes me feel connected.',
+        ],
+        tenley: [
+          'Tenley! Come sit — I\'m writing in my Dutch notebook.',
+          'I just learned the word for grandmother — "oma." And grandfather — "opa."',
+          'Our grandparents in the Netherlands — I wish I could have talked to them.',
+        ],
+        knoxley: [
+          'Knoxley! Looking for the deep history? You should talk to Peter John.',
+          'I\'m still on "hello" and "thank you" in Dutch — I\'ll leave the research to you two.',
+          { dutch:'Dank je wel! [Thank you!]', en:'See? I\'m getting there!' },
+        ],
+        isabella: [
+          'Isabella! It\'s so good to meet cousins on the adventure.',
+          'I\'m the one in the family trying to learn Dutch — everyone else gave up.',
+          'Een, twee, drie — one, two, three. That\'s as far as I got today.',
+        ],
+        henry: [
+          'Henry! Did Peter John send you over?',
+          'I\'m practicing Dutch words. Mom and Dad spoke it — we kids never really learned.',
+          'I keep thinking if I learn enough, it\'s like having a conversation with them somehow.',
+        ],
+        maxwell: [
+          'Maxwell! Come listen — I learned a Dutch word for food today.',
+          { dutch:'Boterkoek! [Butter cake!]', en:'That\'s the easy one. Grandma\'s recipe.' },
+          'I can say all the food words. Now I just need the rest of the sentence.',
         ],
       },
     },
