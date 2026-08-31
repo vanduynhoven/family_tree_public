@@ -328,10 +328,10 @@ export class World {
     return { spent: true, r, c };
   }
 
-  /** Spawn a collectible DroppedItem at a tile position (used for 2-click farming + livestock) */
-  spawnDrop(item, r, c) {
-    const x = c * TILE + TILE * 0.25;
-    const y = r * TILE + TILE * 0.25;
+  /** Spawn a collectible DroppedItem. Pass r,c for tile position OR r=0,c=0,x,y for explicit coords */
+  spawnDrop(item, r, c, explicitX, explicitY) {
+    const x = explicitX ?? (c * TILE + TILE * 0.25);
+    const y = explicitY ?? (r * TILE + TILE * 0.25);
     this._drops.push(new DroppedItem({ ...item, decorOnly: false }, x, y, -1));
   }
 
@@ -422,7 +422,7 @@ export class World {
 
   // ── NPC proximity ──────────────────────────────────────
 
-  nearestNPC(player, maxDist = TILE * 1.6) {
+  nearestNPC(player, maxDist = TILE * 1.1) {
     let best = null, bestDist = maxDist;
     for (const npc of this.activeNPCs) {
       const d = player.distTo(npc);

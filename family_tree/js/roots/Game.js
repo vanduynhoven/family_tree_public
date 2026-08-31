@@ -319,23 +319,26 @@ export class Game {
     // 3. At portal? → open era select
     if (this.world.atPortal(this.player)) { this.ui.showEraSel(); return; }
 
-    // 4. Crop ready? → harvest (spawns item on ground — 2-click: harvest then pick up)
+    // 4. Crop ready? → harvest then pick up (2-click: swing to harvest, bend to pick up)
     const crop = this.world.atCrop(this.player);
     if (crop) {
       const cropItem = CROP_ITEMS.find(c => c.era === this._eraId);
       this.world.harvestCrop(crop.r, crop.c);
       this.player.drainStamina(1);
       if (cropItem) {
-        this.world.spawnDrop(cropItem, crop.r, crop.c);
-        this.ui.showToast(`🌾 Harvested! Pick up the ${cropItem.emoji} ${cropItem.label}`, '#a0e080');
-        this.music.sfxHit?.();
+        // Spawn slightly in front of the player so it's visibly on the ground
+        const offX = Math.cos({'left':-Math.PI,'right':0,'up':-Math.PI/2,'down':Math.PI/2}[this.player.facing]||0) * TILE * 0.6;
+        const offY = Math.sin({'left':-Math.PI,'right':0,'up':-Math.PI/2,'down':Math.PI/2}[this.player.facing]||0) * TILE * 0.6;
+        this.world.spawnDrop(cropItem, 0, 0, this.player.cx + offX - TILE*0.25, this.player.cy + offY - TILE*0.25);
+        this.ui.showToast(`${cropItem.emoji} Harvested ${cropItem.label}! Walk over to pick it up.`, '#a0e080');
+        this.music.sfxCollect?.();
       }
       return;
     }
 
     // 5. Dropped item nearby? → pick up
     for (const drop of this.world.activeDrops) {
-      if (this.player.distTo(drop) < TILE * 1.5) {
+      if (this.player.distTo(drop) < TILE * 1.8) {
         // Decor animal: first click harvests (transforms to meat drop)
         if (drop.decorOnly && drop.item.id.startsWith('decor_')) {
           const meatMap = {
@@ -361,6 +364,8 @@ export class Game {
           drop.alive = false;
           this.events.emit('item_collected', { itemId: drop.item.id });
           this.music.sfxCollect?.();
+        } else if (!drop.decorOnly) {
+          this.ui.showToast(`Inventory full! Drop something to pick up ${drop.item.emoji} ${drop.item.label}.`, '#e08020');
         }
         return;
       }
@@ -428,7 +433,7 @@ export class Game {
     if (result.special === 'npc_gift') {
       // Coin/gift items: boost friendship with nearest NPC
       const npc = this.world.nearestNPC(this.player);
-      if (npc && this.player.distTo(npc) < TILE * 3) {
+      if (npc && this.player.distTo(npc) < TILE * 1.5) {
         npc.addFriendship(2);
         const npcKey2 = npc.gedcomId || npc.name;
         this._npcFriendship.set(npcKey2, npc.friendship);
