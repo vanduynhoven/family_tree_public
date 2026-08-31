@@ -378,12 +378,114 @@ export const NPC_DATA = {
           { dutch:'Een naam is maar een naam. [A name is just a name.]', en:'The family is what counts.' },
         ],
         charlotte: [
-          'Charlotte — you are asking about the name, I can tell.',
-          'I have a copy of the courthouse record somewhere. The clerk simplified it. It just happened.',
-          'Here — I will give you that record. Take it back to your branch of the family.',
+          'Charlotte — my girl! You came all the way back to find me.',
+          'I\'ve been thinking about the family name too. Let me tell you what really happened.',
+          'The clerk simplified it when we moved to Wisconsin. Just like that — a piece of history changed.',
+          'Here — I will give you the courthouse record. Take it back to your branch of the family.',
+        ],
+        tenley: [
+          'Tenley! You\'re asking about the women of the family, I can tell.',
+          'Your grandmother Mary Campbell — she held this whole family together. Start with her.',
+          'And don\'t forget Grandpa Peter John. He\'s the one who brought us all together.',
+        ],
+        knoxley: [
+          'Knoxley — always digging deeper! That\'s my kid.',
+          'You want to know how far back it goes? Your grandfather Peter John knew the whole story.',
+          'Go to Era 5 — find Grandpa. He has answers that go all the way back to 1539.',
+        ],
+        // Generic parent for non-Chuck children
+        isabella: [
+          'Isabella! Your dad is William — my brother. So I\'m your uncle Chuck.',
+          'The whole family gets the same story — we came from the Netherlands in 1950.',
+          'Find your grandfather Peter John. He was there when it all began in America.',
+        ],
+        henry: [
+          'Henry! Looking to meet everyone? That\'s the spirit.',
+          'Your grandfather Peter John is the key to it all. Era 5, Minnesota.',
+          'He can tell you more than anyone alive about this family.',
+        ],
+        maxwell: [
+          'Maxwell! You want to know what daily life was really like.',
+          'Your grandfather Peter John lived it. Farm in Minnesota, church every Sunday.',
+          'Find him in Era 5. He\'ll tell you exactly what it was like.',
         ],
       },
       item: { id:'courthouse_record', label:'Courthouse Record', emoji:'🗂️' },
+    },
+  ],
+
+  // ── Era 5 · 1955 — Peter John (grandfather of ALL US Gen-7) ──────────────
+  // Peter John @I023@ is the grandparent of Charlotte, Tenley, Knoxley,
+  // Isabella, Henry, Maxwell — and great-grandfather of Raven and Starling
+  '5_2_2': [
+    {
+      gedcomId: '@I023@',
+      name: 'Peter John van Duynhoven',
+      given: 'Peter John',
+      era: 5, spawnR: 8, spawnC: 8,
+      bodyColor: '#5a4830', hairColor: '#2a1808', skinColor: '#c89050',
+      lines: {
+        generic: [
+          'Peter John van Duynhoven — that\'s me. We came over from the Netherlands in 1950.',
+          'My parents Johan and Anna brought us on a ship called the Queen Elizabeth. Ten days at sea.',
+          'Minnesota is our home now. Good Dutch Catholic community here. Hard workers, all of us.',
+          'The family farm is east of Moorhead. Come visit — I\'ll show you how we do things here.',
+        ],
+        repeat1: [
+          'The corn is doing well this year. God is good to us.',
+          'I miss the Netherlands sometimes. The cheese especially.',
+          'But my children are growing up American. That\'s what we came here for.',
+        ],
+        heart2: [
+          'I keep a photo of Boekel on the kitchen wall. The village where my father was born.',
+          'He told me: never forget where you come from.',
+          { dutch:'Vergeet niet waar je vandaan komt. [Never forget where you come from.]', en:'I never have.' },
+        ],
+        // ── Grandchild-specific dialog ──
+        charlotte: [
+          { dutch:'Charlotte! Mijn kleinkind! [Charlotte! My grandchild!]', en:'You came all this way to find me!' },
+          'Your father Charles — he is a good boy. Very proud of this family.',
+          'Now you are learning our history too. That makes me so happy.',
+          'Every ancestor you find is a gift. Keep going.',
+        ],
+        tenley: [
+          'Tenley! My granddaughter — come here!',
+          'You want to know about the women of this family? Your grandmother Mary Campbell is the one to find.',
+          'She is the strongest woman I know. Ask her everything.',
+        ],
+        knoxley: [
+          'Knoxley! You have your grandfather\'s curiosity. I like that.',
+          'You want the deepest roots? Go find Johan — my father — at Era 4. On the ship.',
+          'And then find Marianus — his father — at Era 3. The answers go all the way back.',
+        ],
+        isabella: [
+          'Isabella! My granddaughter from William\'s family.',
+          'Your father William is so much like me. Quiet, steady, always there.',
+          'You are here to learn our story. I will tell you everything I know.',
+        ],
+        henry: [
+          'Henry! You\'ve been talking to everyone, haven\'t you!',
+          'That\'s the spirit — meet them all. That\'s what this family deserves.',
+          'When you finish, come back and tell me who was the most interesting.',
+        ],
+        maxwell: [
+          'Maxwell! You want to know what daily life was like.',
+          'I will tell you exactly. Wake at five. Milk the cows. Church on Sunday. Family dinner.',
+          'Simple life. Good life. Everything we needed right here.',
+        ],
+        raven: [
+          { dutch:'Raven! Mijn achterkleinkind! [Raven! My great-grandchild!]', en:'' },
+          'You are Arthur\'s daughter — I can see it in your eyes.',
+          'You were born in Haarlem — the country we left in 1950! The family came full circle.',
+          'I am so proud of you for learning where we all came from.',
+        ],
+        starling: [
+          { dutch:'Starling! Wat een mooie naam. [Starling! What a beautiful name.]', en:'' },
+          'You are Arthur\'s youngest. You were born in Haarlem, just like your great-great-grandparents were Dutch.',
+          'The family went to America and came back. That is something remarkable.',
+          'Go find all of us. We are all waiting for you.',
+        ],
+      },
     },
   ],
 
@@ -423,6 +525,50 @@ export const NPC_DATA = {
           'You\'ve met Dirck in 1539 and you\'re here now in 2020. How does it feel?',
           'This is what I was trying to do with the website. Make all of them real.',
           { dutch:'De familie is nooit echt weg. [The family is never really gone.]', en:'' },
+        ],
+        // ── Special dialog when a child/grandchild is playing ──
+        raven: [
+          { dutch:'Raven, mijn kleine tijdreiziger! [Raven, my little time traveller!]', en:'' },
+          'I am so proud of you for going back to find all these ancestors.',
+          'You were born right here in Haarlem, just like I came back to. This city is in our blood.',
+          'Remember — every ancestor you meet is a part of who you are.',
+        ],
+        starling: [
+          { dutch:'Starling! Mijn avonturierster! [Starling! My little adventurer!]', en:'' },
+          'You are exploring the family tree — I always knew you would love this.',
+          'You were born in Haarlem, same city where our family came back to after 500 years.',
+          'Go find them all. Every one of those ancestors has a story just for you.',
+        ],
+        charlotte: [
+          'Charlotte! Good to see you on this adventure.',
+          'Your grandfather Peter John would have loved to see you here.',
+          'He was the one who held all the family memories together.',
+        ],
+        tenley: [
+          'Tenley! You came to meet the ancestors too.',
+          'Your grandfather Peter John — he knew every family story. Ask about him.',
+          'The women of this family kept everything going. You\'ll find that out.',
+        ],
+        knoxley: [
+          'Knoxley — always looking for the deepest roots!',
+          'Your grandfather Peter John had the same curiosity. He would be so proud.',
+          'There is more history here than any of us could ever imagine.',
+        ],
+        isabella: [
+          'Isabella! Welcome to the family history adventure.',
+          'Your grandfather Peter John started putting these stories together.',
+          'Find him — he has things to tell you that nobody else knows.',
+        ],
+        henry: [
+          'Henry — you\'ve been talking to all of them, haven\'t you.',
+          'You\'ve met Dirck in 1539 and you\'re here now in 2020. How does it feel?',
+          'This is what I was trying to do with the website. Make all of them real.',
+          { dutch:'De familie is nooit echt weg. [The family is never really gone.]', en:'' },
+        ],
+        maxwell: [
+          'Maxwell! A day in their life — that\'s what you want to know.',
+          'Your grandfather Peter John lived that prairie Minnesota life.',
+          'He would sit you down and talk for hours about what it was really like.',
         ],
       },
     },
@@ -723,17 +869,29 @@ export const NPC_DATA = {
           'Coming back to the Netherlands — I wasn\'t just following my heart. I was following the tree.',
           'Dirck van Duinhoven was from a village forty kilometres from here. I can feel it.',
         ],
+        // ── Parent-specific dialog ──
+        raven: [
+          { dutch:'Raven! Mijn meisje! [Raven! My girl!]', en:'' },
+          'You found the journal! I knew you would be the one to go on this adventure.',
+          'You were born right here in Haarlem — and now you\'re going back 500 years to meet everyone.',
+          'I am so proud of you. Go find them all. Every single one.',
+        ],
+        starling: [
+          { dutch:'Starling! Mijn kleine avonturierster! [Starling! My little adventurer!]', en:'' },
+          'You found the family journal! That\'s my curious girl.',
+          'You were born here in Haarlem — the same city our family came back to after 500 years in America.',
+          'Every ancestor you meet is a part of you. Go find them!',
+        ],
       },
     },
   ],
 
-  // ── Era 8 · 2026 · Haarlem — Raven's best friend Romijn ──
-  // Romijn lives nearby on the Leidsevaart — same street, couple of doors down.
-  // She and Raven go to the same school and always cycle to the Grote Markt together.
+  // ── Era 6 · 1984 — Chuck (parent of Charlotte, Tenley, Knoxley) ──────────
+  // Already in 6_1_1 — adding parent dialog
 
-  // ── Era 8 · 2026 · Haarlem — Starling's best friend Liv ──
-  // Liv is a bit younger than Starling but they are inseparable.
-  // She lives two streets over and comes to play almost every day.
+  // ── Era 6 · Peter John and William — grandparents of ALL Gen-7 characters ──
+  // Peter John @I023@ is the grandfather connecting US and NL branches
+  // He appears at Era 5 (1955 Minnesota) but we add special dialog for grandchildren
 
 };
 

@@ -128,3 +128,19 @@ or from Arthur directly. `@I199@` left as `[First name unknown]`.
 - Prior in-repo research: `DEBORAH_GAIL_SEARCH.md`, `NEWS_MINNESOTA_VANDUYNHOVEN.md`
 
 *Prepared 2026-08-31.*
+
+## CONFIRMED BY ARTHUR VAN DUYNHOVEN (2026-08-31)
+
+### Wilhelmus x Deborah — Child confirmed
+- **Amanda (Fagen)** = daughter of Wilhelmus 'Willy' x Deborah Gail van Duynhoven ✅
+  - Added to GEDCOM as @I501@, child of @F052@
+  - Married surname: Fagen (husband first name unknown)
+  - Family @F174@ created for Amanda x Fagen
+
+### Anna Maria's husband (Swoboda)
+- **Nickname: 'Boda'** (not full first name — still unknown) ✅
+  - @I199@ note updated with nickname
+  - Best path: Minnesota Official Marriage System (moms.mn.gov)
+
+### Deborah Gail's maiden name
+- Still unknown — Arthur does not know it
