@@ -1152,7 +1152,8 @@ export class Game {
     const fishable  = this.world.isFishable(this.player);
 
     // Track portal discovery for minimap ★ marker
-    if (atPortal) {
+    // Mark as soon as the player enters any screen containing a portal
+    if (this.world.portalOnScreen()) {
       this.world.portalSet.add(`${this.world.screenRow},${this.world.screenCol}`);
     }
 
