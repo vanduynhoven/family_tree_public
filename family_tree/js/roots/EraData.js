@@ -151,16 +151,43 @@ function carvePathToExit(m, sr, sc, side, pos) {
   for (let r = minR; r <= maxR; r++) carve(r, tc);
 }
 
+/**
+ * Reinforce edges that have NO exit with a 2-tile-thick visual barrier.
+ * Outer row = T.CLIFF (stone-grey), inner row = T.WALL — makes it
+ * unambiguous that the player cannot go that direction.
+ * Called AFTER openEdge() so exit gaps are already carved.
+ */
+function sealClosedEdges(m, exits) {
+  const sides = ['up', 'down', 'left', 'right'];
+  for (const side of sides) {
+    if (exits[side]) continue;   // has an exit — leave the gap alone
+    if (side === 'up') {
+      for (let c = 0; c < W; c++) { m[0][c] = T.CLIFF; m[1][c] = T.WALL; }
+    } else if (side === 'down') {
+      for (let c = 0; c < W; c++) { m[H-1][c] = T.CLIFF; m[H-2][c] = T.WALL; }
+    } else if (side === 'left') {
+      for (let r = 0; r < H; r++) { m[r][0] = T.CLIFF; m[r][1] = T.WALL; }
+    } else if (side === 'right') {
+      for (let r = 0; r < H; r++) { m[r][W-1] = T.CLIFF; m[r][W-2] = T.WALL; }
+    }
+  }
+  // Corners always sealed — cliff at very corner, wall one step in
+  m[0][0] = T.CLIFF;   m[0][W-1] = T.CLIFF;
+  m[H-1][0] = T.CLIFF; m[H-1][W-1] = T.CLIFF;
+}
+
 function makeScreen(map, exits = {}, title = '', spawn = {r:7, c:10}) {
-  // 1. Open edge passages
+  // 1. Open edge passages where exits exist
   Object.entries(exits).forEach(([side, {pos}]) => openEdge(map, side, pos));
-  // 2. Clear spawn zone
+  // 2. Seal closed edges so dead-ends read as walls, not just decoration
+  sealClosedEdges(map, exits);
+  // 3. Clear spawn zone
   clearZone(map, spawn.r, spawn.c, 2);
-  // 3. Carve guaranteed paths from spawn to every exit
+  // 4. Carve guaranteed paths from spawn to every exit
   Object.entries(exits).forEach(([side, {pos}]) =>
     carvePathToExit(map, spawn.r, spawn.c, side, pos)
   );
-  // 4. Derive a representative minimap color from the screen title
+  // 5. Derive a representative minimap color from the screen title
   const color = _screenColor(title);
   return { map, exits, title, spawn, color };
 }

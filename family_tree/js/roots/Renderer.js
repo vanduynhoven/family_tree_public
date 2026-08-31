@@ -264,6 +264,7 @@ function _drawTile(ctx, tile, px, py, r, c, now) {
     case T.DEEP_WATER: _drawWaterShimmer(ctx, px, py, seed, now, true); break;
     case T.BRIDGE: _drawBridgePlanks(ctx, px, py); break;
     case T.WALL:   _drawWallTop(ctx, px, py); break;
+    case T.CLIFF:  _drawCliffFace(ctx, px, py); break;
     case T.DOOR:   _drawDoor(ctx, px, py); break;
   }
 }
@@ -506,6 +507,38 @@ function _drawWallTop(ctx, px, py) {
   const s=TILE;
   ctx.fillStyle='rgba(0,0,0,0.3)'; ctx.fillRect(px, py+s-5, s, 5);
   ctx.fillStyle='rgba(255,255,255,0.06)'; ctx.fillRect(px+2, py+2, s-4, 3);
+}
+
+/** Cliff face — dark stone wall drawn on closed map edges so dead-ends are unmistakable */
+function _drawCliffFace(ctx, px, py) {
+  const s = TILE;
+  // Dark stone base already rendered from sprite; add heavy shadow at bottom
+  ctx.fillStyle = 'rgba(0,0,0,0.45)';
+  ctx.fillRect(px, py + s * 0.65, s, s * 0.35);
+  // Horizontal mortar lines — evenly spaced
+  ctx.strokeStyle = 'rgba(0,0,0,0.35)';
+  ctx.lineWidth = 1.5;
+  for (let y = 0.22; y < 1; y += 0.22) {
+    ctx.beginPath();
+    ctx.moveTo(px, py + s * y);
+    ctx.lineTo(px + s, py + s * y);
+    ctx.stroke();
+  }
+  // Vertical mortar — staggered per row for brickwork feel
+  ctx.lineWidth = 1;
+  [0.25, 0.75].forEach(x => {
+    ctx.beginPath(); ctx.moveTo(px + s * x, py);
+    ctx.lineTo(px + s * x, py + s * 0.22); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(px + s * x, py + s * 0.22);
+    ctx.lineTo(px + s * x, py + s * 0.44); ctx.stroke();
+  });
+  [0.5].forEach(x => {
+    ctx.beginPath(); ctx.moveTo(px + s * x, py + s * 0.44);
+    ctx.lineTo(px + s * x, py + s * 0.66); ctx.stroke();
+  });
+  // Top highlight (light glancing off stone ledge)
+  ctx.fillStyle = 'rgba(255,255,255,0.10)';
+  ctx.fillRect(px, py, s, 4);
 }
 
 function _drawDoor(ctx, px, py) {
@@ -809,7 +842,7 @@ const _FALLBACK = {
   [T.ROAD]:'#a09070',[T.PLANK]:'#907040',[T.STEEL]:'#505868',
   [T.BRIDGE]:'#806030',[T.HOUSE_WALL]:'#d4b880',[T.HOUSE_ROOF]:'#8c3020',
   [T.DOOR]:'#5a2808',[T.PORTAL]:'#2060a0',[T.DEEP_WATER]:'#14305a',
-  [T.CLIFF]:'#504030',[T.PINE]:'#1a4a1a',[T.BRICK]:'#a85a38',
+  [T.CLIFF]:'#2a2218',[T.PINE]:'#1a4a1a',[T.BRICK]:'#a85a38',
   [T.DIRT]:'#907060',[T.CROP_READY]:'#5a9a3a',[T.CROP_SPENT]:'#7a6040',
   [T.SAND]:'#d4b870',[T.CIRCUIT]:'#0a1e10',
 };
