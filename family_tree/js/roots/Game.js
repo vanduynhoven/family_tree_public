@@ -104,14 +104,13 @@ export class Game {
     this.player = new Player(SCREEN_COLS/2 * TILE, (SCREEN_ROWS-3) * TILE, char.sprite);
     this.player.dutchWords = [];
 
-    // Restore player state from save (continue only)
-    if (mode === 'continue' && hasSave && savedData.inventory) {
-      this.player.inventory      = savedData.inventory;
-      this.player.collectedFacts = savedData.collectedFacts || [];
-      this.player.hp             = savedData.playerHP      || 100;
-      this.player.stamina        = savedData.playerStamina || 100;
-      // Dutch vocabulary (Raven's language quest) — restored here, after player exists
-      if (savedData.dutchWords) this.player.dutchWords = savedData.dutchWords;
+    // Restore player state from save (continue only) — each field guarded independently
+    if (mode === 'continue' && hasSave) {
+      if (savedData.inventory     !== undefined) this.player.inventory      = savedData.inventory;
+      if (savedData.collectedFacts !== undefined) this.player.collectedFacts = savedData.collectedFacts;
+      if (savedData.playerHP      !== undefined) this.player.hp             = savedData.playerHP;
+      if (savedData.playerStamina !== undefined) this.player.stamina        = savedData.playerStamina;
+      if (savedData.dutchWords    !== undefined) this.player.dutchWords     = savedData.dutchWords;
     }
 
     // Initialise quest manager
@@ -453,12 +452,17 @@ export class Game {
     const wx = canvasX + this.engine.cameraX;
     const wy = canvasY + this.engine.cameraY;
     const hoverDist = TILE * 1.2;
+    const actRange  = TILE * 1.8;  // hide tooltip when enemy is in act/attack range
     let found = null;
     for (const e of this.world.activeEnemies) {
-      if (e.alive && Math.hypot(e.cx - wx, e.cy - wy) < hoverDist) { found = e; break; }
+      if (!e.alive) continue;
+      if (Math.hypot(e.cx - wx, e.cy - wy) >= hoverDist) continue;
+      // Don't show tooltip if the player is close enough to act — it covers the enemy
+      if (this.player && this.player.distTo(e) < actRange) continue;
+      found = e;
+      break;
     }
     if (found) {
-      // Only redraw if it's a different enemy
       if (this._enemyTipTarget !== found) {
         this._enemyTipTarget = found;
         this._showEnemyTip(found, clientX, clientY);

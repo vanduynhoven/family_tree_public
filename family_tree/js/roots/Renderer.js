@@ -716,20 +716,387 @@ export function drawNPCPortrait(ctx, opts = {}) {
 
 // ── Enemy sprite ──────────────────────────────────────────
 export function drawEnemy(ctx, x, y, opts = {}) {
-  const { color='#a03020', accent='#c05040', emoji='👹', size=TILE*.65 } = opts;
+  const { color='#a03020', accent='#c05040', emoji='👹', size=TILE*.65, enemyId='' } = opts;
   const cx2=x+size/2, cy2=y+size*.5;
+
+  // Drop shadow
   ctx.fillStyle='rgba(0,0,0,0.22)';
   ctx.beginPath(); ctx.ellipse(cx2, y+size*.92, size*.36, size*.09, 0, 0, Math.PI*2); ctx.fill();
-  const bg=ctx.createRadialGradient(cx2-size*.12,cy2-size*.12,0,cx2,cy2,size*.5);
-  bg.addColorStop(0,accent); bg.addColorStop(1,color);
-  ctx.fillStyle=bg; ctx.beginPath(); ctx.arc(cx2,cy2,size*.42,0,Math.PI*2); ctx.fill();
-  ctx.strokeStyle=_darken(color,.4); ctx.lineWidth=1.5;
-  ctx.beginPath(); ctx.arc(cx2,cy2,size*.42,0,Math.PI*2); ctx.stroke();
-  ctx.font=`${Math.floor(size*.38)}px serif`;
-  ctx.textAlign='center'; ctx.textBaseline='middle';
-  ctx.fillText(emoji, cx2, cy2-size*.02);
-  ctx.textBaseline='alphabetic';
+
+  // Draw a distinct silhouette per enemy type
+  const drawFn = _ENEMY_SHAPES[enemyId];
+  if (drawFn) {
+    drawFn(ctx, cx2, cy2, size, color, accent, emoji);
+  } else {
+    // Fallback: generic circle
+    const bg=ctx.createRadialGradient(cx2-size*.12,cy2-size*.12,0,cx2,cy2,size*.5);
+    bg.addColorStop(0,accent); bg.addColorStop(1,color);
+    ctx.fillStyle=bg; ctx.beginPath(); ctx.arc(cx2,cy2,size*.42,0,Math.PI*2); ctx.fill();
+    ctx.strokeStyle=_darken(color,.4); ctx.lineWidth=1.5;
+    ctx.beginPath(); ctx.arc(cx2,cy2,size*.42,0,Math.PI*2); ctx.stroke();
+    ctx.font=`${Math.floor(size*.38)}px serif`;
+    ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.fillText(emoji, cx2, cy2-size*.02);
+    ctx.textBaseline='alphabetic';
+  }
 }
+
+// Helper: draw a filled + stroked shape
+function _eShape(ctx, color, accent, stroke, fn) {
+  const bg = ctx.createLinearGradient(0, 0, 0, 40);
+  bg.addColorStop(0, accent); bg.addColorStop(1, color);
+  ctx.fillStyle = bg; fn(); ctx.fill();
+  ctx.strokeStyle = stroke; ctx.lineWidth = 1.5; fn(); ctx.stroke();
+}
+
+// Per-enemy-type shape renderers: (ctx, cx, cy, size, color, accent, emoji)
+const _ENEMY_SHAPES = {
+  // ── Tax Collector: round portly merchant body + coin bag ──
+  tax_collector(ctx, cx, cy, s, col, acc, em) {
+    const r = s * 0.44;
+    // Fat round body
+    ctx.fillStyle = col; ctx.beginPath(); ctx.ellipse(cx, cy+s*.05, r, r*1.1, 0, 0, Math.PI*2); ctx.fill();
+    ctx.strokeStyle = _darken(col,.35); ctx.lineWidth=1.5; ctx.stroke();
+    // Merchant hat (flat top)
+    ctx.fillStyle = _darken(col,.3);
+    ctx.fillRect(cx-r*.55, cy-r*.9, r*1.1, r*.2);  // brim
+    ctx.fillRect(cx-r*.35, cy-r*1.35, r*.7, r*.45); // crown
+    // Coin bag emoji small
+    ctx.font = `${Math.floor(s*.32)}px serif`; ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.fillText('💰', cx, cy+s*.08); ctx.textBaseline='alphabetic';
+  },
+
+  // ── Plague Rat: elongated low body, pointed snout ──
+  plague_rat(ctx, cx, cy, s, col, acc, em) {
+    const r = s*.38;
+    // Body — elongated ellipse, tilted slightly
+    ctx.fillStyle = col;
+    ctx.beginPath(); ctx.ellipse(cx, cy, r*1.3, r*.65, Math.PI*0.1, 0, Math.PI*2); ctx.fill();
+    ctx.strokeStyle = _darken(col,.4); ctx.lineWidth=1.2; ctx.stroke();
+    // Pointed snout
+    ctx.fillStyle = _darken(col,.2);
+    ctx.beginPath(); ctx.moveTo(cx+r*1.1, cy-r*.1); ctx.lineTo(cx+r*1.5, cy+r*.1); ctx.lineTo(cx+r*1.0, cy+r*.3); ctx.closePath(); ctx.fill();
+    // Tail arc
+    ctx.strokeStyle = _darken(col,.3); ctx.lineWidth=2;
+    ctx.beginPath(); ctx.moveTo(cx-r*1.1, cy); ctx.quadraticCurveTo(cx-r*1.6, cy+r*.8, cx-r*1.2, cy+r*1.2); ctx.stroke();
+    // Eye
+    ctx.fillStyle='#ff2020'; ctx.beginPath(); ctx.arc(cx+r*.7, cy-r*.2, r*.15, 0, Math.PI*2); ctx.fill();
+  },
+
+  // ── Inquisitor: tall dark triangular robe ──
+  inquisitor(ctx, cx, cy, s, col, acc, em) {
+    const r = s*.42;
+    // Dark robe — tall triangle
+    ctx.fillStyle = col;
+    ctx.beginPath(); ctx.moveTo(cx, cy-r*1.1); ctx.lineTo(cx+r*.8, cy+r*.9); ctx.lineTo(cx-r*.8, cy+r*.9); ctx.closePath(); ctx.fill();
+    ctx.strokeStyle = _darken(col,.5); ctx.lineWidth=1.5; ctx.stroke();
+    // Cross symbol
+    ctx.strokeStyle = acc; ctx.lineWidth=2;
+    ctx.beginPath(); ctx.moveTo(cx, cy-r*.2); ctx.lineTo(cx, cy+r*.5); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(cx-r*.25, cy+r*.1); ctx.lineTo(cx+r*.25, cy+r*.1); ctx.stroke();
+    // Hood/face shadow
+    ctx.fillStyle = 'rgba(0,0,0,0.4)';
+    ctx.beginPath(); ctx.arc(cx, cy-r*.55, r*.3, 0, Math.PI*2); ctx.fill();
+  },
+
+  // ── Spanish Soldier: square armoured torso + helmet ──
+  spanish_soldier(ctx, cx, cy, s, col, acc, em) {
+    const r = s*.38;
+    // Armour body — square-ish
+    ctx.fillStyle = col;
+    ctx.beginPath(); ctx.roundRect(cx-r*.7, cy-r*.5, r*1.4, r*1.4, r*.12); ctx.fill();
+    ctx.strokeStyle = _darken(col,.4); ctx.lineWidth=1.5; ctx.stroke();
+    // Helmet
+    ctx.fillStyle = _darken(col,.25);
+    ctx.beginPath(); ctx.ellipse(cx, cy-r*.7, r*.5, r*.35, 0, 0, Math.PI*2); ctx.fill();
+    ctx.fillRect(cx-r*.55, cy-r*.58, r*1.1, r*.18); // visor brim
+    // Sword tip
+    ctx.strokeStyle = acc; ctx.lineWidth=2.5;
+    ctx.beginPath(); ctx.moveTo(cx+r*.8, cy); ctx.lineTo(cx+r*1.4, cy-r*.6); ctx.stroke();
+  },
+
+  // ── Pickpocket: small crouching figure ──
+  pickpocket(ctx, cx, cy, s, col, acc, em) {
+    const r = s*.35;
+    // Crouched body — short and wide
+    ctx.fillStyle = col;
+    ctx.beginPath(); ctx.ellipse(cx, cy+r*.2, r*.9, r*.7, 0, 0, Math.PI*2); ctx.fill();
+    ctx.strokeStyle = _darken(col,.4); ctx.lineWidth=1.2; ctx.stroke();
+    // Head — small, looking sideways
+    ctx.fillStyle = acc;
+    ctx.beginPath(); ctx.arc(cx+r*.4, cy-r*.5, r*.32, 0, Math.PI*2); ctx.fill();
+    ctx.strokeStyle = _darken(col,.3); ctx.lineWidth=1; ctx.stroke();
+    // Reaching hand
+    ctx.strokeStyle = acc; ctx.lineWidth=2;
+    ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(cx+r*1.1, cy-r*.1); ctx.stroke();
+    ctx.beginPath(); ctx.arc(cx+r*1.1, cy-r*.1, r*.15, 0, Math.PI*2); ctx.fill();
+  },
+
+  // ── Debt Collector: stooped figure holding scroll ──
+  debt_collector(ctx, cx, cy, s, col, acc, em) {
+    const r = s*.38;
+    ctx.fillStyle = col;
+    ctx.beginPath(); ctx.ellipse(cx-r*.1, cy+r*.1, r*.75, r*1.0, Math.PI*0.1, 0, Math.PI*2); ctx.fill();
+    ctx.strokeStyle = _darken(col,.4); ctx.lineWidth=1.4; ctx.stroke();
+    // Head bent forward
+    ctx.fillStyle = acc;
+    ctx.beginPath(); ctx.arc(cx+r*.25, cy-r*.75, r*.3, 0, Math.PI*2); ctx.fill();
+    ctx.strokeStyle = _darken(col,.3); ctx.lineWidth=1; ctx.stroke();
+    // Scroll
+    ctx.fillStyle = '#f0e0b0'; ctx.strokeStyle='#806020'; ctx.lineWidth=1;
+    ctx.fillRect(cx-r*.5, cy+r*.2, r*.9, r*.5); ctx.strokeRect(cx-r*.5, cy+r*.2, r*.9, r*.5);
+    ctx.fillStyle='#604010'; ctx.font=`${Math.floor(s*.14)}px serif`; ctx.textAlign='center';
+    ctx.fillText('📜', cx-r*.08, cy+r*.58); ctx.textAlign='center';
+  },
+
+  // ── French Conscript: upright soldier ──
+  fr_conscript(ctx, cx, cy, s, col, acc, em) {
+    const r = s*.38;
+    ctx.fillStyle = col;
+    ctx.beginPath(); ctx.roundRect(cx-r*.55, cy-r*.5, r*1.1, r*1.5, r*.1); ctx.fill();
+    ctx.strokeStyle = _darken(col,.4); ctx.lineWidth=1.4; ctx.stroke();
+    // Shako hat (tall military hat)
+    ctx.fillStyle = _darken(col,.35);
+    ctx.fillRect(cx-r*.45, cy-r*1.4, r*.9, r*.85);
+    // Shako top plate
+    ctx.fillRect(cx-r*.5, cy-r*1.45, r, r*.15);
+    // Plume
+    ctx.strokeStyle = '#ff6060'; ctx.lineWidth=2.5;
+    ctx.beginPath(); ctx.moveTo(cx, cy-r*1.45); ctx.lineTo(cx+r*.2, cy-r*1.9); ctx.stroke();
+    // Musket
+    ctx.strokeStyle = _darken(acc,.2); ctx.lineWidth=2;
+    ctx.beginPath(); ctx.moveTo(cx+r*.7, cy-r*.8); ctx.lineTo(cx+r*.9, cy+r*.9); ctx.stroke();
+  },
+
+  // ── Deserter: running/leaning figure ──
+  deserter(ctx, cx, cy, s, col, acc, em) {
+    const r = s*.38;
+    // Body leaning forward (angled)
+    ctx.fillStyle = col;
+    ctx.beginPath(); ctx.ellipse(cx-r*.1, cy, r*.65, r*1.0, Math.PI*0.25, 0, Math.PI*2); ctx.fill();
+    ctx.strokeStyle = _darken(col,.4); ctx.lineWidth=1.3; ctx.stroke();
+    // Head
+    ctx.fillStyle = acc;
+    ctx.beginPath(); ctx.arc(cx+r*.4, cy-r*.8, r*.28, 0, Math.PI*2); ctx.fill();
+    ctx.strokeStyle = _darken(col,.3); ctx.lineWidth=1; ctx.stroke();
+    // Running legs suggestion
+    ctx.strokeStyle = col; ctx.lineWidth=3;
+    ctx.beginPath(); ctx.moveTo(cx-r*.2, cy+r*.7); ctx.lineTo(cx-r*.6, cy+r*1.4); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(cx+r*.2, cy+r*.7); ctx.lineTo(cx+r*.5, cy+r*1.4); ctx.stroke();
+  },
+
+  // ── Factory Overseer: wide bulky figure ──
+  overseer(ctx, cx, cy, s, col, acc, em) {
+    const r = s*.42;
+    // Wide rectangular body
+    ctx.fillStyle = col;
+    ctx.beginPath(); ctx.roundRect(cx-r*.9, cy-r*.4, r*1.8, r*1.4, r*.08); ctx.fill();
+    ctx.strokeStyle = _darken(col,.4); ctx.lineWidth=1.5; ctx.stroke();
+    // Head — large
+    ctx.fillStyle = acc;
+    ctx.beginPath(); ctx.ellipse(cx, cy-r*.8, r*.5, r*.42, 0, 0, Math.PI*2); ctx.fill();
+    ctx.strokeStyle = _darken(col,.3); ctx.lineWidth=1.2; ctx.stroke();
+    // Top hat
+    ctx.fillStyle = '#2a1a0a';
+    ctx.fillRect(cx-r*.4, cy-r*1.5, r*.8, r*.65);
+    ctx.fillRect(cx-r*.5, cy-r*.9, r, r*.15);
+    // Whip/cane
+    ctx.strokeStyle='#c08030'; ctx.lineWidth=2;
+    ctx.beginPath(); ctx.moveTo(cx+r*.9, cy-r*.2); ctx.quadraticCurveTo(cx+r*1.4, cy+r*.4, cx+r*1.1, cy+r*.9); ctx.stroke();
+  },
+
+  // ── Steam Machine: square mechanical with bolts ──
+  steam_machine(ctx, cx, cy, s, col, acc, em) {
+    const r = s*.42;
+    // Main boiler body — rectangle
+    ctx.fillStyle = col;
+    ctx.beginPath(); ctx.roundRect(cx-r*.85, cy-r*.7, r*1.7, r*1.5, r*.06); ctx.fill();
+    ctx.strokeStyle = _darken(col,.5); ctx.lineWidth=2; ctx.stroke();
+    // Chimney stack
+    ctx.fillStyle = _darken(col,.3);
+    ctx.fillRect(cx-r*.25, cy-r*1.45, r*.5, r*.75);
+    // Steam puffs
+    ctx.fillStyle = 'rgba(200,200,200,0.6)';
+    ctx.beginPath(); ctx.arc(cx-r*.1, cy-r*1.55, r*.2, 0, Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.arc(cx+r*.2, cy-r*1.7, r*.15, 0, Math.PI*2); ctx.fill();
+    // Bolts at corners
+    ctx.fillStyle = acc;
+    [[-r*.65,-r*.5],[r*.65,-r*.5],[-r*.65,r*.55],[r*.65,r*.55]].forEach(([bx,by])=>{
+      ctx.beginPath(); ctx.arc(cx+bx, cy+by, r*.1, 0, Math.PI*2); ctx.fill();
+    });
+    // Pressure gauge
+    ctx.fillStyle='#f0e0a0'; ctx.beginPath(); ctx.arc(cx, cy+r*.1, r*.28, 0, Math.PI*2); ctx.fill();
+    ctx.strokeStyle='#a06020'; ctx.lineWidth=1.5; ctx.stroke();
+  },
+
+  // ── Storm Wave: wave crest shape ──
+  storm_wave(ctx, cx, cy, s, col, acc, em) {
+    const r = s*.44;
+    ctx.fillStyle = col;
+    ctx.beginPath();
+    ctx.moveTo(cx-r, cy+r*.4);
+    ctx.quadraticCurveTo(cx-r*.5, cy-r*.8, cx, cy-r*.3);
+    ctx.quadraticCurveTo(cx+r*.4, cy-r, cx+r, cy-r*.1);
+    ctx.quadraticCurveTo(cx+r*.7, cy+r*.6, cx+r*.3, cy+r*.5);
+    ctx.quadraticCurveTo(cx, cy+r*.9, cx-r*.5, cy+r*.7);
+    ctx.closePath(); ctx.fill();
+    ctx.strokeStyle = _darken(col,.4); ctx.lineWidth=1.5; ctx.stroke();
+    // Foam crest
+    ctx.fillStyle='rgba(255,255,255,0.55)';
+    ctx.beginPath(); ctx.ellipse(cx+r*.2, cy-r*.55, r*.45, r*.18, Math.PI*0.2, 0, Math.PI*2); ctx.fill();
+  },
+
+  // ── U-Boat: elongated submarine shape ──
+  u_boat(ctx, cx, cy, s, col, acc, em) {
+    const r = s*.38;
+    // Submarine hull — elongated
+    ctx.fillStyle = col;
+    ctx.beginPath(); ctx.ellipse(cx, cy+r*.1, r*1.35, r*.42, 0, 0, Math.PI*2); ctx.fill();
+    ctx.strokeStyle = _darken(col,.5); ctx.lineWidth=1.5; ctx.stroke();
+    // Conning tower
+    ctx.fillStyle = _darken(col,.3);
+    ctx.fillRect(cx-r*.18, cy-r*.55, r*.36, r*.5);
+    // Periscope
+    ctx.strokeStyle = acc; ctx.lineWidth=2;
+    ctx.beginPath(); ctx.moveTo(cx+r*.1, cy-r*.5); ctx.lineTo(cx+r*.1, cy-r*1.0); ctx.lineTo(cx+r*.4, cy-r*1.0); ctx.stroke();
+    // Propeller
+    ctx.fillStyle = acc;
+    ctx.beginPath(); ctx.ellipse(cx+r*1.2, cy+r*.1, r*.08, r*.35, Math.PI*0.3, 0, Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.ellipse(cx+r*1.2, cy+r*.1, r*.08, r*.35, -Math.PI*0.3, 0, Math.PI*2); ctx.fill();
+  },
+
+  // ── McCarthyist: suited figure pointing finger ──
+  mccarthyist(ctx, cx, cy, s, col, acc, em) {
+    const r = s*.38;
+    // Suit body
+    ctx.fillStyle = col;
+    ctx.beginPath(); ctx.roundRect(cx-r*.6, cy-r*.3, r*1.2, r*1.3, r*.1); ctx.fill();
+    ctx.strokeStyle = _darken(col,.4); ctx.lineWidth=1.4; ctx.stroke();
+    // Lapels (white shirt/tie)
+    ctx.fillStyle = '#e8e0d0';
+    ctx.beginPath(); ctx.moveTo(cx-r*.15, cy-r*.3); ctx.lineTo(cx, cy+r*.4); ctx.lineTo(cx+r*.15, cy-r*.3); ctx.closePath(); ctx.fill();
+    // Head
+    ctx.fillStyle = acc;
+    ctx.beginPath(); ctx.arc(cx, cy-r*.65, r*.32, 0, Math.PI*2); ctx.fill();
+    ctx.strokeStyle = _darken(col,.3); ctx.lineWidth=1; ctx.stroke();
+    // Pointing arm
+    ctx.strokeStyle = col; ctx.lineWidth=3;
+    ctx.beginPath(); ctx.moveTo(cx+r*.55, cy+r*.2); ctx.lineTo(cx+r*1.25, cy-r*.35); ctx.stroke();
+    ctx.fillStyle = acc;
+    ctx.beginPath(); ctx.arc(cx+r*1.25, cy-r*.35, r*.14, 0, Math.PI*2); ctx.fill();
+  },
+
+  // ── Tornado: funnel/cone shape ──
+  tornado(ctx, cx, cy, s, col, acc, em) {
+    const r = s*.42;
+    ctx.fillStyle = col;
+    // Wide top, narrow bottom funnel
+    ctx.beginPath();
+    ctx.moveTo(cx-r*.9, cy-r*.7);
+    ctx.lineTo(cx+r*.9, cy-r*.7);
+    ctx.bezierCurveTo(cx+r*.7, cy, cx+r*.4, cy+r*.5, cx+r*.12, cy+r*.95);
+    ctx.lineTo(cx-r*.12, cy+r*.95);
+    ctx.bezierCurveTo(cx-r*.4, cy+r*.5, cx-r*.7, cy, cx-r*.9, cy-r*.7);
+    ctx.closePath(); ctx.fill();
+    ctx.strokeStyle=_darken(col,.4); ctx.lineWidth=1.5; ctx.stroke();
+    // Swirl lines
+    ctx.strokeStyle=acc; ctx.lineWidth=1.5;
+    for(let i=0;i<3;i++){
+      const yr = cy-r*.4+i*r*.4;
+      const wr = r*(0.7-i*0.2);
+      ctx.beginPath(); ctx.ellipse(cx, yr, wr*.8, wr*.15, 0, 0, Math.PI); ctx.stroke();
+    }
+  },
+
+  // ── Cold War Spy: slim figure with hat ──
+  cold_war_spy(ctx, cx, cy, s, col, acc, em) {
+    const r = s*.36;
+    // Slim trenchcoat
+    ctx.fillStyle = col;
+    ctx.beginPath(); ctx.roundRect(cx-r*.5, cy-r*.4, r, r*1.5, r*.08); ctx.fill();
+    ctx.strokeStyle = _darken(col,.5); ctx.lineWidth=1.3; ctx.stroke();
+    // Head
+    ctx.fillStyle = acc;
+    ctx.beginPath(); ctx.arc(cx, cy-r*.72, r*.28, 0, Math.PI*2); ctx.fill();
+    ctx.strokeStyle = _darken(col,.4); ctx.lineWidth=1; ctx.stroke();
+    // Fedora
+    ctx.fillStyle = _darken(col,.4);
+    ctx.beginPath(); ctx.ellipse(cx, cy-r*.92, r*.5, r*.15, 0, 0, Math.PI*2); ctx.fill(); // brim
+    ctx.fillRect(cx-r*.3, cy-r*1.22, r*.6, r*.3); // crown
+    // Collar up
+    ctx.strokeStyle = _darken(col,.3); ctx.lineWidth=2;
+    ctx.beginPath(); ctx.moveTo(cx-r*.25, cy-r*.35); ctx.lineTo(cx-r*.45, cy-r*.1); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(cx+r*.25, cy-r*.35); ctx.lineTo(cx+r*.45, cy-r*.1); ctx.stroke();
+  },
+
+  // ── Computer Virus: jagged/spiky digital shape ──
+  computer_virus(ctx, cx, cy, s, col, acc, em) {
+    const r = s*.4;
+    // Spiky star-burst
+    ctx.fillStyle = col;
+    ctx.beginPath();
+    const spikes=8, inner=r*.35, outer=r*.75;
+    for(let i=0;i<spikes*2;i++){
+      const a = (i*Math.PI/spikes) - Math.PI/2;
+      const rad = i%2===0 ? outer : inner;
+      i===0 ? ctx.moveTo(cx+Math.cos(a)*rad, cy+Math.sin(a)*rad)
+             : ctx.lineTo(cx+Math.cos(a)*rad, cy+Math.sin(a)*rad);
+    }
+    ctx.closePath(); ctx.fill();
+    ctx.strokeStyle=acc; ctx.lineWidth=1.5; ctx.stroke();
+    // Screen glow in centre
+    ctx.fillStyle=acc;
+    ctx.beginPath(); ctx.rect(cx-r*.22, cy-r*.18, r*.44, r*.36); ctx.fill();
+    ctx.fillStyle=col;
+    ctx.beginPath(); ctx.arc(cx, cy, r*.1, 0, Math.PI*2); ctx.fill();
+  },
+
+  // ── Virus Cloud: amoeba blob shape ──
+  virus_cloud(ctx, cx, cy, s, col, acc, em) {
+    const r = s*.42;
+    ctx.fillStyle = col;
+    ctx.beginPath();
+    // Irregular blob using bezier curves
+    ctx.moveTo(cx+r*.8, cy);
+    ctx.bezierCurveTo(cx+r*.9, cy-r*.6, cx+r*.3, cy-r*1.0, cx, cy-r*.8);
+    ctx.bezierCurveTo(cx-r*.5, cy-r*.9, cx-r*.95, cy-r*.3, cx-r*.8, cy+r*.2);
+    ctx.bezierCurveTo(cx-r*.85, cy+r*.8, cx-r*.2, cy+r*1.0, cx+r*.3, cy+r*.85);
+    ctx.bezierCurveTo(cx+r*.9, cy+r*.7, cx+r*.75, cy+r*.4, cx+r*.8, cy);
+    ctx.closePath(); ctx.fill();
+    ctx.strokeStyle=_darken(col,.4); ctx.lineWidth=1.5; ctx.stroke();
+    // Spike proteins
+    ctx.strokeStyle=acc; ctx.lineWidth=2;
+    [[r*.85,0],[0,-r*.88],[-r*.82,-r*.1],[0,r*.9],[r*.6,r*.6],[-r*.6,-r*.7]].forEach(([dx,dy])=>{
+      ctx.beginPath(); ctx.moveTo(cx+dx*.75, cy+dy*.75); ctx.lineTo(cx+dx, cy+dy); ctx.stroke();
+      ctx.fillStyle=acc; ctx.beginPath(); ctx.arc(cx+dx, cy+dy, r*.1, 0, Math.PI*2); ctx.fill();
+    });
+  },
+
+  // ── Misinfo Bot: phone/rectangular robot ──
+  misinfo_bot(ctx, cx, cy, s, col, acc, em) {
+    const r = s*.38;
+    // Phone/screen body
+    ctx.fillStyle = col;
+    ctx.beginPath(); ctx.roundRect(cx-r*.6, cy-r*.9, r*1.2, r*1.8, r*.18); ctx.fill();
+    ctx.strokeStyle = _darken(col,.5); ctx.lineWidth=1.5; ctx.stroke();
+    // Screen (glowing)
+    ctx.fillStyle = acc;
+    ctx.beginPath(); ctx.roundRect(cx-r*.45, cy-r*.75, r*.9, r*1.2, r*.08); ctx.fill();
+    // Fake text/content on screen
+    ctx.fillStyle = col;
+    [cy-r*.5, cy-r*.25, cy, cy+r*.25, cy+r*.5].forEach(yy => {
+      ctx.fillRect(cx-r*.35, yy, r*.7*(0.6+Math.random()*.4), r*.08);
+    });
+    // X / fake-news icon
+    ctx.strokeStyle='#ff4040'; ctx.lineWidth=2.5;
+    ctx.beginPath(); ctx.moveTo(cx-r*.15, cy+r*.6); ctx.lineTo(cx+r*.15, cy+r*.9); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(cx+r*.15, cy+r*.6); ctx.lineTo(cx-r*.15, cy+r*.9); ctx.stroke();
+    // Antenna
+    ctx.strokeStyle = _darken(col,.3); ctx.lineWidth=2;
+    ctx.beginPath(); ctx.moveTo(cx, cy-r*.9); ctx.lineTo(cx, cy-r*1.4); ctx.stroke();
+    ctx.fillStyle=acc; ctx.beginPath(); ctx.arc(cx, cy-r*1.4, r*.1, 0, Math.PI*2); ctx.fill();
+  },
+};
 
 // ── Dropped item ──────────────────────────────────────────
 export function drawDroppedItem(ctx, x, y, emoji, frame, itemId) {

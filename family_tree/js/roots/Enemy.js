@@ -181,6 +181,7 @@ export class Enemy extends Entity {
     drawEnemy(ctx, this.x - ox, this.y - oy, {
       color: this.peaceful ? '#c8a020' : this.color,  // gold tint for peaceful
       accent: this.accent, emoji: this.emoji, size: this.w,
+      enemyId: this.def?.id || '',
     });
 
     // HP bar (battle enemies only)
