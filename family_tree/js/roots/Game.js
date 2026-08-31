@@ -59,13 +59,9 @@ export class Game {
   // ── Public entry ────────────────────────────────────
 
   async init() {
-    // Pass hasSave checker so UI can show Continue vs New Game per character
-    const hasSave = (charId) => {
-      const d = this.save.load(0);
-      return !!(d && d.characterId === charId);
-    };
+    // Each character has their own save — hasSave checks by characterId
+    const hasSave = (charId) => this.save.hasSave(charId);
     this.ui.showCharacterSelect(CHARACTERS, hasSave, (id, mode) => this._onCharSelected(id, mode));
-    // Play the title screen track while the character select is shown
     this.music.playTitleTrack();
   }
 
@@ -74,10 +70,14 @@ export class Game {
   _onCharSelected(charId, mode = 'continue') {
     this.characterId = charId;
     const char = getCharacter(charId);
-    const savedData = this.save.load(0);
-    const hasSave   = savedData && savedData.characterId === charId;
+    const savedData = this.save.load(charId);
+    const hasSave   = !!(savedData && savedData.characterId === charId);
     // Set location immediately so any early loadEra calls use the right world
     this._startLocation = char.startLocation || 'haarlem';
+    // Reset per-session milestone flags
+    this._milestone3Hearts = false;
+    this._milestone5Stars  = false;
+    this._milestone1Heart  = false;
 
     if (mode === 'continue' && hasSave) {
       // ── CONTINUE: restore all saved state ──────────
@@ -100,7 +100,7 @@ export class Game {
       this._npcTalkCount  = new Map();
       this.unlockedEras   = new Set([0, 8]);
       // Delete any existing save so it doesn't carry over
-      this.save.deleteSave(0);
+      this.save.deleteSave(charId);
     }
 
     // Initialise player with character appearance
@@ -404,8 +404,9 @@ export class Game {
       const npc = this.world.nearestNPC(this.player);
       if (npc && this.player.distTo(npc) < TILE * 3) {
         npc.addFriendship(2);
-        const npcKey = npc.gedcomId || npc.name;
-        this._npcFriendship.set(npcKey, npc.friendship);
+        const npcKey2 = npc.gedcomId || npc.name;
+        this._npcFriendship.set(npcKey2, npc.friendship);
+        this._checkFriendshipMilestones();
         this.player.removeItem(id, 1);
         const given = npc.data?.given || npc.name.split(' ')[0];
         this.ui.showToast(`${result.emoji} You gave it to ${given}! ❤️❤️ +2 friendship!`, '#ff80c0');
@@ -794,7 +795,22 @@ export class Game {
     const isAncestor = npc.gedcomId !== null;  // null = friend NPC (Romijn, Liv, Paul, Henk)
     if (!alreadyMet) {
       const lines = npc.linesForCharacter(this.characterId);
-      const text  = (typeof lines[0] === 'object' ? lines[0].en || lines[0].dutch : lines[0]) || '';
+      // Build a clean story summary: prefer English lines, strip Dutch-bracket translations
+      let text = '';
+      for (const line of lines) {
+        if (typeof line === 'object') {
+          // Dutch line: use the English translation if available, else strip [brackets]
+          const en = line.en?.trim();
+          if (en) { text = en; break; }
+          const dutch = line.dutch?.replace(/\[.*?\]/g, '').trim();
+          if (dutch) { text = dutch; break; }
+        } else if (typeof line === 'string' && line.trim()) {
+          text = line.trim();
+          break;
+        }
+      }
+      // If still empty or very short, use a friendlier fallback
+      if (!text || text.length < 8) text = `You met ${npc.data?.given || npc.name.split(' ')[0]} on your travels.`;
       this.player.collectedFacts.push({ npcId: npc.gedcomId || npc.name, name: npc.name, text });
       this.events.emit('npc_talked', { npcId: npc.gedcomId });
       this.events.emit('facts_milestone', { count: this.player.collectedFacts.length });
@@ -823,6 +839,9 @@ export class Game {
     const npcKey = npc.gedcomId || npc.name;
     this._npcFriendship.set(npcKey, npc.friendship);
     this._npcTalkCount.set(npcKey, npc.talkCount);
+
+    // Check friendship milestones across all met ancestors
+    this._checkFriendshipMilestones();
 
     // Give gate item
     if (npc.item && !this.player.hasItem(npc.item.id)) {
@@ -1327,14 +1346,61 @@ export class Game {
     return this._familyMemberSet.size;
   }
 
+  _checkFriendshipMilestones() {
+    // Only count real ancestors (gedcomId !== null) that have been met
+    const metAncestors = this.player.collectedFacts.filter(f => f.npcId && !f.npcId.includes(' '));
+    if (metAncestors.length === 0) return;
+
+    // Check hearts (3) and stars (5) across all met ancestors
+    const allAt1 = metAncestors.every(f => (this._npcFriendship.get(f.npcId) || 0) >= 1);
+    const allAt3 = metAncestors.every(f => (this._npcFriendship.get(f.npcId) || 0) >= 3);
+    const allAt5 = metAncestors.every(f => (this._npcFriendship.get(f.npcId) || 0) >= 5);
+    const count  = metAncestors.length;
+
+    // Fire each milestone only once per session (guard with a flag)
+    if (allAt5 && !this._milestone5Stars) {
+      this._milestone5Stars = true;
+      setTimeout(() => {
+        this.music.sfxQuestComplete?.();
+        this.ui.showQuestEndingScreen(
+          `${count} ancestors — Maximum friendship!`,
+          `Every ancestor you've met has given you 5 ★ stars. They know you deeply, and you know them. The family bond across 500 years is complete.`,
+          '🌟'
+        );
+      }, 500);
+    } else if (allAt3 && !this._milestone3Hearts && !this._milestone5Stars) {
+      this._milestone3Hearts = true;
+      this.music.sfxEraUnlock?.();
+      this.ui.showToast(`❤️❤️❤️ All ${count} ancestors trust you! Keep visiting to reach 5 ★`, '#ff80c0');
+    } else if (allAt1 && !this._milestone1Heart && !this._milestone3Hearts && !this._milestone5Stars) {
+      this._milestone1Heart = true;
+      this.music.sfxCollect?.();
+      this.ui.showToast(`❤️ All ${count} ancestors gave you their first heart! Keep talking to them!`, '#ff80c0');
+    }
+  }
+
   _bindQuestEvents() {
     this.events.on('quest_step_done', ({ questId, stepId, desc }) => {
       this.ui.showToast(`📋 Quest progress: ${desc}`, '#a0c0ff');
       this.ui.showQuestBadge();   // pulse red dot on journal button
     });
     this.events.on('quest_complete', ({ questId, title }) => {
-      this.ui.showToast(`✅ Quest complete: ${title}!`, '#80ff80');
       this.music.sfxQuestComplete?.();
+      // Show the character's personal ending screen
+      const char = this.characterId ? getCharacter(this.characterId) : null;
+      if (char?.ending) {
+        setTimeout(() => this.ui.showQuestEndingScreen(title, char.ending, char.emoji), 600);
+      } else {
+        this.ui.showToast(`✅ Quest complete: ${title}!`, '#80ff80');
+      }
+    });
+    this.events.on('facts_milestone', ({ count }) => {
+      // Era completion: if all eligible NPCs in the current era have been met, celebrate
+      const total = this._totalNpcCount?.() || 999;
+      if (count >= total) {
+        this.ui.showToast('🎉 You met every ancestor! The Family Album is complete!', '#f0c040');
+        this.music.sfxEraUnlock?.();
+      }
     });
   }
 }

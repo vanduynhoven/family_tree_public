@@ -1,22 +1,27 @@
 // ═══════════════════════════════════════════════════════════
-//  SaveManager — localStorage save/load, 3 slots
-//  Key: vdh_roots_v1_slot{0|1|2}
+//  SaveManager — per-character localStorage saves
+//  Key: vdh_roots_v1_char_{characterId}
+//  One save slot per character — each kid has their own adventure.
 // ═══════════════════════════════════════════════════════════
 
-const PREFIX  = 'vdh_roots_v1_slot';
+const PREFIX  = 'vdh_roots_v1_char_';
 const VERSION = 1;
 
 export class SaveManager {
-  hasSave(slot = 0) {
-    try { return !!localStorage.getItem(`${PREFIX}${slot}`); }
+  _key(charId) { return `${PREFIX}${charId}`; }
+
+  hasSave(charId) {
+    try { return !!localStorage.getItem(this._key(charId)); }
     catch { return false; }
   }
 
   save(game, slot = 0) {
+    // slot param kept for API compat — actual key is always the characterId
+    const charId = game.characterId || `slot${slot}`;
     try {
       const data = {
         version:       VERSION,
-        characterId:   game.characterId,
+        characterId:   charId,
         eraId:         game._eraId,
         screenRow:     game.world.screenRow,
         screenCol:     game.world.screenCol,
@@ -29,17 +34,14 @@ export class SaveManager {
         questState:    game.quests?.serialize() || {},
         visitedScreens:Array.from(game.world.visitedSet),
         portalScreens: Array.from(game.world.portalSet),
-        // Persistent NPC state — hearts + talk counts
         npcFriendship: Object.fromEntries(game._npcFriendship || []),
         npcTalkCount:  Object.fromEntries(game._npcTalkCount  || []),
         unlockedEras:  Array.from(game.unlockedEras || []),
-        // Music variant state — preserve A/B cycle across sessions
         eraVisitCount: { ...(game._eraVisitCount || {}) },
-        // Dutch vocabulary collected during play (Raven's quest)
         dutchWords:    JSON.parse(JSON.stringify(game.player.dutchWords || [])),
         savedAt:       new Date().toISOString(),
       };
-      localStorage.setItem(`${PREFIX}${slot}`, JSON.stringify(data));
+      localStorage.setItem(this._key(charId), JSON.stringify(data));
       return true;
     } catch (e) {
       console.warn('Save failed:', e);
@@ -47,14 +49,22 @@ export class SaveManager {
     }
   }
 
-  load(slot = 0) {
+  load(charIdOrSlot = 0) {
+    // Accept either a characterId string or legacy numeric slot
+    const key = typeof charIdOrSlot === 'string'
+      ? this._key(charIdOrSlot)
+      : `${PREFIX.replace('char_', 'slot')}${charIdOrSlot}`;  // legacy compat
     try {
-      const raw = localStorage.getItem(`${PREFIX}${slot}`);
+      // Try character-keyed save first, then legacy slot-keyed
+      let raw = localStorage.getItem(this._key(typeof charIdOrSlot === 'string' ? charIdOrSlot : `slot${charIdOrSlot}`));
+      if (!raw && typeof charIdOrSlot === 'number') {
+        raw = localStorage.getItem(`vdh_roots_v1_slot${charIdOrSlot}`);
+      }
       if (!raw) return null;
       const data = JSON.parse(raw);
       if (data.version !== VERSION) {
         console.warn('Save version mismatch — discarding.');
-        this.deleteSave(slot);
+        this.deleteSave(typeof charIdOrSlot === 'string' ? charIdOrSlot : charIdOrSlot);
         return null;
       }
       return data;
@@ -63,14 +73,23 @@ export class SaveManager {
     }
   }
 
-  deleteSave(slot = 0) {
-    try { localStorage.removeItem(`${PREFIX}${slot}`); } catch {}
+  deleteSave(charIdOrSlot = 0) {
+    try {
+      if (typeof charIdOrSlot === 'string') {
+        localStorage.removeItem(this._key(charIdOrSlot));
+      } else {
+        localStorage.removeItem(`vdh_roots_v1_slot${charIdOrSlot}`);
+        localStorage.removeItem(this._key(`slot${charIdOrSlot}`));
+      }
+    } catch {}
   }
 
+  /** List all saved characters */
   listSlots() {
-    return [0, 1, 2].map(slot => {
-      const d = this.load(slot);
-      return d ? { slot, characterId: d.characterId, eraId: d.eraId, savedAt: d.savedAt } : null;
-    });
+    const chars = ['traveller','raven','starling','charlotte','tenley','knoxley','isabella','henry','maxwell'];
+    return chars.map(charId => {
+      const d = this.load(charId);
+      return d ? { slot: charId, characterId: d.characterId, eraId: d.eraId, savedAt: d.savedAt } : null;
+    }).filter(Boolean);
   }
 }

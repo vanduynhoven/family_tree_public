@@ -1495,6 +1495,149 @@ export const NPC_DATA = {
     },
   ],
 
+  // ── Era 8 · 2026 · Mankato — Chuck's wife Daina ─────────────────────────
+  '8_1_2': [
+    {
+      gedcomId: '@I029@',
+      name: 'Daina',
+      given: 'Daina',
+      location: 'mankato',
+      era: 8, spawnR: 7, spawnC: 10,
+      bodyColor: '#805060', hairColor: '#301820', skinColor: '#d4a880',
+      lines: {
+        generic: [
+          'Hi! I\'m Daina — Chuck\'s wife. We\'ve lived at 313 Hanover for twenty years now.',
+          'Mankato is a good place to grow up. Close to the river, good schools.',
+          'Chuck talks about the Dutch side of the family all the time. I married into quite a history!',
+          'If you ever want to know what this house was like when the kids were little, just ask.',
+        ],
+        repeat1: [
+          'I was just making coffee. Want some?',
+          'Chuck\'s out back. He always finds something to fix on Saturdays.',
+          'Did you know there\'s a Blue Earth River just four blocks west? Beautiful walking path.',
+        ],
+        heart2: [
+          'Can I tell you something? When I married Chuck I didn\'t know the family went back to 1539.',
+          'Then I saw the family tree Arthur built. Five hundred years. I was speechless.',
+          'I\'m so glad the kids are curious about it. That\'s rare.',
+        ],
+        charlotte: [
+          'Charlotte! My girl — come in, come in.',
+          'I made boterkoek this morning. Your grandfather\'s recipe, the one Anna brought from Boekel.',
+          'Sit down. Tell me everything you\'ve found.',
+        ],
+        tenley: [
+          'Tenley! You\'re exploring the family history — I love that.',
+          'The women of this family — you should ask your grandfather about his mother Anna Maria.',
+          'She crossed the Atlantic with twelve children. Can you imagine?',
+        ],
+        knoxley: [
+          'My littlest one asking the biggest questions! Come here.',
+          'I\'ve been baking — boterkoek, straight from the recipe Anna brought from the Netherlands.',
+          'I think you\'re going to find something really special on this adventure.',
+        ],
+        isabella: ['Isabella! Your dad William and I were just talking about you.', 'I\'m so proud you\'re learning your family history.', 'Come in — there\'s coffee and boterkoek.'],
+        henry:    ['Henry! You want to meet everyone — I love that spirit.', 'Start here at home and work your way back. 1539 is a long way!'],
+        maxwell:  ['Maxwell! Daily life — you want to know what it\'s really like?', 'Wake up. Make coffee. Drive to work. Come home. That\'s 2026 Mankato.', 'But your ancestors\' daily life? That\'s much more interesting.'],
+        raven:    ['Raven! It\'s so good to see you. How is Haarlem?', 'I miss Holland sometimes. The canals, the cheese...', 'Your dad said you\'ve been exploring the family history. Tell me everything!'],
+        starling: ['Starling! My little adventurer.', 'You\'re collecting things from every era? That\'s my girl.', 'Come inside — I have something from the attic that might interest you.'],
+      },
+    },
+  ],
+
+  // ── Era 8 · 2026 · Mankato — William's wife Leslie ───────────────────────
+  '8_2_1': [
+    {
+      gedcomId: '@I037@',
+      name: 'Leslie',
+      given: 'Leslie',
+      location: 'mankato',
+      era: 8, spawnR: 8, spawnC: 9,
+      bodyColor: '#506070', hairColor: '#202818', skinColor: '#d8b890',
+      lines: {
+        generic: [
+          'Hi — I\'m Leslie, William\'s wife. Welcome to Mankato!',
+          'We\'re right near Minnesota State University. It\'s a good neighbourhood.',
+          'William and I have been here since the kids were babies.',
+          'The Van Duynhoven family history is remarkable. I\'m always learning something new.',
+        ],
+        repeat1: [
+          'Good to see you again! William\'s at work but he\'ll be back later.',
+          'I was just looking through some old photos of the family.',
+          'Have you been to the Blue Earth River yet? Beautiful this time of year.',
+        ],
+        heart2: [
+          'You know what strikes me most about this family?',
+          'They crossed an ocean with almost nothing and built something real.',
+          'That takes courage. I hope the kids understand how much.',
+        ],
+        isabella: [
+          'Isabella! My girl — come in.',
+          'I was just thinking about the crossing. Your great-grandparents on a ship for ten days.',
+          'You want to understand why they went. I think about that too.',
+        ],
+        henry:    ['Henry! Talking to everyone — that\'s a big goal.', 'But honestly? Every person has a story worth knowing.', 'Start with Grandpa Peter John. He remembers the family in Minnesota when it was new.'],
+        maxwell:  ['Maxwell! Daily life in every era — I love that.', 'Our daily life is pretty ordinary. But 1539? 1872? That must have been something.', 'Go find out. Come back and tell me.'],
+        charlotte: ['Charlotte! You\'re tracing the name — fascinating project.', 'Van Duynhoven, Van Dyn Hoven, Duynhoven... all the same family.', 'Names change. Families persist.'],
+        tenley:    ['Tenley! The women of the family.', 'There are so many remarkable women in this line.', 'Go find them. I want to hear all about it when you get back.'],
+        knoxley:   ['Knoxley! The littlest one on the biggest quest.', 'You know, I\'ve always thought the youngest ask the best questions.', 'Don\'t let anyone tell you you\'re too small for this adventure.'],
+        raven:     ['Raven! How\'s Haarlem? We miss you.', 'You were born there, same city the family came from. That\'s remarkable.'],
+        starling:  ['Starling! A collection from every era — brilliant idea.', 'I\'m going to want to see it when you\'re done.'],
+      },
+    },
+  ],
+
+  // ── Era 8 · 2026 · Mankato — Peter John's wife Mary Campbell ─────────────
+  '8_3_1': [
+    {
+      gedcomId: '@I025@',
+      name: 'Mary Cecilia Campbell',
+      given: 'Mary',
+      location: 'mankato',
+      era: 8, spawnR: 6, spawnC: 12,
+      bodyColor: '#406060', hairColor: '#d8d0c0', skinColor: '#d4b080',  // silver hair
+      lines: {
+        generic: [
+          'I\'m Mary — Mary Campbell, Peter John\'s wife. We came here from Minnesota a long time ago.',
+          'The Campbell family came from Scotland generations back. A long journey, just like the Van Duynhovens.',
+          'Peter John and I raised our children to know both sides of the family.',
+          'There is so much history in this family. I\'m glad someone is still curious about it.',
+        ],
+        repeat1: [
+          'Peter John talks about Boekel sometimes. The fields, the church.',
+          'I never saw it. But I feel like I know it from his stories.',
+          'That\'s what stories do, I suppose. They carry places across time.',
+        ],
+        heart2: [
+          'Can I show you something?',
+          'I have a photo of Johan and Anna on the ship. 1950. They look so young.',
+          'Peter John was just a boy then. He doesn\'t talk about the crossing much.',
+          'But I think it shaped everything that came after.',
+        ],
+        charlotte: [
+          'Charlotte! You\'re tracing the name through history.',
+          'Van Duynhoven, Van Duijnhoven, Van Dyn Hoven — your grandfather always laughed about that.',
+          'He said: "The name changed, but we always knew who we were."',
+        ],
+        tenley: [
+          'Tenley! The women of the family — that\'s MY kind of history.',
+          'The women kept this family together through everything.',
+          'Ask me anything. I know more than I let on.',
+        ],
+        knoxley: [
+          'The youngest one, all the way here to find us.',
+          'Your grandfather would be so moved by this.',
+          'You have his curiosity, you know. That\'s the rarest thing.',
+        ],
+        isabella: ['Isabella! You want to understand the crossing.', 'Your great-grandmother Anna Maria was the one who kept everyone together on that ship.', 'Ten days at sea with children. I can\'t imagine.'],
+        henry:    ['Henry! You want to meet everyone — then start with us, the ones who remember the most.'],
+        maxwell:  ['Maxwell! Daily life — come ask me. I have stories that will surprise you.'],
+        raven:    ['Raven! Born in Haarlem, just like your great-great-grandparents.', 'The family went to America and came back. That makes my heart full.'],
+        starling: ['Starling! A collection from every time.', 'I have a small smooth stone from Minnesota. Would that count?', 'Your great-grandfather found it by the river in 1955.'],
+      },
+    },
+  ],
+
 };
 
 // Crop-patch side-quests: simple one-step harvest items per era

@@ -465,6 +465,39 @@ export class UI {
     this.journalOpen ? this.closeJournal() : this.openJournal();
   }
 
+  /** Show a full-screen quest completion celebration with the character's ending text */
+  showQuestEndingScreen(questTitle, endingText, emoji = '⭐') {
+    const overlay = document.createElement('div');
+    overlay.id = 'rt-ending-overlay';
+    overlay.style.cssText = `
+      position:fixed;inset:0;z-index:9000;
+      background:rgba(5,3,18,0.97);
+      display:flex;flex-direction:column;align-items:center;justify-content:center;
+      padding:32px 24px;text-align:center;animation:fadeIn .6s ease;
+    `;
+    overlay.innerHTML = `
+      <div style="font-size:clamp(48px,12vw,80px);margin-bottom:16px;animation:bounceIn .8s ease">${emoji}</div>
+      <div style="font-size:clamp(13px,2.5vw,20px);color:#f0c040;font-weight:bold;margin-bottom:12px;font-family:monospace">
+        ✅ ${questTitle} — Complete!
+      </div>
+      <div style="font-size:clamp(14px,2.2vw,22px);color:#dde;line-height:1.7;max-width:520px;margin-bottom:32px">
+        "${endingText}"
+      </div>
+      <div style="font-size:clamp(10px,1.5vw,14px);color:#555;margin-bottom:24px">
+        Your journey is saved in the Family Album. 📚
+      </div>
+      <button id="rt-ending-close" style="
+        font-family:monospace;font-size:clamp(13px,2vw,18px);
+        padding:12px 36px;background:#2980b9;color:#fff;
+        border:none;border-radius:6px;cursor:pointer;
+      ">✨ Keep Exploring</button>
+    `;
+    document.body.appendChild(overlay);
+    overlay.querySelector('#rt-ending-close')?.addEventListener('click', () => overlay.remove());
+    // Also close on tap anywhere after 1s
+    setTimeout(() => overlay.addEventListener('click', () => overlay.remove()), 1000);
+  }
+
   showQuestBadge() {
     const el = document.getElementById('rt-quest-badge');
     if (el) el.style.display = 'block';
