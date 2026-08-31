@@ -352,12 +352,15 @@ export class UI {
         </div>
         <div style="font-size:0.75em;color:#666;margin-top:4px">${pct}% of the family discovered ✨</div>`;
       content.appendChild(header);
-      facts.forEach(f => {
+      facts.forEach((f, i) => {
         const div = document.createElement('div');
         div.className = 'rt-journal-entry';
+        const story = (f.text && f.text.trim())
+          ? f.text
+          : 'You met this ancestor on your travels. Talk to them again to learn more of their story.';
         div.innerHTML = `
-          <div class="rt-je-name">👤 ${f.name}</div>
-          <div class="rt-je-text">${f.text}</div>`;
+          <div class="rt-je-name">👤 <strong>${f.name}</strong> <span style="color:#666;font-weight:normal;font-size:0.85em">· #${i + 1}</span></div>
+          <div class="rt-je-text">${story}</div>`;
         content.appendChild(div);
       });
     } else if (tab === 'quests') {
@@ -391,6 +394,17 @@ export class UI {
     const list = document.getElementById('rt-era-list');
     if (!list) return;
     list.innerHTML = '';
+    // One-line description per era (falls back to the era name if unlisted)
+    const eraDesc = {
+      0: 'Medieval Netherlands · ~1450',
+      1: 'Renaissance & Reformation · ~1539',
+      2: 'Dutch Golden Age · ~1700',
+      3: 'Industrial Revolution · ~1829',
+      4: 'Early Republic · ~1872',
+      5: 'World War Era · ~1915',
+      6: 'Post-War America · ~1951',
+      7: 'Modern Era · ~1982',
+    };
     const unlockedEras = this.game.unlockedEras || new Set([0, 8]);
     ERAS.forEach(era => {
       const locked = !unlockedEras.has(era.id);
@@ -399,9 +413,12 @@ export class UI {
             ? '313 Hanover St, Mankato MN'
             : 'Leidsevaart 276, Haarlem NL')
         : era.name;
+      const desc = era.id === 8 ? 'Present Day · 2026' : (eraDesc[era.id] || '');
       const btn = document.createElement('button');
       btn.className = 'rt-era-btn' + (locked ? ' locked' : '');
-      btn.innerHTML = `<span class="rt-era-year">${era.year}</span> ${locLabel} ${locked ? '🔒' : ''}`;
+      btn.innerHTML = `
+        <span class="rt-era-year">${era.year}</span> ${locLabel} ${locked ? '🔒' : ''}
+        ${desc ? `<div style="font-size:0.78em;color:#7f9db0;margin-top:2px">${desc}</div>` : ''}`;
       if (!locked) btn.addEventListener('click', () => { this.closeEraSel(); this.game.travelToEra(era.id); });
       list.appendChild(btn);
     });

@@ -978,7 +978,7 @@ export const NPC_DATA = {
           'I hope you find all the answers. She deserves to know where she comes from.',
         ],
         // ── Raven-specific dialog ──
-        // Romijn knows Raven was born in Haarlem, grew up here together
+        // Every line is direct second-person — Romijn is talking TO Raven
         raven: [
           { dutch:'RAVEN! Eindelijk! [RAVEN! Finally!]', en:'I\'ve been waiting at the canal for twenty minutes!' },
           'The purple tulips are in at Lies\'s stall. She saved them for you!',
@@ -989,10 +989,21 @@ export const NPC_DATA = {
           'I was at your house yesterday but you were already out with your dad. He was buying sausages from Henk again.',
           { dutch:'Jouw vader en die worst! [Your dad and those sausages!]', en:'Every single Saturday!' },
         ],
+        raven_repeat2: [
+          'Have you been to the Saturday market yet this week?',
+          { dutch:'Lies heeft roze tulpen voor je bewaard. [Lies saved pink tulips for you.]', en:'' },
+          'She knows you always come. She started saving the good ones on purpose.',
+        ],
         raven_heart2: [
           'Raven — I\'ve been thinking about your school project on the family history.',
           { dutch:'Jij bent zo slim. [You are so smart.]', en:'Finding all those ancestors going back hundreds of years.' },
-          'My oma says your family is famous in Haarlem for being Dutch-American. That\'s really special.',
+          'My oma says your family is one of the most interesting in Haarlem. I\'m honestly a bit jealous.',
+        ],
+        raven_heart3: [
+          { dutch:'Raven, ik ben zo trots op jou. [Raven, I am so proud of you.]', en:'' },
+          'You went all the way back to 1539 to meet your family. That is the bravest thing I\'ve ever heard.',
+          'When you come back, you have to tell me everything. Every single ancestor.',
+          { dutch:'Belooft? [Promise?]', en:'' },
         ],
         // ── Starling-specific dialog ──
         starling: [
@@ -1004,6 +1015,22 @@ export const NPC_DATA = {
           'Starling! The courtyard is free. Do you want to play?',
           { dutch:'We kunnen verstoppertje spelen. [We can play hide and seek.]', en:'' },
           'Last time you hid in the big flower pot and nobody found you for twenty minutes!',
+        ],
+        starling_repeat2: [
+          'We should cycle to the Grote Markt together this Saturday.',
+          { dutch:'Jij neemt de tulpen, ik neem de stroopwafels. [You take the tulips, I\'ll take the stroopwafels.]', en:'' },
+          'Deal? It\'s always more fun when we go together.',
+        ],
+        starling_heart2: [
+          'Starling — can I tell you something?',
+          'You know more about your family history than anyone I\'ve ever met.',
+          { dutch:'Dat is echt bijzonder. [That is really special.]', en:'Not everyone can say their family goes back to 1539.' },
+        ],
+        starling_heart3: [
+          { dutch:'Starling, ik ben zo blij dat we vriendinnen zijn. [Starling, I am so glad we are friends.]', en:'' },
+          'You went on the most incredible adventure through your whole family history.',
+          'When you come back, you have to tell me everything — especially about the oldest one!',
+          { dutch:'Belooft? [Promise?]', en:'' },
         ],
       },
     },
@@ -1051,7 +1078,7 @@ export const NPC_DATA = {
           { dutch:'Pas goed op haar, hè? [Take good care of her, okay?]', en:'' },
         ],
         // ── Starling-specific dialog ──
-        // Liv and Starling were born and grew up in Haarlem together
+        // Every line is direct second-person — Liv is talking TO Starling
         starling: [
           { dutch:'STARLING! Daar ben je! [STARLING! There you are!]', en:'I\'ve been looking everywhere for you!' },
           'I found a really shiny stone by the canal. I kept it for you.',
@@ -1072,11 +1099,33 @@ export const NPC_DATA = {
           'You always have the most amazing stories. But they\'re all TRUE.',
           { dutch:'Jouw familie is echt bijzonder. [Your family is really special.]', en:'Not everyone can trace their family back 500 years.' },
         ],
+        starling_heart3: [
+          { dutch:'Starling, ik ben zo trots op jou. [Starling, I am so proud of you.]', en:'' },
+          'You went all the way back through your whole family history.',
+          'When you come back — and you ARE coming back — you have to draw it all for me.',
+          { dutch:'Elke voorouder. Belooft? [Every ancestor. Promise?]', en:'' },
+        ],
         // ── Raven-specific dialog ──
+        // Raven is Starling's sister — Liv talks to Raven directly, not about Starling in third person
         raven: [
           { dutch:'Raven! Is Starling bij jou? [Raven! Is Starling with you?]', en:'We were supposed to meet at the fountain!' },
-          'Tell her I have the drawings I made of the family tree. I used all my best pencils.',
-          { dutch:'Voor jullie allebei! [For both of you!]', en:'One each.' },
+          'I have drawings of the family tree for both of you. I used all my best pencils.',
+          { dutch:'Voor jullie allebei. [For both of you.]', en:'One each — yours has the ship on it.' },
+        ],
+        raven_repeat1: [
+          'Oh good — maybe you know where Starling went after school.',
+          'I wanted to show you both my ancestor map before it gets dark.',
+          { dutch:'Kom je mee zoeken? [Will you come look with me?]', en:'' },
+        ],
+        raven_repeat2: [
+          'Raven — are you going on the big family history adventure too?',
+          'Starling talked about it but I didn\'t know you were also going back in time!',
+          { dutch:'Dat is zo cool! [That is so cool!]', en:'You have to take notes for me.' },
+        ],
+        raven_heart2: [
+          'Raven — it makes me so happy that both of you are doing this together.',
+          'You and Starling are always better as a team.',
+          { dutch:'Jullie zijn geweldig. [You two are amazing.]', en:'I mean it.' },
         ],
       },
     },
@@ -1221,6 +1270,184 @@ export const NPC_DATA = {
   // ── Era 6 · Peter John and William — grandparents of ALL Gen-7 characters ──
   // Peter John @I023@ is the grandfather connecting US and NL branches
   // He appears at Era 5 (1955 Minnesota) but we add special dialog for grandchildren
+
+  // ══════════════════════════════════════════════════════════
+  //  DEEP-ANCESTOR NPCs — one companion ancestor per early era
+  //  (added alongside the key ancestors already placed above)
+  // ══════════════════════════════════════════════════════════
+
+  // ── Era 0 · ~1460 · The maternal Blaffarts line (ancient stones) ──
+  '0_0_3': [
+    {
+      gedcomId: '@I090@',
+      name: 'Ariaen Jan Blaffarts',
+      given: 'Ariaen',
+      era: 0, spawnR: 7, spawnC: 9,
+      bodyColor: '#4a3a24', hairColor: '#20140a', skinColor: '#c89a5e',
+      lines: {
+        generic: [
+          { dutch:'Wees welkom bij de oude stenen. [Be welcome at the ancient stones.]', en:'Few travellers come this far out onto the heath.' },
+          'I am Ariaen Jan Blaffarts. My line runs into the Van der Heijden family — the mother\'s side of your tree.',
+          { dutch:'Namen vervagen, maar het bloed blijft. [Names fade, but the blood remains.]', en:'Remember mine.' },
+        ],
+        raven: [
+          { dutch:'Jij spreekt onze taal! Dat verwarmt een oud hart. [You speak our tongue! That warms an old heart.]', en:'' },
+          'The Blaffarts and the Van der Heijden — through them the mother\'s blood reaches you.',
+        ],
+        starling: [
+          { dutch:'Klein vogeltje, zo ver van huis. [Little bird, so far from home.]', en:'' },
+          'Even the oldest roots have two sides — the father\'s and the mother\'s. I am the mother\'s side.',
+        ],
+      },
+    },
+  ],
+
+  // ── Era 1 · 1796 · Elisabeth van Boxtel (Petrus\'s mother-line spouse) ──
+  '1_2_1': [
+    {
+      gedcomId: '@I091@',
+      name: 'Elisabeth van Boxtel',
+      given: 'Elisabeth',
+      era: 1, spawnR: 7, spawnC: 8,
+      bodyColor: '#5a3a4a', hairColor: '#2a1810', skinColor: '#dcae7a',
+      lines: {
+        generic: [
+          { dutch:'Goedendag. Ik ben Elisabeth van Boxtel. [Good day. I am Elisabeth van Boxtel.]', en:'I married into the Van Duijnhoven family in 1796.' },
+          'People sometimes muddle my story — my second marriage, to Joannes Timmers, was in 1808. But the Van Duijnhoven match came first, in \'96.',
+          { dutch:'Onthoud de juiste datum. [Remember the right date.]', en:'The records are easily confused.' },
+        ],
+        raven: [
+          { dutch:'Wat lief dat je Nederlands spreekt! [How sweet that you speak Dutch!]', en:'' },
+          'A wife carries the family forward as much as any husband. Do not forget the women in your tree.',
+        ],
+        starling: [
+          { dutch:'Zo\'n jonge reiziger, en toch zo beleefd. [Such a young traveller, and yet so polite.]', en:'' },
+          'I married in 1796 — write it down so no one mistakes it for the later wedding.',
+        ],
+      },
+    },
+  ],
+
+  // ── Era 2 · ~1798 · Johanna van der Heijden (maternal line) ──
+  '2_2_2': [
+    {
+      gedcomId: '@I092@',
+      name: 'Johanna van der Heijden',
+      given: 'Johanna',
+      era: 2, spawnR: 7, spawnC: 9,
+      bodyColor: '#3a4a5a', hairColor: '#2a2010', skinColor: '#dca878',
+      lines: {
+        generic: [
+          { dutch:'Ik ben Johanna van der Heijden. [I am Johanna van der Heijden.]', en:'My family reaches back to the old Blaffarts line, out on the heath.' },
+          'Through me the maternal blood joins the Van Duijnhoven line — two rivers meeting.',
+          { dutch:'De vrouwen dragen de familie net zo goed als de mannen. [The women carry the family as much as the men.]', en:'' },
+        ],
+        raven: [
+          { dutch:'Nederlands, en zo goed! [Dutch, and so well!]', en:'' },
+          'Ariaen Jan Blaffarts, out at the ancient stones — he is of my mother\'s people. Go greet him if you can.',
+        ],
+        starling: [
+          { dutch:'Welkom, klein reizigertje. [Welcome, little traveller.]', en:'' },
+          'The maternal line matters. Van der Heijden, and Blaffarts before that.',
+        ],
+      },
+    },
+  ],
+
+  // ── Era 3 · 1829 · Martinus van Duijnhoven (Marianus\'s father) ──
+  '3_1_1': [
+    {
+      gedcomId: '@I093@',
+      name: 'Martinus van Duijnhoven',
+      given: 'Martinus',
+      era: 3, spawnR: 7, spawnC: 9,
+      bodyColor: '#3a2a1a', hairColor: '#241606', skinColor: '#c89050',
+      item: { id:'marriage_record', label:'Marriage Record 1858', emoji:'💍' },
+      lines: {
+        generic: [
+          { dutch:'Ik ben Martinus, geboren in 1829. [I am Martinus, born in 1829.]', en:'Marianus, who works the south fields, is my son.' },
+          'In February 1858 I married Geertruda Verwegen — and my brother married her sister the very same year, in the same church.',
+          'Take this marriage record. It ties two families together for good.',
+        ],
+        knoxley: [
+          { dutch:'Wil je verder terug? [Do you want to go further back?]', en:'My father farmed this soil, and his father before him.' },
+          'The oldest names rest in the church archives — all the way back to 1539.',
+        ],
+        raven: [
+          { dutch:'Raven! Je spreekt Nederlands! [Raven! You speak Dutch!]', en:'' },
+          'Two Van Duijnhoven brothers, two Verwegen sisters, one wedding year. That is how small Boekel is.',
+        ],
+        starling: [
+          { dutch:'Zo\'n kleine reiziger, zo ver terug in de tijd. [Such a small traveller, so far back in time.]', en:'' },
+          'My son Marianus works the south fields. Go and find him next.',
+        ],
+      },
+    },
+  ],
+
+  // ── Era 3 · 1833 · Geertruda Verwegen (Martinus\'s wife) ──
+  '3_2_2': [
+    {
+      gedcomId: '@I094@',
+      name: 'Geertruda Verwegen',
+      given: 'Geertruda',
+      era: 3, spawnR: 7, spawnC: 8,
+      bodyColor: '#4a2a3a', hairColor: '#2a1808', skinColor: '#d8a468',
+      lines: {
+        generic: [
+          { dutch:'Ik ben Geertruda Verwegen. [I am Geertruda Verwegen.]', en:'I married Martinus van Duijnhoven in 1858.' },
+          'My sister married his brother the same year — so the Verwegen and Van Duijnhoven lines are doubly bound.',
+          { dutch:'Marianus is mijn zoon. [Marianus is my son.]', en:'He will have twelve children of his own.' },
+        ],
+        tenley: [
+          'You ask about the women? Good — too often we are left out of the records.',
+          'Two Verwegen sisters, two Van Duijnhoven brothers. Remember us both.',
+        ],
+        raven: [
+          { dutch:'Nederlands! Wat een vreugde! [Dutch! What a joy!]', en:'' },
+          'The Verwegen name runs through you too, child. Not only the Van Duijnhoven.',
+        ],
+        starling: [
+          { dutch:'Welkom, klein vogeltje. [Welcome, little bird.]', en:'' },
+          'My husband Martinus is nearby, in the north of the village. Go and meet him.',
+        ],
+      },
+    },
+  ],
+
+  // ── Era 4 · 1878 · Anna Maria van den Elzen (Marianus\'s wife) ──
+  '4_2_1': [
+    {
+      gedcomId: '@I095@',
+      name: 'Anna Maria van den Elzen',
+      given: 'Anna Maria',
+      era: 4, spawnR: 7, spawnC: 9,
+      bodyColor: '#3a3a5a', hairColor: '#241408', skinColor: '#dcac78',
+      lines: {
+        generic: [
+          { dutch:'Ik ben Anna Maria van den Elzen. [I am Anna Maria van den Elzen.]', en:'I married Marianus in Boekel, 18 May 1906.' },
+          'Twelve children we raised together. Our son Johan sailed for America.',
+          { dutch:'Ik overleef mijn man met drie jaar. [I outlive my husband by three years.]', en:'I die in Uden, December 1952. Remember me.' },
+        ],
+        tenley: [
+          'The women hold a family together through everything. Never forget that.',
+          'Twelve children, and I knew every one of their birthdays by heart.',
+        ],
+        isabella: [
+          'You are looking for Johan\'s story, I think. My son. He left for America in 1950.',
+          'It broke my heart — but a mother lets her children go where they must.',
+        ],
+        raven: [
+          { dutch:'Je spreekt Nederlands! Kom, zit bij me. [You speak Dutch! Come, sit with me.]', en:'' },
+          'My husband Marianus works the south fields. Together we began the whole American branch.',
+        ],
+        starling: [
+          { dutch:'Zo\'n klein meisje, zo dapper. [Such a little girl, so brave.]', en:'' },
+          'Anna Maria van den Elzen — say my name so it is not forgotten.',
+        ],
+      },
+    },
+  ],
 
 };
 

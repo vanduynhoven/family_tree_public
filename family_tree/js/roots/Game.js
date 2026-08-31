@@ -580,8 +580,9 @@ export class Game {
   _onDialogDone(npc) {
     this._dialogNPC = null;
 
-    // Add fact to journal — only on first meeting
+    // Add fact to journal — only on first meeting, and only for real ancestors (not friends/contemporaries)
     const alreadyMet = this.player.collectedFacts.find(f => f.npcId === (npc.gedcomId || npc.name));
+    const isAncestor = npc.gedcomId !== null;  // null = friend NPC (Romijn, Liv, Paul, Henk)
     if (!alreadyMet) {
       const lines = npc.linesForCharacter(this.characterId);
       const text  = (typeof lines[0] === 'object' ? lines[0].en || lines[0].dutch : lines[0]) || '';
@@ -589,17 +590,19 @@ export class Game {
       this.events.emit('npc_talked', { npcId: npc.gedcomId });
       this.events.emit('facts_milestone', { count: this.player.collectedFacts.length });
 
-      // 🎉 Celebrate discovering a new ancestor — kid-friendly big toast
-      const given = npc.data?.given || npc.name.split(' ')[0];
-      const count = this.player.collectedFacts.length;
-      const msgs = [
-        `🎉 You met ${given}! Added to your Family Album!`,
-        `⭐ Amazing! ${given} is now in your Family Album!`,
-        `✨ New ancestor found: ${given}! Keep exploring!`,
-        `🌟 ${given} joined your family story! ${count} ancestors met!`,
-      ];
-      this.ui.showToast(msgs[Math.floor(Math.random() * msgs.length)], '#f0c040');
-      this.music.sfxCollect?.();
+      if (isAncestor) {
+        // 🎉 Celebrate discovering a new ancestor — kid-friendly big toast
+        const given = npc.data?.given || npc.name.split(' ')[0];
+        const count = this.player.collectedFacts.length;
+        const msgs = [
+          `🎉 You met ${given}! Added to your Family Album!`,
+          `⭐ Amazing! ${given} is now in your Family Album!`,
+          `✨ New ancestor found: ${given}! Keep exploring!`,
+          `🌟 ${given} joined your family story! ${count} ancestors met!`,
+        ];
+        this.ui.showToast(msgs[Math.floor(Math.random() * msgs.length)], '#f0c040');
+        this.music.sfxCollect?.();
+      }
     }
 
     // Add friendship — cap at 5
