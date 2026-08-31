@@ -347,6 +347,8 @@ export class World {
     const toC = this.screenCol + dC;
     if (toR < 0 || toR >= WORLD_ROWS || toC < 0 || toC >= WORLD_COLS) return;
     if (!this.canExitDir(dir)) return;
+    // Don't transition to an undefined screen — that traps the player with no exits
+    if (!this.screens?.[toR]?.[toC]) return;
 
     this.transition = { dir, fromR: this.screenRow, fromC: this.screenCol, toR, toC, progress: 0, eraId, npcData, location: this._location || 'haarlem' };
     // Friendship maps stay on this._friendshipMap / this._talkCountMap — already set at loadEra
@@ -418,7 +420,24 @@ export class World {
     for (const enemy of this.activeEnemies) enemy.update(dt, this, game);
     for (const drop of this.activeDrops)  drop.update(dt);
 
-    // Cull dead entities
+    // Cull dead entities — spawn loot for newly-dead enemies
+    for (const enemy of this._enemies) {
+      if (!enemy.alive && enemy.deathTimer > 0 && !enemy._lootDropped) {
+        enemy._lootDropped = true;
+        const drops = enemy.loot?.() || [];
+        for (let i = 0; i < drops.length; i++) {
+          // Scatter drops slightly around the death position
+          const angle = (i / Math.max(drops.length, 1)) * Math.PI * 2;
+          const r = TILE * 0.5;
+          const dx = drops.length > 1 ? Math.cos(angle) * r : 0;
+          const dy = drops.length > 1 ? Math.sin(angle) * r : 0;
+          this._drops.push(new DroppedItem(drops[i], enemy.cx + dx - TILE*0.25, enemy.cy + dy - TILE*0.25, 30));
+        }
+        if (drops.length > 0) {
+          game?.ui?.showToast(`💀 ${enemy.name} dropped ${drops.length} item${drops.length > 1 ? 's' : ''}!`, '#c0ffa0');
+        }
+      }
+    }
     this._npcs    = this._npcs.filter(n => n.alive);
     this._enemies = this._enemies.filter(e => e.alive || e.deathTimer > 0);
     this._drops   = this._drops.filter(d => d.alive);

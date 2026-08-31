@@ -608,7 +608,7 @@ export function buildEraWorld(eraId, location = 'haarlem') {
         fill(m,4,0,H-1,W-1,T.COBBLE);
         fill(m,4,8,7,11,T.GRASS); // garden below wall
         fill(m,5,9,6,10,T.FLOWER);
-        grid[2][3]=makeScreen(m,{left:{pos:7},up:{pos:10},down:{pos:10}},'1660 · City Wall Walk',{r:8,c:9}); }
+        grid[2][3]=makeScreen(m,{left:{pos:7},up:{pos:10}},'1660 · City Wall Walk',{r:8,c:9}); }
 
       // [3,0] City outskirts south
       { const m=blank(T.GRASS); border(m,T.TREE);
@@ -770,7 +770,7 @@ export function buildEraWorld(eraId, location = 'haarlem') {
         for(let c=1;c<W-1;c++){ m[5][c]=T.WATER; m[6][c]=T.WATER; m[7][c]=T.WATER; }
         m[5][9]=T.BRIDGE; m[6][9]=T.BRIDGE; m[7][9]=T.BRIDGE;
         m[5][10]=T.BRIDGE; m[6][10]=T.BRIDGE; m[7][10]=T.BRIDGE;
-        grid[2][3]=makeScreen(m,{left:{pos:7},up:{pos:10},down:{pos:10}},'1799 · River Bridge',{r:4,c:9}); }
+        grid[2][3]=makeScreen(m,{left:{pos:7},up:{pos:10}},'1799 · River Bridge',{r:4,c:9}); }
 
       // [3,0] Deserter hideout — inn
       { const m=blank(T.GRASS); border(m,T.TREE);
@@ -965,7 +965,7 @@ export function buildEraWorld(eraId, location = 'haarlem') {
         fill(m,8,1,H-3,W-3,T.WATER);
         m[8][9]=T.BRIDGE; m[8][10]=T.BRIDGE;
         fill(m,4,3,7,6,T.CROP_READY);
-        grid[2][3]=makeScreen(m,{left:{pos:7},up:{pos:10},down:{pos:10}},'1872 · Potato Fields',{r:5,c:9}); }
+        grid[2][3]=makeScreen(m,{left:{pos:7},up:{pos:10}},'1872 · Potato Fields',{r:5,c:9}); }
 
       // [3,0] Village inn — innkeeper
       { const m=blank(T.GRASS); border(m,T.TREE);
@@ -1130,7 +1130,7 @@ export function buildEraWorld(eraId, location = 'haarlem') {
         for(let r=3;r<H-3;r+=2){ for(let c=3;c<W-3;c++) set(m,r,c,T.ROCK); }
         // Overhead lighting every 4 cols
         for(let c=3;c<W-3;c+=4) set(m,1,c,T.CROP_READY);
-        grid[2][3]=makeScreen(m,{left:{pos:7},up:{pos:10},down:{pos:10}},'1950 · Cargo Hold',{r:8,c:12}); }
+        grid[2][3]=makeScreen(m,{left:{pos:7},up:{pos:10}},'1950 · Cargo Hold',{r:8,c:12}); }
 
       // [3,0] Rough sea — storm waves
       { const m=blank(T.DEEP_WATER); border(m,T.PLANK);
@@ -1312,7 +1312,7 @@ export function buildEraWorld(eraId, location = 'haarlem') {
         m[HP][1]=T.BRIDGE; m[HP][2]=T.BRIDGE; m[HP][3]=T.BRIDGE;
         fill(m,1,1,3,W-2,T.GRASS);
         for(let c=3;c<W-3;c+=3) set(m,2,c,T.TREE);
-        grid[2][3]=makeScreen(m,{left:{pos:7},up:{pos:10},down:{pos:10}},'1955 · Walleye Lake',{r:HP,c:4}); }
+        grid[2][3]=makeScreen(m,{left:{pos:7},up:{pos:10}},'1955 · Walleye Lake',{r:HP,c:4}); }
 
       // [3,0] Old farmstead — innkeeper
       { const m=blank(T.GRASS); border(m,T.TREE);
@@ -1464,7 +1464,7 @@ export function buildEraWorld(eraId, location = 'haarlem') {
         m[HP][9]=T.BRIDGE; m[HP][10]=T.BRIDGE; m[HP][11]=T.BRIDGE;
         fill(m,0,0,2,W-1,T.HOUSE_WALL); fill(m,9,0,H-1,W-1,T.HOUSE_WALL);
         for(let c=2;c<W-2;c+=4){ set(m,2,c,T.DOOR); set(m,9,c,T.DOOR); }
-        grid[2][3]=makeScreen(m,{left:{pos:7},up:{pos:10},down:{pos:10}},'1984 · Dutch Canal Street',{r:5,c:9}); }
+        grid[2][3]=makeScreen(m,{left:{pos:7},up:{pos:10}},'1984 · Dutch Canal Street',{r:5,c:9}); }
 
       // [3,0] Wisconsin suburbs — quiet street
       { const m=blank(T.GRASS); border(m,T.TREE);
@@ -1626,7 +1626,7 @@ export function buildEraWorld(eraId, location = 'haarlem') {
         set(m,2,8,T.BRICK); set(m,2,11,T.BRICK); set(m,2,14,T.BRICK); // shuttered brick shops
         m[HP][6]=T.BRIDGE; m[HP][7]=T.BRIDGE;
         for(let r=2;r<H-2;r+=2) set(m,r,3,T.FLOWER);
-        grid[2][3]=makeScreen(m,{left:{pos:7},up:{pos:10},down:{pos:10}},'2020 · Empty Haarlem Street',{r:7,c:10}); }
+        grid[2][3]=makeScreen(m,{left:{pos:7},up:{pos:10}},'2020 · Empty Haarlem Street',{r:7,c:10}); }
 
       // [3,0] Minnesota river walk
       { const m=blank(T.GRASS); border(m,T.TREE);

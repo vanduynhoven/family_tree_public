@@ -38,6 +38,7 @@ export class Enemy extends Entity {
     this.stealAmt     = def.steal || 0;
     this.stealCd      = 0;       // cooldown between steals
     this.stealFlash   = 0;       // visual flash timer
+    this.stolenItems  = [];      // items stolen from the player this session — dropped on death
   }
 
   takeDamage(amt, kdx = 0, kdy = 0) {
@@ -143,6 +144,7 @@ export class Enemy extends Entity {
       if (any) {
         const taken = any.label;
         player.removeItem(any.id, 1);
+        this.stolenItems.push({ id: any.id, label: any.label, emoji: any.emoji || '📦' });
         game?.ui?.showToast(`🤏 ${this.name} swiped your ${taken}! Watch your pockets!`, '#ff8040');
         this.stealFlash = 0.4;
         game?.music?.sfxHurt?.();
@@ -163,6 +165,7 @@ export class Enemy extends Entity {
       if (slot) {
         const taken = slot.label;
         player.removeItem(target, 1);
+        this.stolenItems.push({ id: slot.id, label: slot.label, emoji: slot.emoji || '📦' });
         const msgs = {
           tax_collector:  `💰 Tax Collector took your ${taken}! Pay your dues!`,
           debt_collector: `📜 Debt Collector collected your ${taken}! Debt paid.`,
@@ -188,6 +191,38 @@ export class Enemy extends Entity {
     game?.ui?.showToast(fallbackMsgs[id] || `😰 ${this.name} drained your energy!`, '#ff8040');
     this.stealFlash = 0.4;
     game?.music?.sfxHurt?.();
+  }
+
+  /** Returns the items this enemy drops on death: stolen items + era bonus loot */
+  loot() {
+    const drops = [...this.stolenItems];   // return everything that was stolen
+    const id = this.def?.id || '';
+
+    // Era-appropriate bonus loot per enemy type
+    const bonusLoot = {
+      tax_collector:   { id:'coin',         label:'Coin',           emoji:'🪙' },
+      plague_rat:      { id:'herb',          label:'Healing Herb',   emoji:'🌿' },
+      inquisitor:      { id:'prayer_book',   label:'Prayer Book',    emoji:'📖' },  // drops a copy
+      spanish_soldier: { id:'coin',          label:'Coin',           emoji:'🪙' },
+      pickpocket:      { id:'coin',          label:'Coin',           emoji:'🪙' },
+      debt_collector:  { id:'coin',          label:'Coin',           emoji:'🪙' },
+      fr_conscript:    { id:'fr_button',     label:'French Button',  emoji:'🔘' },
+      deserter:        { id:'rye',           label:'Rye',            emoji:'🌾' },
+      overseer:        { id:'coal',          label:'Coal',           emoji:'⬛' },
+      steam_machine:   { id:'iron',          label:'Iron',           emoji:'🔩' },
+      storm_wave:      { id:'flotsam',       label:'Flotsam',        emoji:'🪵' },
+      u_boat:          { id:'rope',          label:'Rope',           emoji:'🪢' },
+      mccarthyist:     { id:'coin',          label:'Dollar',         emoji:'💵' },
+      tornado:         { id:'corn',          label:'Corn',           emoji:'🌽' },
+      cold_war_spy:    { id:'cassette_tape', label:'Cassette Tape',  emoji:'📼' },
+      computer_virus:  { id:'coin',          label:'Dollar',         emoji:'💵' },
+      virus_cloud:     { id:'herb',          label:'Herb',           emoji:'🌿' },
+      misinfo_bot:     { id:'flower',        label:'Flower',         emoji:'🌸' },   // ironic: something real
+    };
+
+    const bonus = bonusLoot[id];
+    if (bonus) drops.push(bonus);
+    return drops;
   }
 
   _moveToward(target, dt, world) {
