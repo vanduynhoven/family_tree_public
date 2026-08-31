@@ -30,6 +30,7 @@ export class SaveManager {
         playerHP:      game.player.hp,
         playerStamina: game.player.stamina,
         inventory:     JSON.parse(JSON.stringify(game.player.inventory)),
+        keyItems:      JSON.parse(JSON.stringify(game.player.keyItems || [])),
         collectedFacts:JSON.parse(JSON.stringify(game.player.collectedFacts)),
         questState:    game.quests?.serialize() || {},
         visitedScreens:Array.from(game.world.visitedSet),

@@ -8,6 +8,7 @@ import { NPC_DATA as _unused, STATIC_SCREEN_DROPS } from './NpcData.js';
 import { NPC } from './NPC.js';
 import { Enemy } from './Enemy.js';
 import { DroppedItem } from './DroppedItem.js';
+import { Livestock } from './Livestock.js';
 
 export class World {
   constructor() {
@@ -30,6 +31,7 @@ export class World {
   get activeNPCs()   { return this._npcs.filter(n => n.alive); }
   get activeEnemies(){ return this._enemies.filter(e => e.alive); }
   get activeDrops()  { return this._drops.filter(d => d.alive); }
+  get activeLivestock() { return this._livestock || []; }
 
   // ── Load an era ────────────────────────────────────────
 
@@ -51,6 +53,7 @@ export class World {
     this._drops   = [];
     this._npcs    = [];
     this._enemies = [];
+    this._livestock = [];
 
     const scr = this.screen;
     if (!scr) return;
@@ -169,12 +172,20 @@ export class World {
     const screenKey2 = `${eraId}_${this.screenRow}_${this.screenCol}`;
     for (const sd of STATIC_SCREEN_DROPS) {
       if (sd.screenKey !== screenKey2) continue;
-      // Skip location-restricted drops when location doesn't match
       if (sd.location && sd.location !== (this._location || 'haarlem')) continue;
+      // Decor animals → wandering Livestock entities (not static drops)
+      if (sd.item.decorOnly && sd.item.id?.startsWith('decor_')) {
+        const sx = sd.c * TILE + TILE * 0.1;
+        const sy = sd.r * TILE + TILE * 0.1;
+        if (!this.solidAt(sx + 4, sy + 4)) {
+          this._livestock.push(new Livestock({ animalId: sd.item.id, emoji: sd.item.emoji, name: sd.item.label }, sx, sy));
+        }
+        continue;
+      }
       const sx = sd.c * TILE + 8;
       const sy = sd.r * TILE + 8;
       if (!this.solidAt(sx, sy)) {
-        this._drops.push(new DroppedItem(sd.item, sx, sy, -1)); // -1 = permanent
+        this._drops.push(new DroppedItem(sd.item, sx, sy, -1));
       }
     }
   }
@@ -436,6 +447,7 @@ export class World {
   update(dt, player, game) {
     for (const npc of this.activeNPCs)    npc.update(dt, this, game);
     for (const enemy of this.activeEnemies) enemy.update(dt, this, game);
+    for (const livestock of this._livestock || []) livestock.update(dt, this);
     for (const drop of this.activeDrops)  drop.update(dt);
 
     // Cull dead entities — spawn loot for newly-dead enemies

@@ -116,6 +116,7 @@ export class Game {
     // Restore player state from save (continue only) — each field guarded independently
     if (mode === 'continue' && hasSave) {
       if (savedData.inventory     !== undefined) this.player.inventory      = savedData.inventory;
+      if (savedData.keyItems      !== undefined) this.player.keyItems       = savedData.keyItems;
       if (savedData.collectedFacts !== undefined) this.player.collectedFacts = savedData.collectedFacts;
       if (savedData.playerHP      !== undefined) this.player.hp             = savedData.playerHP;
       if (savedData.playerStamina !== undefined) this.player.stamina        = savedData.playerStamina;
@@ -201,7 +202,7 @@ export class Game {
     this.engine.start((dt, frame) => this._tick(dt, frame));
     this.ui.showToast(`▶ Resumed — ${ERAS[resumeEra]?.year || ''}`);
     // Populate the inventory HUD bar with the restored items
-    this.ui.renderInventory(this.player.inventory, (id) => this._useItem(id));
+    this._renderBothBars();
   }
 
   _afterIntro(char) {
@@ -241,7 +242,7 @@ export class Game {
 
       this.engine.start((dt, frame) => this._tick(dt, frame));
       // Render inventory bar (empty on new game, populated on continue)
-      this.ui.renderInventory(this.player.inventory, (id) => this._useItem(id));
+      this._renderBothBars();
       this.ui.showToast(`⏰ ${ERAS[startEra]?.year} — Find your ancestors!`);
 
       // Onboarding hint for first-time players (no collected facts yet)
@@ -336,31 +337,43 @@ export class Game {
       return;
     }
 
-    // 5. Dropped item nearby? → pick up
+    // 5. Livestock nearby? → butcher or pick up meat
+    for (const animal of this.world.activeLivestock) {
+      if (this.player.distTo(animal) < TILE * 1.5) {
+        if (!animal.butchered) {
+          // First click: butcher the animal
+          animal.butchered = true;
+          animal.butcherTimer = 0.5;
+          const meatMap = {
+            decor_cow:     { id:'beef',          label:'Beef',        emoji:'🥩' },
+            decor_pig:     { id:'pork',           label:'Pork',        emoji:'🥩' },
+            decor_sheep:   { id:'lamb',           label:'Lamb',        emoji:'🥩' },
+            decor_chicken: { id:'chicken',        label:'Chicken',     emoji:'🍗' },
+            decor_horse:   { id:'horse_leather',  label:'Leather',     emoji:'🟫' },
+            decor_goat:    { id:'goat_cheese',    label:'Goat Cheese', emoji:'🧀' },
+          };
+          const meat = meatMap[animal.animalId] || { id:'meat', label:'Meat', emoji:'🥩' };
+          animal._meatItem = meat;
+          this.ui.showToast(`🔪 Butchered! Pick up the ${meat.emoji} ${meat.label}`, '#c0ffa0');
+          this.music.sfxHit?.();
+        } else if (animal._meatItem && this.player.collectItem(animal._meatItem)) {
+          // Second click: collect the meat
+          this.ui.showItemToast(animal._meatItem);
+          this._renderBothBars();
+          this.events.emit('item_collected', { itemId: animal._meatItem.id });
+          this.music.sfxCollect?.();
+          animal.alive = false;  // remove the livestock entity
+        }
+        return;
+      }
+    }
+
+    // 6. Dropped item nearby? → pick up
     for (const drop of this.world.activeDrops) {
       if (this.player.distTo(drop) < TILE * 1.8) {
-        // Decor animal: first click harvests (transforms to meat drop)
-        if (drop.decorOnly && drop.item.id.startsWith('decor_')) {
-          const meatMap = {
-            decor_cow:     { id:'beef',    label:'Beef',       emoji:'🥩' },
-            decor_pig:     { id:'pork',    label:'Pork',       emoji:'🥩' },
-            decor_sheep:   { id:'lamb',    label:'Lamb',       emoji:'🥩' },
-            decor_chicken: { id:'chicken', label:'Chicken',    emoji:'🍗' },
-            decor_horse:   { id:'horse_leather', label:'Leather', emoji:'🟫' },
-            decor_goat:    { id:'goat_cheese', label:'Goat Cheese', emoji:'🧀' },
-          };
-          const meat = meatMap[drop.item.id];
-          if (meat) {
-            drop.item    = meat;
-            drop.decorOnly = false;
-            this.ui.showToast(`🔪 Butchered! Pick up the ${meat.emoji} ${meat.label}`, '#c0ffa0');
-            this.music.sfxHit?.();
-          }
-          return;
-        }
         if (!drop.decorOnly && this.player.collectItem(drop.item)) {
           this.ui.showItemToast(drop.item);
-          this.ui.renderInventory(this.player.inventory, (id) => this._useItem(id));
+          this._renderBothBars();
           drop.alive = false;
           this.events.emit('item_collected', { itemId: drop.item.id });
           this.music.sfxCollect?.();
@@ -402,6 +415,11 @@ export class Game {
     }
   }
 
+  _renderBothBars() {
+    this.ui.renderInventory(this.player.inventory, (id) => this._useItem(id));
+    this.ui.renderKeyItems(this.player.keyItems);
+  }
+
   _useItem(id) {
     const result = this.player.useItem(id);
     if (!result) return;
@@ -425,7 +443,7 @@ export class Game {
         this.ui.showToast(`${result.emoji} No enemy nearby to throw it at!`, '#888');
         // Don't consume — no target
       }
-      this.ui.renderInventory(this.player.inventory, (id) => this._useItem(id));
+      this._renderBothBars();
       this.save.save(this);
       return;
     }
@@ -445,7 +463,7 @@ export class Game {
       } else {
         this.ui.showToast(`${result.emoji} Walk close to a family member to give it to them.`, '#888');
       }
-      this.ui.renderInventory(this.player.inventory, (id) => this._useItem(id));
+      this._renderBothBars();
       this.save.save(this);
       return;
     }
@@ -456,21 +474,21 @@ export class Game {
       this.player.removeItem(id, 1);
       setTimeout(() => { if (this.player) this.player._flotsam = false; }, 5000);
       this.ui.showToast(`${result.emoji} Flotsam placed! You can cross one water tile for 5 seconds.`, '#80c0ff');
-      this.ui.renderInventory(this.player.inventory, (id) => this._useItem(id));
+      this._renderBothBars();
       this.save.save(this);
       return;
     }
 
     if (result.special === 'fishing_boost') {
       this.ui.showToast(`${result.emoji} Lure equipped! Next catch has double chance of being rare! 🎣`, '#80ff80');
-      this.ui.renderInventory(this.player.inventory, (id) => this._useItem(id));
+      this._renderBothBars();
       this.save.save(this);
       return;
     }
 
     if (result.special === 'fishing_fast') {
       this.ui.showToast(`${result.emoji} Smart Buoy deployed! Fish will bite much faster! ⚡🎣`, '#80ffff');
-      this.ui.renderInventory(this.player.inventory, (id) => this._useItem(id));
+      this._renderBothBars();
       this.save.save(this);
       return;
     }
@@ -478,7 +496,7 @@ export class Game {
     // ── Standard consumable (heal/stamina) ────────────────
     this.ui.showToast(`${result.emoji} Used! ${result.label}`, '#80ff80');
     this.music.sfxCollect?.();
-    this.ui.renderInventory(this.player.inventory, (id) => this._useItem(id));
+    this._renderBothBars();
     this.save.save(this);
   }
 
@@ -621,6 +639,14 @@ export class Game {
       }
     }
 
+    // 2b. Livestock?
+    for (const animal of this.world.activeLivestock) {
+      if (animal.alive && Math.hypot(animal.cx - wx, animal.cy - wy) < TILE * 1.2) {
+        this._navigateTo(animal.cx, animal.cy, () => this.interact());
+        return;
+      }
+    }
+
     // 3. Dropped item?
     for (const drop of this.world.activeDrops) {
       if (!drop.alive) continue;
@@ -634,7 +660,7 @@ export class Game {
           this._navigateTo(drop.cx, drop.cy, () => {
             if (!drop.decorOnly && this.player.collectItem(drop.item)) {
               this.ui.showItemToast(drop.item);
-              this.ui.renderInventory(this.player.inventory, (id) => this._useItem(id));
+              this._renderBothBars();
               drop.alive = false;
               this.events.emit('item_collected', { itemId: drop.item.id });
               this.music.sfxCollect?.();
@@ -807,7 +833,7 @@ export class Game {
     if (!pick) return;
     if (this.player.collectItem(pick)) {
       this.ui.showItemToast(pick);
-      this.ui.renderInventory(this.player.inventory, (id) => this._useItem(id));
+      this._renderBothBars();
       this.events.emit('item_collected', { itemId: pick.id });
     }
     this.music.sfxFishCaught?.();
@@ -886,7 +912,7 @@ export class Game {
     if (npc.item && !this.player.hasItem(npc.item.id)) {
       if (this.player.collectItem(npc.item)) {
         this.ui.showItemToast(npc.item);
-        this.ui.renderInventory(this.player.inventory, (id) => this._useItem(id));
+        this._renderBothBars();
         this.music.sfxCollect?.();
         // Unlock next era if this is the gate item
         const era = ERAS[this._eraId];
@@ -1029,7 +1055,7 @@ export class Game {
     for (const d of this.world.activeDrops) d.draw(ctx, ox, oy, frame);
 
     // Entities sorted by Y (depth sort)
-    const entities = [...this.world.activeNPCs, ...this.world.activeEnemies, this.player];
+    const entities = [...this.world.activeNPCs, ...this.world.activeEnemies, ...this.world.activeLivestock, this.player];
     entities.sort((a, b) => a.cy - b.cy);
     for (const e of entities) e.draw(ctx, ox, oy, frame);
 

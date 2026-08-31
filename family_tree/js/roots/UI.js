@@ -59,6 +59,8 @@ export class UI {
 
       <!-- Inventory bar -->
       <div id="rt-inv"></div>
+      <!-- Artefacts pouch (key/gate items — unlimited, separate from inventory) -->
+      <div id="rt-artifacts" style="display:none"></div>
 
       <!-- D-pad (collapsable — tap 🕹️ to toggle) -->
       <div id="rt-dpad">
@@ -193,6 +195,36 @@ export class UI {
     document.getElementById('rt-stories').textContent = `📖 ${storiesCount}/${totalNpcs}`;
     const fishBtn = document.getElementById('ab-fish');
     if (fishBtn) fishBtn.style.display = isFishable ? 'flex' : 'none';
+  }
+
+  renderKeyItems(keyItems) {
+    const bar = document.getElementById('rt-artifacts');
+    if (!bar) return;
+    if (!keyItems?.length) { bar.style.display = 'none'; return; }
+    bar.style.display = 'flex';
+    bar.innerHTML = '<span style="font-size:9px;color:#c9820a;margin-right:4px;align-self:center">📜</span>';
+    keyItems.forEach(item => {
+      const slot = document.createElement('div');
+      slot.className = 'rt-inv-slot rt-key-slot';
+      slot.style.position = 'relative';
+      slot.setAttribute('role', 'img');
+      slot.setAttribute('aria-label', item.label);
+      const tip = itemTooltip(item);
+      slot.addEventListener('mouseenter', (e) => this._showItemTip(e.currentTarget, tip));
+      slot.addEventListener('mouseleave', () => this._hideItemTip());
+      slot.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        this._itemTipTarget = slot;
+        this._showItemTip(e.currentTarget, tip);
+        clearTimeout(this._tipAutoHide);
+        this._tipAutoHide = setTimeout(() => { this._hideItemTip(); this._itemTipTarget = null; }, 3000);
+      }, { passive: false });
+      const emojiEl = document.createElement('span');
+      emojiEl.textContent = item.emoji || '📜';
+      emojiEl.style.fontSize = '20px';
+      slot.appendChild(emojiEl);
+      bar.appendChild(slot);
+    });
   }
 
   renderInventory(inventory, onUse) {

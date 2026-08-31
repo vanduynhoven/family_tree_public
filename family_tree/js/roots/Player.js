@@ -124,7 +124,8 @@ export class Player extends Entity {
     this.maxHp      = 100;
     this.stamina    = 100;
     this.maxStamina = 100;
-    this.inventory      = [];   // max 12 slots
+    this.inventory      = [];   // max 12 slots — consumables, trade items, fish, crops
+    this.keyItems       = [];   // unlimited — gate items & story artefacts (don't use inventory space)
     this.collectedFacts = [];   // { npcId, name, text }
     this.walkCycle      = 0;
     this.hurtTimer      = 0;
@@ -145,12 +146,20 @@ export class Player extends Entity {
   }
 
   get inventoryFull() { return this.inventory.length >= 12; }
-  hasItem(id)         { return this.inventory.some(i => i.id === id); }
-  countItem(id)       { return this.inventory.find(i => i.id === id)?.count ?? 0; }
+  hasItem(id)         { return this.inventory.some(i => i.id === id) || this.keyItems.some(i => i.id === id); }
+  countItem(id)       { return this.inventory.find(i => i.id === id)?.count ?? (this.keyItems.some(i => i.id === id) ? 1 : 0); }
 
   collectItem(item) {
     if (!item) return false;
-    // Check if item is stackable (most items are; key/quest items are not)
+    // Key/gate items go into the separate keyItems pouch (no inventory limit)
+    const info = ITEM_INFO[item.id];
+    if (info?.useLabel?.startsWith('Key item')) {
+      if (!this.keyItems.some(i => i.id === item.id)) {
+        this.keyItems.push({ ...item, count: 1 });
+      }
+      return true;
+    }
+    // Regular items stack in inventory (max 12 slots)
     const existing = this.inventory.find(i => i.id === item.id);
     if (existing) {
       existing.count = (existing.count || 1) + 1;
