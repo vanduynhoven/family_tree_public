@@ -473,7 +473,12 @@ export class World {
     this._drops   = this._drops.filter(d => d.alive);
   }
 
-  get visitedSet() { return this._visited; }
+  get visitedSet()     { return this._visited; }
+  /** Count of non-null screens in the current era (may be 15 not 16 for eras without [3,3]) */
+  get definedScreenCount() {
+    if (!this.screens) return 16;
+    return this.screens.reduce((n, row) => n + row.filter(Boolean).length, 0);
+  }
 }
 
 // ── Helpers ───────────────────────────────────────────────

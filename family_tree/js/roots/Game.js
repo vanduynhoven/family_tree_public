@@ -967,7 +967,8 @@ export class Game {
         this.player.y = pos.y;
         this.ui.showScreenTitle(this.world.screen?.title || '');
         // Check if all 16 screens in this era have now been explored
-        const totalScreens = WORLD_ROWS * WORLD_COLS;
+        // Count actual defined screens (some eras have 15, not 16 — [3,3] removed)
+        const totalScreens = this.world.definedScreenCount;
         if (this.world.visitedSet.size >= totalScreens && !this._exploredEras?.has(this._eraId)) {
           if (!this._exploredEras) this._exploredEras = new Set();
           this._exploredEras.add(this._eraId);

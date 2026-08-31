@@ -469,8 +469,18 @@ export function buildEraWorld(eraId, location = 'haarlem') {
         set(m,7,4,T.ROCK); set(m,7,15,T.ROCK); set(m,8,5,T.ROCK); set(m,8,14,T.ROCK);
         // Wide clear corridor up the centre so player can always move
         fill(m,7,8,H-3,11,T.GRASS);
-        grid[3][2]=makeScreen(m,{left:{pos:7},up:{pos:10}},'1539 · Old Shrine',{r:10,c:10}); }
+        grid[3][2]=makeScreen(m,{left:{pos:7},right:{pos:7},up:{pos:10}},'1539 · Old Shrine',{r:10,c:10}); }
 
+
+      // [3,3] Secret Stone Circle — hidden ritual site beyond the shrine
+      { const m=blank(T.GRASS); border(m,T.PINE);
+        fill(m,2,2,H-3,W-3,T.FLOWER);
+        // Ring of ancient standing stones
+        [[3,9],[3,10],[3,11],[5,7],[5,13],[7,5],[7,15],[9,7],[9,13],[11,9],[11,10],[11,11]].forEach(([r,c])=>set(m,r,c,T.ROCK));
+        // Central altar glowing
+        set(m,7,10,T.PORTAL); // this is a bonus portal — second way to time travel!
+        clearZone(m,7,10,2);
+        grid[3][3]=makeScreen(m,{left:{pos:7}},'1539 · Secret Stone Circle',{r:7,c:7}); }
       break; }
 
     // ═══════════════════════════════════════════════════
@@ -608,7 +618,7 @@ export function buildEraWorld(eraId, location = 'haarlem') {
         fill(m,4,0,H-1,W-1,T.COBBLE);
         fill(m,4,8,7,11,T.GRASS); // garden below wall
         fill(m,5,9,6,10,T.FLOWER);
-        grid[2][3]=makeScreen(m,{left:{pos:7},up:{pos:10}},'1660 · City Wall Walk',{r:8,c:9}); }
+        grid[2][3]=makeScreen(m,{left:{pos:7},up:{pos:10},down:{pos:10}},'1660 · City Wall Walk',{r:8,c:9}); }
 
       // [3,0] City outskirts south
       { const m=blank(T.GRASS); border(m,T.TREE);
@@ -630,8 +640,18 @@ export function buildEraWorld(eraId, location = 'haarlem') {
         fill(m,1,1,H-3,W-3,T.WHEAT);
         fill(m,4,6,9,13,T.GRASS);
         houseEra(m, 5,7,5,5, 1);
-        grid[3][2]=makeScreen(m,{left:{pos:7},up:{pos:10}},'1660 · Polder Farm',{r:9,c:9}); }
+        grid[3][2]=makeScreen(m,{left:{pos:7},right:{pos:7},up:{pos:10}},'1660 · Polder Farm',{r:9,c:9}); }
 
+
+      // [3,3] Merchant's Hidden Garden — private pleasure garden
+      { const m=blank(T.GRASS); border(m,T.TREE);
+        fill(m,2,2,H-3,W-3,T.FLOWER);
+        for(let c=4;c<W-4;c+=3) set(m,5,c,T.TREE);
+        for(let c=4;c<W-4;c+=3) set(m,9,c,T.TREE);
+        fill(m,6,7,8,12,T.WATER); // ornamental pond
+        set(m,7,9,T.BRIDGE);
+        houseEra(m, 1,8,3,4, 1); // summer house
+        grid[3][3]=makeScreen(m,{left:{pos:7}},'1660 · Hidden Garden',{r:7,c:5}); }
       break; }
 
     // ═══════════════════════════════════════════════════
@@ -770,7 +790,7 @@ export function buildEraWorld(eraId, location = 'haarlem') {
         for(let c=1;c<W-1;c++){ m[5][c]=T.WATER; m[6][c]=T.WATER; m[7][c]=T.WATER; }
         m[5][9]=T.BRIDGE; m[6][9]=T.BRIDGE; m[7][9]=T.BRIDGE;
         m[5][10]=T.BRIDGE; m[6][10]=T.BRIDGE; m[7][10]=T.BRIDGE;
-        grid[2][3]=makeScreen(m,{left:{pos:7},up:{pos:10}},'1799 · River Bridge',{r:4,c:9}); }
+        grid[2][3]=makeScreen(m,{left:{pos:7},up:{pos:10},down:{pos:10}},'1799 · River Bridge',{r:4,c:9}); }
 
       // [3,0] Deserter hideout — inn
       { const m=blank(T.GRASS); border(m,T.TREE);
@@ -804,8 +824,20 @@ export function buildEraWorld(eraId, location = 'haarlem') {
         set(m,8,5,T.ROCK); set(m,8,14,T.ROCK); // flanking chests / strongboxes
         fill(m,9,7,10,12,T.COBBLE); // audience floor before the entrance
         set(m,6,9,T.DOOR);
-        grid[3][2]=makeScreen(m,{left:{pos:7},up:{pos:10}},'1799 · French Manor HQ',{r:10,c:9}); }
+        grid[3][2]=makeScreen(m,{left:{pos:7},right:{pos:7},up:{pos:10}},'1799 · French Manor HQ',{r:10,c:9}); }
 
+
+      // [3,3] Cellar Hideout — civilians hiding from conscription
+      { const m=blank(T.DIRT); border(m,T.WALL);
+        fill(m,1,1,H-3,W-3,T.COBBLE);
+        // Barrels and crates
+        fill(m,2,3,4,5,T.ROCK); fill(m,2,14,4,16,T.ROCK);
+        fill(m,8,3,10,6,T.ROCK); fill(m,8,13,10,15,T.ROCK);
+        // Candle glow
+        set(m,5,9,T.CROP_READY); set(m,5,10,T.CROP_READY);
+        // Hidden stash (fr_button on floor)
+        set(m,7,9,T.FLOWER); // makeshift bed of straw
+        grid[3][3]=makeScreen(m,{left:{pos:7}},'1799 · Cellar Hideout',{r:7,c:10}); }
       break; }
 
     // ═══════════════════════════════════════════════════
@@ -965,7 +997,7 @@ export function buildEraWorld(eraId, location = 'haarlem') {
         fill(m,8,1,H-3,W-3,T.WATER);
         m[8][9]=T.BRIDGE; m[8][10]=T.BRIDGE;
         fill(m,4,3,7,6,T.CROP_READY);
-        grid[2][3]=makeScreen(m,{left:{pos:7},up:{pos:10}},'1872 · Potato Fields',{r:5,c:9}); }
+        grid[2][3]=makeScreen(m,{left:{pos:7},up:{pos:10},down:{pos:10}},'1872 · Potato Fields',{r:5,c:9}); }
 
       // [3,0] Village inn — innkeeper
       { const m=blank(T.GRASS); border(m,T.TREE);
@@ -1000,8 +1032,22 @@ export function buildEraWorld(eraId, location = 'haarlem') {
         // Abandoned mine carts (ROCK) beside the rail
         set(m,10,7,T.ROCK); set(m,11,12,T.ROCK);
         clearZone(m,H-3,9,2);
-        grid[3][2]=makeScreen(m,{left:{pos:7},up:{pos:10}},'1872 · Abandoned Mine Shaft',{r:H-3,c:9}); }
+        grid[3][2]=makeScreen(m,{left:{pos:7},right:{pos:7},up:{pos:10}},'1872 · Abandoned Mine Shaft',{r:H-3,c:9}); }
 
+
+      // [3,3] Miners' Rest — secret break room deep in the mine
+      { const m=blank(T.DIRT); border(m,T.ROCK);
+        fill(m,1,1,H-3,W-3,T.COBBLE);
+        // Support beams
+        set(m,2,7,T.WALL); set(m,2,12,T.WALL);
+        set(m,6,7,T.WALL); set(m,6,12,T.WALL);
+        // Miner's table and lanterns
+        fill(m,4,8,5,11,T.DIRT);
+        set(m,4,8,T.CROP_READY); set(m,4,11,T.CROP_READY); // lanterns
+        set(m,3,9,T.ROCK); set(m,3,10,T.ROCK); // stools
+        // Coal pile
+        fill(m,9,4,11,7,T.ROCK);
+        grid[3][3]=makeScreen(m,{left:{pos:7}},'1872 · Miners\' Rest',{r:7,c:10}); }
       break; }
 
     // ═══════════════════════════════════════════════════
@@ -1130,7 +1176,7 @@ export function buildEraWorld(eraId, location = 'haarlem') {
         for(let r=3;r<H-3;r+=2){ for(let c=3;c<W-3;c++) set(m,r,c,T.ROCK); }
         // Overhead lighting every 4 cols
         for(let c=3;c<W-3;c+=4) set(m,1,c,T.CROP_READY);
-        grid[2][3]=makeScreen(m,{left:{pos:7},up:{pos:10}},'1950 · Cargo Hold',{r:8,c:12}); }
+        grid[2][3]=makeScreen(m,{left:{pos:7},up:{pos:10},down:{pos:10}},'1950 · Cargo Hold',{r:8,c:12}); }
 
       // [3,0] Rough sea — storm waves
       { const m=blank(T.DEEP_WATER); border(m,T.PLANK);
@@ -1152,8 +1198,20 @@ export function buildEraWorld(eraId, location = 'haarlem') {
         fill(m,H-4,0,H-1,W-1,T.DEEP_WATER); // water at stern
         fill(m,H-5,1,H-5,W-2,T.BRIDGE); // fishing rail
         for(let c=4;c<W-3;c+=4) set(m,6,c,T.ROCK);
-        grid[3][2]=makeScreen(m,{left:{pos:7},up:{pos:10}},'1950 · Aft Promenade',{r:5,c:9}); }
+        grid[3][2]=makeScreen(m,{left:{pos:7},right:{pos:7},up:{pos:10}},'1950 · Aft Promenade',{r:5,c:9}); }
 
+
+      // [3,3] Secret Cargo Hold — hidden space where stowaways hid
+      { const m=blank(T.PLANK); border(m,T.PLANK);
+        fill(m,1,1,H-3,W-3,T.PLANK);
+        // Cargo boxes
+        fill(m,2,2,5,6,T.ROCK); fill(m,2,13,5,17,T.ROCK);
+        fill(m,8,2,11,5,T.ROCK); fill(m,8,14,11,17,T.ROCK);
+        // Narrow passage through
+        fill(m,2,7,H-3,12,T.PLANK);
+        // Small light source
+        set(m,6,9,T.CROP_READY);
+        grid[3][3]=makeScreen(m,{left:{pos:7}},'1950 · Secret Cargo Hold',{r:6,c:9}); }
       break; }
 
     // ═══════════════════════════════════════════════════
@@ -1312,7 +1370,7 @@ export function buildEraWorld(eraId, location = 'haarlem') {
         m[HP][1]=T.BRIDGE; m[HP][2]=T.BRIDGE; m[HP][3]=T.BRIDGE;
         fill(m,1,1,3,W-2,T.GRASS);
         for(let c=3;c<W-3;c+=3) set(m,2,c,T.TREE);
-        grid[2][3]=makeScreen(m,{left:{pos:7},up:{pos:10}},'1955 · Walleye Lake',{r:HP,c:4}); }
+        grid[2][3]=makeScreen(m,{left:{pos:7},up:{pos:10},down:{pos:10}},'1955 · Walleye Lake',{r:HP,c:4}); }
 
       // [3,0] Old farmstead — innkeeper
       { const m=blank(T.GRASS); border(m,T.TREE);
@@ -1330,8 +1388,20 @@ export function buildEraWorld(eraId, location = 'haarlem') {
         fill(m,1,3,6,15,T.COBBLE);
         houseEra(m, 1,7,4,6, 5);
         fill(m,7,1,H-3,W-3,T.FLOWER);
-        grid[3][2]=makeScreen(m,{left:{pos:7},up:{pos:10}},'1955 · Old Drive-In',{r:10,c:9}); }
+        grid[3][2]=makeScreen(m,{left:{pos:7},right:{pos:7},up:{pos:10}},'1955 · Old Drive-In',{r:10,c:9}); }
 
+
+      // [3,3] Abandoned Silo — old grain storage on the edge of the farm
+      { const m=blank(T.GRASS); border(m,T.TREE);
+        fill(m,2,5,H-3,14,T.DIRT); // dirt floor inside silo
+        // Circular silo wall
+        fill(m,2,5,2,14,T.HOUSE_WALL); fill(m,H-3,5,H-3,14,T.HOUSE_WALL);
+        fill(m,2,5,H-3,5,T.HOUSE_WALL); fill(m,2,14,H-3,14,T.HOUSE_WALL);
+        set(m,H-3,9,T.DOOR); set(m,H-3,10,T.DOOR); // barn doors open
+        // Old grain pile
+        fill(m,5,7,8,12,T.WHEAT);
+        set(m,6,9,T.CORN); set(m,6,10,T.CORN); // harvestable
+        grid[3][3]=makeScreen(m,{left:{pos:7}},'1955 · Abandoned Silo',{r:H-3,c:9}); }
       break; }
 
     // ═══════════════════════════════════════════════════
@@ -1464,7 +1534,7 @@ export function buildEraWorld(eraId, location = 'haarlem') {
         m[HP][9]=T.BRIDGE; m[HP][10]=T.BRIDGE; m[HP][11]=T.BRIDGE;
         fill(m,0,0,2,W-1,T.HOUSE_WALL); fill(m,9,0,H-1,W-1,T.HOUSE_WALL);
         for(let c=2;c<W-2;c+=4){ set(m,2,c,T.DOOR); set(m,9,c,T.DOOR); }
-        grid[2][3]=makeScreen(m,{left:{pos:7},up:{pos:10}},'1984 · Dutch Canal Street',{r:5,c:9}); }
+        grid[2][3]=makeScreen(m,{left:{pos:7},up:{pos:10},down:{pos:10}},'1984 · Dutch Canal Street',{r:5,c:9}); }
 
       // [3,0] Wisconsin suburbs — quiet street
       { const m=blank(T.GRASS); border(m,T.TREE);
@@ -1491,8 +1561,21 @@ export function buildEraWorld(eraId, location = 'haarlem') {
       { const m=blank(T.FLOWER); border(m,T.TREE);
         for(let r=1;r<H-1;r++){ m[r][9]=T.ROAD; m[r][10]=T.ROAD; }
         fill(m,1,1,H-3,8,T.FLOWER); fill(m,1,11,H-3,W-3,T.FLOWER);
-        grid[3][2]=makeScreen(m,{left:{pos:7},up:{pos:10}},'1984 · Dutch Rural Road',{r:7,c:9}); }
+        grid[3][2]=makeScreen(m,{left:{pos:7},right:{pos:7},up:{pos:10}},'1984 · Dutch Rural Road',{r:7,c:9}); }
 
+
+      // [3,3] Secret Records Room — hidden research archive
+      { const m=blank(T.COBBLE); border(m,T.WALL);
+        fill(m,1,1,H-3,W-3,T.COBBLE);
+        // Filing cabinets along walls
+        fill(m,2,2,H-3,3,T.HOUSE_WALL); fill(m,2,16,H-3,17,T.HOUSE_WALL);
+        fill(m,2,2,3,W-3,T.HOUSE_WALL);
+        // Computer terminal (CIRCUIT + CROP_READY glow)
+        set(m,6,9,T.CIRCUIT); set(m,6,10,T.CIRCUIT);
+        set(m,5,9,T.CROP_READY); set(m,5,10,T.CROP_READY); // screen glow
+        // Research table
+        fill(m,8,6,9,13,T.DIRT);
+        grid[3][3]=makeScreen(m,{left:{pos:7}},'1984 · Secret Records Room',{r:7,c:10}); }
       break; }
 
     // ═══════════════════════════════════════════════════
@@ -1636,7 +1719,7 @@ export function buildEraWorld(eraId, location = 'haarlem') {
         set(m,2,8,T.BRICK); set(m,2,11,T.BRICK); set(m,2,14,T.BRICK); // shuttered brick shops
         m[HP][6]=T.BRIDGE; m[HP][7]=T.BRIDGE;
         for(let r=2;r<H-2;r+=2) set(m,r,3,T.FLOWER);
-        grid[2][3]=makeScreen(m,{left:{pos:7},up:{pos:10}},'2020 · Empty Haarlem Street',{r:7,c:10}); }
+        grid[2][3]=makeScreen(m,{left:{pos:7},up:{pos:10},down:{pos:10}},'2020 · Empty Haarlem Street',{r:7,c:10}); }
 
       // [3,0] Minnesota river walk — Blue Earth River, social distancing signs
       { const m=blank(T.GRASS); border(m,T.TREE);
@@ -1664,8 +1747,22 @@ export function buildEraWorld(eraId, location = 'haarlem') {
         for(let r=1;r<H-1;r++){ m[r][9]=T.ROAD; m[r][10]=T.ROAD; }
         houseEra(m, 2,2,4,5, 7); houseEra(m, 2,13,4,5, 7);
         fill(m,7,2,H-3,6,T.FLOWER); fill(m,7,13,H-3,W-3,T.FLOWER);
-        grid[3][2]=makeScreen(m,{left:{pos:7},up:{pos:10}},'2020 · Quiet Neighbourhood',{r:7,c:9}); }
+        grid[3][2]=makeScreen(m,{left:{pos:7},right:{pos:7},up:{pos:10}},'2020 · Quiet Neighbourhood',{r:7,c:9}); }
 
+
+      // [3,3] Rooftop Garden — escape to open sky during lockdown
+      { const m=blank(T.COBBLE); border(m,T.HOUSE_WALL);
+        fill(m,1,1,H-3,W-3,T.COBBLE);
+        // Planters and garden patches
+        fill(m,3,3,5,7,T.FLOWER); fill(m,3,12,5,16,T.FLOWER);
+        fill(m,8,4,10,8,T.FLOWER); fill(m,8,11,10,15,T.FLOWER);
+        // Trees in pots
+        set(m,4,9,T.TREE); set(m,4,10,T.TREE);
+        // Water feature / bird bath
+        set(m,7,9,T.WATER); set(m,7,10,T.WATER);
+        // Solar panels (STEEL)
+        fill(m,2,7,2,12,T.STEEL);
+        grid[3][3]=makeScreen(m,{left:{pos:7}},'2020 · Rooftop Garden',{r:7,c:12}); }
       break; }
 
     default:
