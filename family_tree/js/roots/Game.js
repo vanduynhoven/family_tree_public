@@ -1042,8 +1042,26 @@ export class Game {
         // Determine the person's location from birth place
         const loc = _gedcomPersonLocation(gd.birthPlace, eraId);
 
+        // For non-VD spouses, find their Van Duynhoven partner's given name
+        // so _buildPersonDialog can introduce them in the first line
+        const isVdName = /van\s*du[iy][jn]nhov/i.test(gd.name);
+        let spouseGiven = null;
+        if (!isVdName) {
+          for (const famId of gd.fams) {
+            const fam = families.get(famId);
+            if (!fam) continue;
+            const otherId = fam.husb === id ? fam.wife : fam.husb;
+            if (!otherId) continue;
+            const other = individuals.get(otherId);
+            if (other && /van\s*du[iy][jn]nhov/i.test(other.name)) {
+              spouseGiven = other.given || other.name.split(' ')[0];
+              break;
+            }
+          }
+        }
+
         // Build accurate, location-specific dialog
-        const lines = _buildPersonDialog(given, fullName, gd, eraId, loc);
+        const lines = _buildPersonDialog(given, fullName, gd, eraId, loc, spouseGiven);
 
         const npcEntry = {
           gedcomId:  id,
@@ -1160,20 +1178,21 @@ function _eraPalette(eraId) {
  * Build historically accurate, location-specific dialog for a GEDCOM individual.
  * All lines sound like they come from a real person of that time and place.
  */
-function _buildPersonDialog(given, fullName, gd, eraId, loc) {
+function _buildPersonDialog(given, fullName, gd, eraId, loc, spouseGiven = null) {
   const year     = gd.birthYear  || null;
   const died     = gd.deathYear  || null;
   const place    = gd.birthPlace ? gd.birthPlace.split(',')[0].trim() : null;
   const occu     = gd.occupation ? gd.occupation.toLowerCase() : null;
   const isFemale = gd.sex === 'F';
-  const pronoun  = isFemale ? 'she' : 'he';
 
   const lines = { generic: [], repeat1: [], repeat2: [] };
 
   // ── Introduction ──────────────────────────────────────────────
 
-  // Line 1: who they are
-  if (year && place) {
+  // Line 1: for spouses, lead with their Van Duynhoven partner
+  if (spouseGiven) {
+    lines.generic.push(`I am ${given} — ${spouseGiven}'s ${isFemale ? 'wife' : 'husband'}. We are family.`);
+  } else if (year && place) {
     lines.generic.push(`${_intro(eraId, loc, given, fullName, year, place)}`);
   } else if (year) {
     lines.generic.push(`My name is ${fullName}. I was born in ${year}.`);

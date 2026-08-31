@@ -459,10 +459,10 @@ export const NPC_DATA = {
       bodyColor: '#704020', hairColor: '#2a1808', skinColor: '#d0a060',
       lines: {
         generic: [
+          'I\'m Anna Maria — Johan van Duijnhoven\'s wife. We are sailing to America together.',
           { dutch:'Ik mis Boekel al. [I already miss Boekel.]', en:'But we had to go. There was no future there for the children.' },
           'I packed the boterkoek recipe in my luggage. Some things you carry no matter what.',
           'The sea is bigger than I imagined. The horizon goes on forever.',
-          'I will die in Minnesota in 1987. But today — today we are just beginning.',
         ],
         repeat1: [
           'The children are seasick. I have been up since three this morning.',
