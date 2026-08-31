@@ -100,11 +100,48 @@ export const NPC_DATA = {
           'My grandmother was a Verwegen before she married. Two families, one village, for generations.',
           'Sometimes I think the fields know us. They grow better when the same hands tend them.',
         ],
-      },
-    },
-  ],
-
-  // ── Era 1 · 1660 · Dutch Golden Age ──────────────────
+        // ── Character-specific dialog ──
+        // Aelken is Dirck's kinswoman — she greets Dutch-speaking players (Raven/Starling) more warmly
+        raven: [
+          { dutch:'Jij spreekt Nederlands? Wat een verrassing! [You speak Dutch? What a surprise!]', en:'' },
+          { dutch:'Wij zijn familie, voel ik het. [We are family, I feel it.]', en:'Something in your face looks familiar.' },
+          { dutch:'Ga naar de oostelijke akkers — Dirck wacht op jou. [Go to the east fields — Dirck is waiting for you.]', en:'' },
+        ],
+        starling: [
+          { dutch:'Nederlands! En zo goed! [Dutch! And so well!]', en:'You speak our language — that is rare for a traveller.' },
+          { dutch:'Jouw naam klinkt als een vogel. [Your name sounds like a bird.]', en:'We have them in the fields here — the starlings.' },
+          { dutch:'Dirck is je voorouder. Ga hem zoeken. [Dirck is your ancestor. Go find him.]', en:'' },
+        ],
+        charlotte: [
+          'Charlotte — a city name for a country girl! Where are you from?',
+          'You are looking for Dirck, I can tell. He is in the eastern fields, working at sunrise.',
+          'He will not talk to just anyone. But he knows family when he sees it.',
+        ],
+        tenley: [
+          'A girl travelling alone — that is unusual here. You must have a reason.',
+          'You are looking for the oldest ancestor you can find? That would be Dirck.',
+          'East fields, just past the old oak. He is always there in the morning.',
+        ],
+        knoxley: [
+          'You have that look — the one that means you are searching for something.',
+          'If it is roots you want, Dirck van Duinhoven is who you need.',
+          'Follow the furrows east. He will be there.',
+        ],
+        isabella: [
+          'Isabella — that is a Spanish name. Strange thing to hear in Brabant.',
+          'The world is bigger than this field, I know that much.',
+          'If you are family, Dirck will know it. East fields. Go now, before midday.',
+        ],
+        henry: [
+          'A lad with questions — I like that.',
+          'Dirck keeps the oldest memories of this place. Find him.',
+          'East of here, past the oak, at the edge of the field.',
+        ],
+        maxwell: [
+          'You want to know how life works here? Get up before dawn and watch.',
+          'Every hand has a job. The fields feed the family. The family keeps the fields.',
+          'Find Dirck — he has been at this longer than anyone.',
+        ],
 
   '1_1_1': [
     {
@@ -126,11 +163,41 @@ export const NPC_DATA = {
           '"Van Duijnhoven" they write here. By your time it will change again.',
           'Names change as people move. The family stays the same underneath.',
         ],
-      },
-    },
-  ],
-
-  // ── Era 2 · 1799 · Napoleonic Uden ──────────────────
+        raven: [
+          { dutch:'Jij spreekt Nederlands! Wij zijn verwanten, dat voel ik. [You speak Dutch! We are kin, I feel it.]', en:'' },
+          { dutch:'"Van Duijnhoven" — zo schrijven we het hier. ["Van Duijnhoven" — that is how we write it here.]', en:'Your name will change spelling as the family moves.' },
+          { dutch:'Neem het gebedenboek mee. Het heeft ons door de zwaarste tijden gedragen. [Take the prayer book. It has carried us through the hardest times.]', en:'' },
+        ],
+        starling: [
+          { dutch:'Nederlands! Wat goed! Kom hier, kom hier. [Dutch! How good! Come here, come here.]', en:'' },
+          { dutch:'Wij zijn dezelfde familie — ik zie het aan je ogen. [We are the same family — I can see it in your eyes.]', en:'' },
+          { dutch:'Dit gebedenboek is voor jou. Bewaar het goed. [This prayer book is for you. Keep it safe.]', en:'' },
+        ],
+        tenley: [
+          { dutch:'Welkom, vreemdeling. [Welcome, stranger.]', en:'What brings you to this church?' },
+          'The name on these walls is Van Duijnhoven. Your name too, I suspect.',
+          'Take the prayer book — it connects your family across the centuries.',
+        ],
+        knoxley: [
+          { dutch:'De Gouden Eeuw, jongen. [The Golden Age, lad.]', en:'The most prosperous time our country has ever known.' },
+          'And yet we in the south remain Catholic, careful, and quiet.',
+          'Your ancestors kept the faith here. Remember that.',
+        ],
+        isabella: [
+          { dutch:'Welkom in de zeventiende eeuw. [Welcome to the seventeenth century.]', en:'' },
+          'Amsterdam is rich, but we are something richer — we are old.',
+          'This prayer book has the family names going back even further. Take it.',
+        ],
+        henry: [
+          { dutch:'Welkom. [Welcome.]', en:'You look like you have been travelling a long time.' },
+          'The family name goes back further than even I know.',
+          'Start with the prayer book. The answers are in the margins.',
+        ],
+        maxwell: [
+          { dutch:'Hoe gaat het? [How goes it?]', en:'You seem weary from the road.' },
+          'Sit a moment. The church is quiet at this hour.',
+          'Life here is simple — prayer, work, family. The same as your time, I imagine.',
+        ],
 
   '2_1_1': [
     {
@@ -152,11 +219,41 @@ export const NPC_DATA = {
           'My grandfather\'s grandfather farmed here too. The records go back to 1539 at least.',
           'Look in the ancient church archives. That is where the deepest roots are kept.',
         ],
-      },
-    },
-  ],
-
-  // ── Era 3 · 1872 · Industrial Noord-Brabant ─────────
+        raven: [
+          { dutch:'Je spreekt Nederlands! In deze tijd is dat niet zo gewoon. [You speak Dutch! In this era that is not so common for a traveller.]', en:'' },
+          { dutch:'Dit geboorteregister is voor jou — bewijs dat wij hier al eeuwen leven. [This birth record is yours — proof we have lived here for centuries.]', en:'' },
+          { dutch:'De Fransen proberen alles te veranderen, maar wij blijven wie we zijn. [The French try to change everything, but we remain who we are.]', en:'' },
+        ],
+        starling: [
+          { dutch:'Nederlands! Goed zo! Hier in Napoleontische tijd is dat dapper. [Dutch! Well done! In Napoleonic times that is brave.]', en:'' },
+          { dutch:'Wij van Duijnhoven — wij zijn hier al honderden jaren. [We van Duijnhoven — we have been here hundreds of years.]', en:'' },
+          { dutch:'Neem het geboorteregister. Het is jouw bewijs van onze familie. [Take the birth record. It is your proof of our family.]', en:'' },
+        ],
+        charlotte: [
+          'Charlotte — you want the record of our family name?',
+          'I was born in 1799, the year Napoleon\'s armies marched through here.',
+          'Here — take the birth record. One day it will matter more than you know.',
+        ],
+        tenley: [
+          'You are curious about the women of the family? Good.',
+          'My mother kept this family together when the French occupation made everything harder.',
+          'Take the birth record. The women\'s names are in there too.',
+        ],
+        isabella: [
+          'Isabella — looking for roots in Napoleonic times!',
+          'This was a difficult era. But the family name survived everything.',
+          'Take this record. It proves where you come from.',
+        ],
+        henry: [
+          'A young man looking for history — I respect that.',
+          'In 1799 the world was changing faster than anyone could understand.',
+          'Your family kept their head down and survived. Take the record.',
+        ],
+        maxwell: [
+          'You want to know what life was like under Napoleon\'s laws?',
+          'Conscription, taxes, French everywhere. But the family kept going.',
+          'Here — take the birth record. Proof we were here.',
+        ],
 
   '3_2_1': [  // South fields — Marianus works here mornings
     {
@@ -205,8 +302,16 @@ export const NPC_DATA = {
           'That is how small this village is. Everyone is connected to everyone.',
         ],
         raven: [
-          { dutch:'Raven! Weet je het woord voor trein? [Raven! Do you know the word for train?]', en:'"Trein." T-R-E-I-N.' },
-          'The railway brought the modern world to our village. One day it will carry my family far away.',
+          { dutch:'Raven! Je spreekt onze taal! Geweldig! [Raven! You speak our language! Wonderful!]', en:'' },
+          { dutch:'Weet je het woord voor trein? "Trein." T-R-E-I-N. [Do you know the word for train? "Trein."]', en:'The railway brought the modern world to our village.' },
+          { dutch:'Een dag zal de trein mijn familie ver weg brengen. [One day the train will carry my family far away.]', en:'But not yet. Not yet.' },
+          { dutch:'Hier — dit treinkaartje is voor jou. [Here — this train ticket is for you.]', en:'' },
+        ],
+        starling: [
+          { dutch:'Je spreekt Nederlands! Hier in 1872 is dat een verrassing. [You speak Dutch! Here in 1872 that is a surprise.]', en:'' },
+          { dutch:'Mijn naam is Marianus. Ik ben jouw overgrootgrootvader. [My name is Marianus. I am your great-great-great-grandfather.]', en:'' },
+          { dutch:'Het leven hier is eenvoudig maar zwaar. Maar de familie houdt alles samen. [Life here is simple but hard. But the family holds everything together.]', en:'' },
+          { dutch:'Neem het treinkaartje mee. Het begint een lange reis. [Take the train ticket. It begins a long journey.]', en:'' },
         ],
         isabella: [
           'You are here about my son Johan, I think.',
@@ -219,6 +324,30 @@ export const NPC_DATA = {
           { dutch:'Ze is een goede vrouw. [She is a good woman.]', en:'Twelve children and never a complaint.' },
           'She will outlive me by three years. She dies in Uden, December 1952.',
           'Remember her name: Anna Maria van den Elzen. She deserves to be remembered.',
+        ],
+        charlotte: [
+          'Charlotte — the women in our family carried everything.',
+          'My Anna had twelve children and kept this household running through hard years.',
+          { dutch:'Sterke vrouwen maken sterke families. [Strong women make strong families.]', en:'Remember that.' },
+          'Take the train ticket — it will make sense later.',
+        ],
+        knoxley: [
+          'You want to go further back? Good — I like that spirit.',
+          'My father is Martinus, born 1830. His father before him farmed here too.',
+          { dutch:'Ga naar de kerk — de oude archieven gaan terug tot 1539. [Go to the church — the old archives go back to 1539.]', en:'' },
+          'Dirck van Duinhoven. That is the name you want.',
+        ],
+        henry: [
+          'Henry! A young man on a mission.',
+          'Let me tell you what daily life was like here in 1872.',
+          'We wake at dawn, work the fields, eat together as a family. Church on Sunday.',
+          { dutch:'Simpel leven, goed leven. [Simple life, good life.]', en:'Do not let anyone tell you otherwise.' },
+        ],
+        maxwell: [
+          'You want to know about daily life here?',
+          'The factory in Veghel is new. Before that, only farming.',
+          { dutch:'Wij werken van zonsopgang tot zonsondergang. [We work from sunrise to sunset.]', en:'Every day, every season.' },
+          'But in the evening — family, food, and stories. That is what matters.',
         ],
       },
     },
@@ -269,8 +398,45 @@ export const NPC_DATA = {
           { dutch:'Wij zijn samen sterk. [Together we are strong.]', en:'That is what matters.' },
         ],
         raven: [
-          { dutch:'Raven! Weet je het woord voor "schip"? [Raven! Do you know the word for "ship"?]', en:'"Schip." That is what brought your family to America.' },
-          'Without this ship, there is no you.',
+          { dutch:'Je spreekt Nederlands op een schip midden op de oceaan! [You speak Dutch on a ship in the middle of the ocean!]', en:'' },
+          { dutch:'"Schip" — dat is het woord. Dit schip brengt jouw familie naar Amerika. ["Ship" — that is the word. This ship takes your family to America.]', en:'' },
+          { dutch:'Zonder dit schip ben jij er niet. Begrijp je dat? [Without this ship, you would not exist. Do you understand that?]', en:'' },
+          { dutch:'Hier zijn de immigratiepapieren — bewaar ze goed. [Here are the immigration papers — keep them safe.]', en:'' },
+        ],
+        starling: [
+          { dutch:'Starling! Je spreekt Nederlands! Op de oceaan! [Starling! You speak Dutch! On the ocean!]', en:'' },
+          { dutch:'Wij verlaten Nederland voor altijd. Dat doet pijn. [We leave the Netherlands forever. That hurts.]', en:'' },
+          { dutch:'Maar jij bent geboren in Haarlem — de familie is teruggekomen! [But you were born in Haarlem — the family came back!]', en:'' },
+          { dutch:'Dat maakt deze reis de moeite waard. [That makes this journey worth it.]', en:'' },
+        ],
+        charlotte: [
+          'Charlotte — you found us in the middle of the Atlantic!',
+          'Your grandfather Peter John is a child on this very ship.',
+          { dutch:'Kijk — daar speelt hij. [Look — there he plays.]', en:'That small boy is the reason you exist.' },
+          'Take the papers. They cross an ocean, just like you.',
+        ],
+        tenley: [
+          'Tenley! Your grandmother Mary Campbell is waiting in Minnesota.',
+          'Your grandfather Peter John will meet her there. The family grows from that meeting.',
+          'Everything depends on this crossing.',
+          { dutch:'Alles begint hier. [Everything begins here.]', en:'' },
+        ],
+        knoxley: [
+          'Knoxley — always digging to the bottom of things.',
+          'This is the moment everything changed. Before 1950 — Dutch. After 1950 — American.',
+          { dutch:'Maar wij vergeten nooit waar we vandaan komen. [But we never forget where we come from.]', en:'' },
+          'That is the promise of this whole journey.',
+        ],
+        henry: [
+          'Henry! You want to know what this ship was really like.',
+          'Three hundred people below deck. Forty days of storms.',
+          { dutch:'Maar wij kwamen aan. Dat is het enige wat telt. [But we arrived. That is all that matters.]', en:'' },
+        ],
+        maxwell: [
+          'Maxwell — you want the details of daily life on this ship.',
+          'Boiled potatoes, salted fish, and sea water spray in your face every morning.',
+          { dutch:'Tien dagen op zee. Elke dag een nieuw avontuur. [Ten days at sea. Every day a new adventure.]', en:'' },
+          'But also sunsets over the ocean you would not believe.',
         ],
       },
     },
@@ -333,6 +499,41 @@ export const NPC_DATA = {
           'Morning: milk the cows. Afternoon: the fields. Evening: church, supper, family.',
           { dutch:'Elke dag hetzelfde, maar nooit saai. [Every day the same, but never boring.]', en:'That is farming.' },
         ],
+        charlotte: [
+          'Charlotte! Your father Chuck is my cousin — so we are family.',
+          'Moorhead is a good Dutch community. Everyone knows everyone.',
+          { dutch:'Wij helpen elkaar. [We help each other.]', en:'That is how it works here.' },
+        ],
+        tenley: [
+          'Tenley! You are looking for Grandpa Peter John, I imagine.',
+          'He lives just down the road. Find him — he has the whole family story.',
+          { dutch:'Hij weet alles over ons. [He knows everything about us.]', en:'' },
+        ],
+        knoxley: [
+          'Knoxley — you want to go deeper. I know that look.',
+          'Peter John knows the story from the beginning — 1950, the ship, Boekel.',
+          'Find him. He will tell you everything.',
+        ],
+        isabella: [
+          'Isabella! Your grandfather Peter John is my brother.',
+          'You have the same eyes as your grandmother Mary Campbell.',
+          { dutch:'Welkom in Minnesota. [Welcome to Minnesota.]', en:'The Dutch community here is warm.' },
+        ],
+        henry: [
+          'Henry — you want to know how a Dutch farm family became American.',
+          'Slowly. One English word at a time. One Sunday church service at a time.',
+          { dutch:'Nu zijn we Amerikaans, maar ons hart blijft Nederlands. [Now we are American, but our heart stays Dutch.]', en:'' },
+        ],
+        raven: [
+          { dutch:'Raven! Je spreekt Nederlands! Hier in Minnesota! [Raven! You speak Dutch! Here in Minnesota!]', en:'' },
+          { dutch:'Je opa Peter John zal zo blij zijn. [Your grandpa Peter John will be so happy.]', en:'Go find him — he is just down the road.' },
+          { dutch:'De boterkoekjes zijn net klaar. Wil je er eentje? [The boterkoekjes are just done. Do you want one?]', en:'Dutch butter cake — your dad\'s favourite.' },
+        ],
+        starling: [
+          { dutch:'Starling! Wat een mooie naam! En je spreekt Nederlands! [Starling! What a lovely name! And you speak Dutch!]', en:'' },
+          { dutch:'Oma maakte dit recept elke zondag. Nu geef ik het aan jou. [Grandma made this recipe every Sunday. Now I give it to you.]', en:'' },
+          { dutch:'Bewaar het goed — het is familie-erfgoed. [Keep it safe — it is family heritage.]', en:'' },
+        ],
       },
     },
   ],
@@ -357,11 +558,41 @@ export const NPC_DATA = {
           'I left the Maas river behind in Brabant. I found this lake in Minnesota. Different water, same peace.',
           { dutch:'Thuis is waar het water rustig is. [Home is where the water is calm.]', en:'I believe that.' },
         ],
-      },
-    },
-  ],
-
-  // ── Era 6 · 1984 ─────────────────────────────────────
+        raven: [
+          { dutch:'Raven! Je spreekt onze taal — zelfs hier bij het meer! [Raven! You speak our language — even here at the lake!]', en:'' },
+          { dutch:'Weet je het woord voor "meer"? [Do you know the word for "lake"?]', en:'"Meer." Here in Brabant we had rivers. Here in Minnesota — a meer. Different water, same peace.' },
+          { dutch:'Jij bent de toekomst van onze familie. Vergeet ons niet. [You are the future of our family. Don\'t forget us.]', en:'' },
+        ],
+        starling: [
+          { dutch:'Starling! Je bent zo ver gekomen om ons te vinden. [Starling! You came so far to find us.]', en:'' },
+          { dutch:'Het meer hier — het doet me denken aan de rivieren thuis in Brabant. [This lake here — it reminds me of the rivers back home in Brabant.]', en:'' },
+          { dutch:'Wij dachten dat we alles achterlieten. Maar jij bent teruggekomen. [We thought we left everything behind. But you came back.]', en:'' },
+        ],
+        charlotte: [
+          'Charlotte — you found an old man fishing on a Sunday.',
+          'This is my favourite place in all of Minnesota.',
+          'Sit down. The fish are not going anywhere. Neither are the stories.',
+        ],
+        tenley: [
+          'Tenley — you want to know the quieter side of immigrant life.',
+          'It is right here. Sunday at the lake. Children running, fish jumping.',
+          { dutch:'Zelfs in Amerika vinden we rust. [Even in America we find peace.]', en:'' },
+        ],
+        knoxley: [
+          'Knoxley — good to see you. How far back have you gone?',
+          'Every journey needs a quiet moment. Sit by the lake.',
+          'The walleye is good this year. Almost as good as the carp back in Brabant.',
+        ],
+        henry: [
+          'Henry! You found the Sunday fishing spot.',
+          'This is where the family talks. Really talks.',
+          { dutch:'Op zondag is er tijd voor verhalen. [On Sunday there is time for stories.]', en:'Ask me anything.' },
+        ],
+        maxwell: [
+          'Maxwell — you want to know what the food and daily rhythm was really like.',
+          'Sunday afternoon: fishing. Monday to Saturday: work. That was the life.',
+          { dutch:'Simpel maar goed. [Simple but good.]', en:'The walleye was excellent.' },
+        ],
 
   '6_1_1': [
     {
@@ -519,12 +750,6 @@ export const NPC_DATA = {
           'Can I tell you something? Building that family tree changed me.',
           'When you see all those names going back to 1450 — Dirck, Johannes, Petrus, Martinus, Marianus, Johan, me — you feel very small.',
           'But also very connected. It is hard to explain.',
-        ],
-        henry: [
-          'Henry — you\'ve been talking to all of them, haven\'t you.',
-          'You\'ve met Dirck in 1539 and you\'re here now in 2020. How does it feel?',
-          'This is what I was trying to do with the website. Make all of them real.',
-          { dutch:'De familie is nooit echt weg. [The family is never really gone.]', en:'' },
         ],
         // ── Special dialog when a child/grandchild is playing ──
         raven: [
@@ -794,8 +1019,12 @@ export const NPC_DATA = {
           'Tell your dad the new Ardennes sausage is in. He\'ll want some.',
           { dutch:'En één gratis worst voor jou. [And one free sausage for you.]', en:'Don\'t tell the others.' },
         ],
+        starling: [
+          { dutch:'Starling! Jij houdt wél van de knoflook! [Starling! You do like the garlic!]', en:'' },
+          'Unlike your sister — she always makes a face.',
+          { dutch:'Een stukje gerookte worst voor jou. [A piece of smoked sausage for you.]', en:'Your dad\'s favourite kind.' },
+        ],
       },
-      item: { id: 'smoked_garlic', label: 'Smoked Garlic', emoji: '🧄' },
     },
   ],
 
