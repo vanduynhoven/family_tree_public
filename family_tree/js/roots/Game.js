@@ -1363,7 +1363,12 @@ export class Game {
 
     for (const [key, arr] of Object.entries(NPC_DATA)) {
       if (!key.startsWith(`${eraId}_`)) continue;
-      result[key] = arr.map(d => {
+      result[key] = arr.filter(d => {
+        // Respect npc.era field if it differs from the screen key era
+        // (allows Carolyn era:6 to live under 5_2_2 key without appearing in Era 5)
+        if (d.era !== undefined && d.era !== eraId) return false;
+        return true;
+      }).map(d => {
         if (d.gedcomId) staticKeys.add(d.gedcomId);
         if (d.gedcomId && this._gedcom) {
           const gd = this._gedcom.individuals.get(d.gedcomId);

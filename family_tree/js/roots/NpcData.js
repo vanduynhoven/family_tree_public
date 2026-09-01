@@ -682,7 +682,7 @@ export const NPC_DATA = {
         knoxley: [
           'My youngest — and already asking the biggest questions! That\'s my girl.',
           'You want to know how far back it goes? Your grandfather Peter John knew the whole story.',
-          'Go to Era 5 — find Grandpa. He has answers that go all the way back to 1539.',
+          'Go find Grandpa Peter John — he\'s back in 2026 Mankato. He knows the whole story.',
         ],
         // Generic parent for non-Chuck children
         isabella: [
@@ -692,13 +692,13 @@ export const NPC_DATA = {
         ],
         henry: [
           'Henry! Looking to meet everyone? That\'s the spirit.',
-          'Your grandfather Peter John is the key to it all. Era 5, Minnesota.',
+          'Your grandfather Peter John is the key to it all. Find him in Mankato, 2026.',
           'He can tell you more than anyone alive about this family.',
         ],
         maxwell: [
           'Maxwell! You want to know what daily life was really like.',
           'Your grandfather Peter John lived it. Farm in Minnesota, church every Sunday.',
-          'Find him in Era 5. He\'ll tell you exactly what it was like.',
+          'Find him in 2026 Mankato. He remembers every detail of the farm years.',
         ],
         raven: [
           'Raven! Arthur\'s daughter — all the way from Haarlem to find me!',
@@ -714,6 +714,40 @@ export const NPC_DATA = {
       },
       item: { id:'floppy_disk', label:'Floppy Disk', emoji:'💾' },
     },
+    // ── Peter John (born 1956, age 28 in 1984) — young married man ──────────
+    {
+      gedcomId: '@I023@',
+      name: 'Peter John van Duynhoven',
+      given: 'Peter John',
+      era: 6, spawnR: 9, spawnC: 11,
+      bodyColor: '#5a4830', hairColor: '#2a1808', skinColor: '#c89050',
+      lines: {
+        generic: [
+          'Peter John van Duynhoven. Twenty-eight years old and already chasing the history books.',
+          'Born here in Minnesota, 1956. My folks came over from Boekel, Netherlands six years before I arrived.',
+          'I grew up hearing Dutch at the dinner table — "eet smakelijk" before every meal.',
+          'Now I have a family of my own. Trying to pass those stories on.',
+        ],
+        repeat1: [
+          'My father Johan told me the ship was called the Queen Elizabeth. Ten days across the Atlantic.',
+          'I never took that journey — I was born on American soil. But I know every detail from his stories.',
+          'I keep a Dutch prayer book from my grandmother Anna. I can\'t read it, but I keep it.',
+        ],
+        heart2: [
+          'You know what I want my kids to understand? That we didn\'t lose anything when we came here.',
+          'We added something. Dutch roots, American life. That\'s who we are.',
+          'My father knew Boekel. I know Minnesota. My kids will know both.',
+        ],
+        raven:    ['Raven! Arthur\'s daughter from Haarlem! The family has gone full circle.', 'Born in the Netherlands, just like my grandparents. That makes my heart full.'],
+        starling: ['Starling! A collector — you\'d love the stories my dad Johan used to tell.', 'He had a way of making 1950 sound like yesterday.'],
+        charlotte: ['Charlotte! You want to understand the family name? Ask your grandfather — me, later.', 'Right now I\'m still figuring it all out too.'],
+        tenley:   ['Tenley! The women of the family. You should hear about my mother Anna — tough as nails.', 'Crossed the Atlantic at thirty-seven with six kids. Nothing scared that woman.'],
+        knoxley:  ['The youngest! Looking for the deep roots? Start at Era 3 — Boekel, 1872.', 'That\'s where Marianus was born. Your anchor to the old country.'],
+        isabella: ['Isabella! Your dad is William — my son. So I\'m your grandfather Peter John.', 'One day you will want to know about the crossing. Ask me then — I will tell you everything.'],
+        henry:    ['Henry! Meeting the whole family? You\'ve got a long list ahead of you.', 'Start with the elders. Johan — your great-grandfather — is still with us. Find him.'],
+        maxwell:  ['Maxwell! Daily life in 1984? Drive to work, fix the farm, come home to kids.', 'Different from 1872 — but the love for the land? Same thing.'],
+      },
+    },
   ],
 
   // ── Era 5 · 1955 — Peter John (grandfather of ALL US Gen-7) ──────────────
@@ -724,26 +758,27 @@ export const NPC_DATA = {
       gedcomId: '@I023@',
       name: 'Peter John van Duynhoven',
       given: 'Peter John',
-      era: 5, spawnR: 8, spawnC: 8,
+      era: 8, spawnR: 8, spawnC: 8,  // born 1956 in Minnesota — DOES NOT appear in Era 5
       bodyColor: '#5a4830', hairColor: '#2a1808', skinColor: '#c89050',
       lines: {
         // Peter John came to America as a child — he speaks English, not Dutch.
         // He knows a few Dutch words his parents used at home, but does not use them himself.
         generic: [
-          'Peter John van Duynhoven — that\'s me. We came over from the Netherlands in 1950.',
-          'My parents Johan and Anna brought us on a ship called the Queen Elizabeth. Ten days at sea.',
-          'Minnesota is our home now. Good Dutch Catholic community here. Hard workers, all of us.',
+          'Peter John van Duynhoven. Born right here in Minnesota, April 1956.',
+          'My parents Johan and Anna came over from Boekel, Netherlands in 1950. I was their fourth child.',
+          'I grew up hearing Dutch at the dinner table — Mom and Dad, Grandma Anna, all of them.',
+          'Seventy years old now. America is the only home I\'ve ever known. But I carry Boekel in my heart.',
           'The family farm is east of Moorhead. Come visit — I\'ll show you how we do things here.',
         ],
         repeat1: [
-          'The corn is doing well this year. God is good to us.',
-          'I miss the Netherlands sometimes. The cheese especially.',
-          'But my children are growing up American. That\'s what we came here for.',
+          'I farmed this land for forty years. Retired now, but I still walk the fields.',
+          'You know what I miss? The Dutch bakeries my parents used to talk about. Boekel bread.',
+          'Minnesota is home. Always has been. But the roots go deep — all the way back to 1539.',
         ],
         heart2: [
-          'I keep a photo of Boekel on the kitchen wall. The village where my father was born.',
-          'He told me: never forget where you come from.',
-          'My father always said that — in Dutch of course. I understood it even if I couldn\'t say it back.',
+          'I keep a photo of Boekel on my wall. I\'ve never been there, but I know every street name.',
+          'My father Johan used to tell me stories about the fields, the church, the neighbours.',
+          'He carried Boekel with him all his life. Now I carry it too, even though I was born here.',
         ],
         // ── Grandchild-specific dialog ──
         charlotte: [
@@ -758,7 +793,7 @@ export const NPC_DATA = {
           'She is the strongest woman I know. Ask her everything.',
         ],
         knoxley: [
-          'My youngest granddaughter — and she came the furthest back to find me! I\'m amazed.',
+          'My youngest granddaughter here — all the way back through family history! I love that.',
           'You want the deepest roots? Go find Johan — my father — at Era 4. On the ship.',
           'And then find Marianus — his father — at Era 3. The answers go all the way back.',
         ],
@@ -780,7 +815,7 @@ export const NPC_DATA = {
         raven: [
           'Raven! My great-grandchild! You came all the way back to find me!',
           'You are Arthur\'s daughter — I can see it in your eyes.',
-          'You were born in Haarlem — the country we left in 1950! The family came full circle.',
+          'You were born in Haarlem! My parents came from the Netherlands in 1950, and now here you are.',
           'I am so proud of you. Go find all of us. We are all waiting for you.',
         ],
         starling: [
@@ -798,7 +833,7 @@ export const NPC_DATA = {
       gedcomId: '@I101@',
       name: 'Carolyn Kay van Duynhoven',
       given: 'Carolyn',
-      era: 5, spawnR: 6, spawnC: 11,
+      era: 6,  // born 1957, appears in Era 6 (1984, age 27) spawnR: 6, spawnC: 11,
       bodyColor: '#a04060', hairColor: '#6a2010', skinColor: '#d8b080',
       lines: {
         generic: [
@@ -876,6 +911,113 @@ export const NPC_DATA = {
       },
     },
   ],
+
+  // ── Era 6 · 1984 — Johan (age 69) + Anna (age 71) as visiting grandparents ─
+  '6_2_3': [
+    {
+      gedcomId: '@I060@',
+      name: 'Johan van Duijnhoven',
+      given: 'Johan',
+      era: 6, spawnR: 7, spawnC: 8,
+      bodyColor: '#704020', hairColor: '#d0c8b0', skinColor: '#c08050',
+      lines: {
+        generic: [
+          'Sixty-nine years old now. Still on the farm, but slower than I used to be.',
+          'I remember arriving in 1950 like it was last week. The cold. The strange language. The kindness of the church community.',
+          'Minnesota became home. But Boekel — Boekel is still home too, in here.',
+          { dutch:'Thuis is waar het hart is. [Home is where the heart is.]', en:'Two homes. Two hearts.' },
+        ],
+        repeat1: [
+          'I\'ve watched my children grow up American. Peter John, Carolyn, Anna Maria — good people.',
+          'Sometimes they speak Dutch phrases without knowing it. "Gezellig," they say.',
+          'They inherited the language of their heart, even if they never learned to speak it properly.',
+        ],
+        repeat2: [
+          'The farm here is good land. Flat, like Brabant.',
+          'First year, I planted rye — just like home. Neighbours looked at me like I was strange.',
+          'Second year, I planted corn. They left me alone after that.',
+        ],
+        heart2: [
+          'When I am gone, I want my grandchildren to know one thing.',
+          'We left not because we stopped loving the Netherlands. We left because we loved our children more.',
+          'That\'s what every immigrant leaves behind. And what every child should carry forward.',
+        ],
+        raven:    ['Raven — born in Haarlem! The old country! Tell me, does the polder still smell the same in spring?', 'I close my eyes and I am back there. Sixty-nine years old and I can still smell it.'],
+        starling: ['Starling! A collector from every time. You remind me of my mother Anna Maria.', 'She kept everything. A button, a prayer card, a ribbon. Small things that held everything together.'],
+        charlotte: ['Charlotte. The family name — yes, I know about that. The clerk in Wisconsin...', 'Your grandfather Peter John will tell you. Ask him. He has the story right.'],
+        tenley:   ['Tenley! You want to hear about the women? Then you want to hear about Anna Maria.', 'She crossed that ocean and never complained once. Stronger than anyone I\'ve ever known.'],
+        knoxley:  ['The youngest one! Here — I have a Dutch coin in my pocket. From Boekel.', 'I brought it on the ship in 1950. Forty years I\'ve kept it. Now you keep it.'],
+        isabella: ['Isabella — the crossing is your quest! I can tell you exactly what it was like.', 'The smell of the engine room. The colour of the North Sea. The sound of Anna praying at night.'],
+        henry:    ['Henry! You want to meet everyone? Then start with the oldest memories.', 'I have stories that go back to my father Marianus. And his father before him. All the way back.'],
+        maxwell:  ['Maxwell! Daily life — mine started at 4am. Every day for forty years.', 'Milk the cows, tend the crops, feed the family. Not glamorous. But good.'],
+      },
+      item: { id:'dutch_coin', label:'Dutch Coin', emoji:'🪙' },
+    },
+    {
+      gedcomId: '@I061@',
+      name: 'Anna Maria Cornelissen',
+      given: 'Anna',
+      era: 6, spawnR: 8, spawnC: 12,
+      bodyColor: '#805060', hairColor: '#d8d0c0', skinColor: '#c89060',
+      lines: {
+        generic: [
+          'Anna Maria van Duijnhoven now — Cornelissen by birth. Seventy-one years old.',
+          'I still make Dutch recipes every Sunday. Stampot. Erwtensoep. The family knows when Sunday is coming.',
+          'This kitchen smells like Boekel on Sundays. That\'s how I keep it alive.',
+          { dutch:'Zondagse erwtensoep voor iedereen! [Sunday pea soup for everyone!]', en:'Come eat — you look too thin.' },
+        ],
+        repeat1: [
+          'People ask me: do you miss the Netherlands? I say: yes, every single day.',
+          'But I would not trade this life. Not for anything.',
+          'My children are here. My grandchildren are here. This is where I am meant to be.',
+        ],
+        heart2: [
+          'I want to tell you about the ship. The Queen Elizabeth, November 1950.',
+          'Six children, two suitcases, and a prayer book. Johan had a Boekel soil in his coat pocket.',
+          'I had nothing but faith. It was enough. It has always been enough.',
+        ],
+        raven:    ['Raven! You speak Dutch — say something for me.', 'When I hear Dutch spoken by a young person, I think: the language lives on. Good.'],
+        starling: ['Starling! You collect things from every era?', 'I have my mother\'s recipe book from Boekel. In Dutch, of course. A hundred years old. Here — you can hold it.'],
+        charlotte: ['Charlotte — looking for the family roots. Then you need to know about the crossing.', 'My husband Johan will tell you the history. I will tell you what it felt like.'],
+        knoxley:  ['The youngest! Knoxley, come here — let me look at you.', 'You have the Cornelissen eyes. Same as my grandmother. Five generations of strong women.'],
+        isabella: ['Isabella! The crossing quest — that one is mine to tell. Come, sit.', 'Ten days on the North Atlantic. Every detail is still here.', 'Find me in Era 4 first — on the ship. Then come back and I\'ll tell you how the story ended.'],
+        tenley:   ['Tenley! Women of the family. That\'s exactly the right question to ask.', 'Start with me. Then go back to Geertruda in 1799. Then Aelken in 1539. We are the thread.'],
+        henry:    ['Henry! Meeting everyone — then you must talk to Johan. He has the family timeline memorised.', 'I have the recipes memorised. Together we cover everything.'],
+        maxwell:  ['Maxwell! You want to know about daily life. Then come to my kitchen.', 'That\'s where daily life happened. That\'s where the family was fed and held together.'],
+      },
+    },
+    {
+      gedcomId: '@I070@',
+      name: 'Gerardus van Duijnhoven',
+      given: 'Gerardus',
+      era: 6, spawnR: 10, spawnC: 9,
+      bodyColor: '#405060', hairColor: '#c8c0b0', skinColor: '#c09060',
+      lines: {
+        generic: [
+          'Gerardus van Duijnhoven. Seventy-five years old. Still sharp, still here.',
+          'I came to America in 1950 with Johan\'s family. We were neighbours in Boekel first.',
+          'You know what surprised me about Minnesota? The silence at night. After Boekel — quiet.',
+          { dutch:'Stil als een muis. [Still as a mouse.]', en:'Beautiful silence. I never got used to the Netherlands noise after that.' },
+        ],
+        repeat1: [
+          'I had a farm of my own here. Not as big as Boekel, but mine.',
+          'Johan was always the organised one. I was always the one who needed organising.',
+          'Good friendship, ours. Fifty years in the same county.',
+        ],
+        heart2: [
+          'At seventy-five you start counting. Not years — people.',
+          'How many are still here. How many you wish could see what happened next.',
+          'My parents brought us here. I have grandchildren in three states now. They would be proud.',
+        ],
+        raven:    ['Raven — you came all the way from Haarlem! I never went back after 1950.', 'Tell me — does Sint-Lambertus Church still stand in Aarle-Rixtel?'],
+        knoxley:  ['The youngest one — deep roots quest! Then let me tell you about digging.', 'Every spring I planted. Same rhythm as my father Jozef in Boekel. Same rhythm as his father before him.'],
+        isabella: ['Isabella! The crossing? I was on that ship too. Different family, same voyage.', 'Find me in Era 5 first — I was forty-six in Minnesota. Then come back here.'],
+        henry:    ['Henry! Family facts — ask me anything about the Minnesota years.', 'Forty years of being neighbours with Johan. I know their family as well as my own.'],
+        maxwell:  ['Maxwell! Daily life 1984? Wake up at five. Coffee. Walk the fields.', 'Still the same as 1955. Some things don\'t change and shouldn\'t.'],
+      },
+    },
+  ],
+
 
   // ── Era 7 · 2020 ──────────────────────────────────────
 
@@ -1295,6 +1437,7 @@ export const NPC_DATA = {
       gedcomId: '@I090@',
       name: 'Arthur Van Duynhoven',
       given: 'Arthur',
+      location: 'haarlem',
       era: 8, spawnR: 9, spawnC: 9,
       bodyColor: '#2050a0', hairColor: '#1a1a2a', skinColor: '#c89050',
       lines: {
@@ -1370,12 +1513,12 @@ export const NPC_DATA = {
   ],
 
   // ── Era 1 · 1796 · Elisabeth van Boxtel (Petrus\'s mother-line spouse) ──
-  '1_2_1': [
+  '2_3_1': [
     {
-      gedcomId: '@I091@',
+      gedcomId: '@I291@',  // unique ID — @I091@ belongs to Raven
       name: 'Elisabeth van Boxtel',
       given: 'Elisabeth',
-      era: 1, spawnR: 7, spawnC: 8,
+      era: 2, spawnR: 7, spawnC: 8,
       bodyColor: '#5a3a4a', hairColor: '#2a1810', skinColor: '#dcae7a',
       lines: {
         generic: [
@@ -1417,6 +1560,43 @@ export const NPC_DATA = {
           { dutch:'Welkom, klein reizigertje. [Welcome, little traveller.]', en:'' },
           'The maternal line matters. Van der Heijden, and Blaffarts before that.',
         ],
+      },
+    },
+    // ── Geertruda Verwegen (@I031@) born ~1790, age ~9 in 1799 ──────────────
+    {
+      gedcomId: '@I031@',
+      name: 'Geertruda Verwegen',
+      given: 'Geertruda',
+      era: 2, spawnR: 9, spawnC: 8,
+      bodyColor: '#804060', hairColor: '#5a3020', skinColor: '#d4a870',
+      lines: {
+        generic: [
+          'I am Geertruda Verwegen. Nine years old and curious about everything.',
+          'My father farms near Boekel. He says this soil has been tended by the same families for centuries.',
+          'One day I will marry a Van Duijnhoven. Mama says Martinus is the right one. I think he is nice.',
+          { dutch:'Hoe oud ben jij? [How old are you?]', en:'I am nine. Almost ten!' },
+        ],
+        repeat1: [
+          'I helped plant the rye this morning. My hands are still dirty.',
+          'Martinus van Duijnhoven waved to me today. He is twelve. Very serious for his age.',
+          'Mama says I will understand when I am older. I wish older would hurry up.',
+        ],
+        heart2: [
+          'Will you keep a secret? I already know I want to marry Martinus.',
+          'He showed me his father\'s field and said: one day this will be ours.',
+          'That is the most romantic thing I have heard. Even if I am only nine.',
+        ],
+        tenley: [
+          'You are asking about the women! Then ask me — I will be one of the important ones.',
+          'My grandmother says our family has strong women going back many generations.',
+          'I plan to be the strongest. You will see.',
+        ],
+        raven: [
+          'You speak Dutch so well! Are you from Boekel too?',
+          { dutch:'Welkom in ons dorp! [Welcome to our village!]', en:'We do not get many visitors here.' },
+        ],
+        knoxley:  ['Looking for ancient things? The stones at the north heath are very old.', 'My grandfather showed me one. He said families put them there to mark the land.'],
+        starling: ['You collect things from every era? Here — a button from my mother\'s dress.', 'Buttons show where a family came from. Different patterns, different places.'],
       },
     },
   ],
@@ -1657,7 +1837,95 @@ export const NPC_DATA = {
         starling: ['Starling! A collection from every time.', 'I have a small smooth stone from Minnesota. Would that count?', 'Your great-grandfather found it by the river in 1955.'],
       },
     },
+    // ── Boda Swoboda — husband of Anna Maria van Duynhoven, passionate fisherman ──
+    {
+      gedcomId: '@I199@',
+      name: 'Boda Swoboda',
+      given: 'Boda',
+      location: 'mankato',
+      era: 8, spawnR: 10, spawnC: 8,
+      bodyColor: '#4a6030', hairColor: '#d0c0a0', skinColor: '#c89060',
+      lines: {
+        generic: [
+          'Galen James Swoboda — but everyone calls me Boda. Married Anna Maria Van Duynhoven back in \'77.',
+          'I\'ve been fishing this pond for forty years. Blue Earth River, too. Nothing beats it.',
+          'Early morning, before sunrise, rod in hand — that\'s when I think clearest.',
+          'You want to fish? Grab a rod. Best walleye in Sibley County right here.',
+        ],
+        repeat1: [
+          'Caught a 28-inch walleye last Tuesday. Anna didn\'t believe me until I showed her the photo.',
+          'The Blue Earth River is quarter-mile west. If you haven\'t fished it, you\'re missing out.',
+          'I\'ve been married to a Van Duynhoven for nearly fifty years. Quite a family.',
+        ],
+        repeat2: [
+          'You know what Anna always says? "Boda, the fish will still be there tomorrow." She\'s wrong, but I love her.',
+          'Dutch family, this one. Strong tradition of hard work and good food.',
+          'There\'s a beautiful quiet on the water at dawn. I understand why they call it "hooked."',
+        ],
+        heart2: [
+          'I\'ll tell you something. I married into this family and I got more than a wife.',
+          'The whole Van Duynhoven story — five hundred years, two continents, twelve children on the Boekel farm.',
+          'I\'m just a Minnesota boy who loves to fish. But I\'m proud to be part of it.',
+        ],
+        // ── Character-specific ──
+        raven: [
+          'Raven! You\'re Arthur\'s kid — I can tell. Same eyes as the whole family.',
+          'You know your great-aunt Anna Maria loves fishing too? Must be the Blue Earth River in your blood.',
+          'Here — take this old lure. Belongs to someone who uses it. Go fish!',
+        ],
+        starling: [
+          'Starling! Collecting things from every era? Ask your great-aunt Anna about the fishing lures.',
+          'I\'ve got one from 1977 — the year we married. Practically a family heirloom.',
+        ],
+        charlotte: ['Charlotte! Looking for family stories? I\'ve got one: the best fishing stories in Sibley County.',    'Your family is famous here. Van Duynhovens don\'t brag — they just quietly do everything well.'],
+        tenley:   ['Tenley! The women of the family? Your great-aunt Anna could outfish anyone in the county.',           'Strong women, this family. I should know — I\'ve been married to one for fifty years.'],
+        knoxley:  ['The youngest one! Come here, I\'ll show you how to cast a line.',                                     'Your family goes back to 1539. My family goes back to... last Tuesday\'s catch. Ha!'],
+        isabella: ['Isabella! You want to understand why people crossed oceans? Same reason I get up at 4am.',            'For something worth doing. For the people you love.'],
+        henry:    ['Henry! Meeting everyone? Then sit down and let me tell you about fishing with your great-uncle Morris.', 'We used to go out at dawn on the Blue Earth. Those were good days.'],
+        maxwell:  ['Maxwell — daily life, you said? My daily life is wake up, make coffee, grab the rod.',               'Simple. Good. Exactly the same as your ancestor Dirck tending his fields in 1539.'],
+      },
+      item: { id:'old_lure', label:'Old Fishing Lure', emoji:'🎣' },
+    },
   ],
+
+  // ── Era 8 · 2026 · Mankato — Peter John van Duynhoven (born 1956, age 70) ──
+  '8_3_0': [
+    {
+      gedcomId: '@I023@',
+      name: 'Peter John van Duynhoven',
+      given: 'Peter John',
+      location: 'mankato',
+      era: 8, spawnR: 8, spawnC: 8,
+      bodyColor: '#5a4830', hairColor: '#d8cdb0', skinColor: '#c89050',
+      lines: {
+        generic: [
+          'Peter John van Duynhoven. Born right here in Minnesota, April 1956.',
+          'My parents Johan and Anna came over from Boekel, Netherlands in 1950. I was their fourth child.',
+          'I grew up hearing Dutch at the dinner table. Eet smakelijk before every meal.',
+          'Seventy years old now. America is the only home I have known. But I carry Boekel in my heart.',
+        ],
+        repeat1: [
+          'I farmed this land for forty years. Retired now, but I still walk the fields every morning.',
+          'You know what I miss? The Dutch bakeries my parents always talked about. Boekel rye bread.',
+          'Minnesota is home. Always has been. But the roots go deep, all the way back to 1539.',
+        ],
+        heart2: [
+          'I keep a photo of Boekel on my wall. I have never been there, but I know every street name.',
+          'My father Johan told me stories about the fields, the church, the neighbours.',
+          'He carried Boekel with him all his life. Now I carry it too, even though I was born here.',
+        ],
+        raven:    ['Raven! Your great-grandparents came from the Netherlands in 1950, and here you are born there.', 'The family went the whole way around. That makes my heart full.'],
+        starling: ['Starling! Find Johan in Era 4 and Era 5. He made 1950 sound like yesterday.', 'Your great-great-grandmother Anna kept a Dutch recipe book. It is still in this house.'],
+        charlotte: ['Charlotte! You found the family name trail.', 'I was there when your dad Chuck got the Wisconsin forms stamped.'],
+        tenley:   ['Tenley! Your grandmother Mary Campbell held everything together.', 'And Anna Cornelissen before her. Tough as nails, both of them.'],
+        knoxley:  ['The youngest! Your family goes back to 1539.', 'Great-grandfather Johan documented everything. Go find him in Era 4.'],
+        isabella: ['Isabella! Find Johan and Anna in Era 4 for the crossing story.', 'Ten days on the North Atlantic, 1950. They will tell you everything.'],
+        henry:    ['Henry! Start with Johan in Era 4, then Gerardus in Era 5, then work back to Dirck.', 'It is a long family. You have the best quest.'],
+        maxwell:  ['Maxwell! Tend the land, feed the family, go to church.', 'Same in 1539 as in 2026. Some things should not change.'],
+      },
+    },
+  ],
+
 
 };
 
