@@ -1225,7 +1225,7 @@ export function buildEraWorld(eraId, location = 'haarlem') {
       break; }
 
     // ═══════════════════════════════════════════════════
-    // ERA 5 · 1955 · MOORHEAD / FRAZEE, MINNESOTA
+    // ERA 5 · 1955 · GREEN ISLE, SIBLEY COUNTY, MINNESOTA
     // Flat prairie farms, small-town Main St.
     // Portal: old Dutch Lutheran church basement [1,3]
     // ═══════════════════════════════════════════════════
@@ -1298,7 +1298,7 @@ export function buildEraWorld(eraId, location = 'haarlem') {
         // Boulevard maples
         set(m,4,7,T.TREE); set(m,4,11,T.TREE);
         set(m,9,7,T.TREE); set(m,9,11,T.TREE);
-        grid[1][1]=makeScreen(m,{left:{pos:7},right:{pos:7},up:{pos:10},down:{pos:10}},'1955 · Main Street Frazee',{r:7,c:9}); }
+        grid[1][1]=makeScreen(m,{left:{pos:7},right:{pos:7},up:{pos:10},down:{pos:10}},'1955 · Main Street Green Isle',{r:7,c:9}); }
 
       // [1,2] Farmstead — Gerardus NPC area
       { const m=blank(T.GRASS); border(m,T.TREE);
@@ -1319,7 +1319,7 @@ export function buildEraWorld(eraId, location = 'haarlem') {
         // Vegetable garden rows in front of the house
         fill(m,10,3,10,5,T.FLOWER); fill(m,12,3,12,5,T.FLOWER);
         fill(m,4,3,4,5,T.CROP_READY); fill(m,9,3,9,5,T.CROP_READY);
-        grid[1][2]=makeScreen(m,{left:{pos:7},right:{pos:7},up:{pos:10},down:{pos:10}},'1955 · Dutch Immigrant Farm',{r:7,c:9}); }
+        grid[1][2]=makeScreen(m,{left:{pos:7},right:{pos:7},up:{pos:10},down:{pos:10}},'1955 · Van Duynhoven Farm',{r:7,c:9}); }
 
       // [1,3] DUTCH LUTHERAN CHURCH + BASEMENT PORTAL
       { const m=blank(T.GRASS); border(m,T.TREE);

@@ -408,7 +408,7 @@ export const NPC_DATA = {
 
   '4_1_1': [
     {
-      gedcomId: '@I060@',
+      gedcomId: '@I014@',
       name: 'Johan van Duijnhoven',
       given: 'Johan',
       era: 4, spawnR: 7, spawnC: 9,
@@ -418,7 +418,7 @@ export const NPC_DATA = {
         generic: [
           'Ten days at sea. My wife Anna, our children, and four suitcases. Everything we own.',
           { dutch:'We verlaten Nederland voor altijd. [We leave the Netherlands forever.]', en:'Boekel is behind us now.' },
-          'America. We say it like a prayer. Moorhead, Minnesota. A Dutch Catholic community there.',
+          'America. We say it like a prayer. Green Isle, Minnesota. A small Dutch Catholic community there.',
           'My father Marianus never left Brabant. I wonder sometimes if he knew what it would cost.',
           'Take these papers — immigration papers. Without them, you cannot cross the border.',
         ],
@@ -492,7 +492,7 @@ export const NPC_DATA = {
       },
     },
     {
-      gedcomId: '@I061@',
+      gedcomId: '@I019@',
       name: 'Anna Maria Cornelissen',
       given: 'Anna',
       era: 4, spawnR: 8, spawnC: 11,
@@ -538,7 +538,7 @@ export const NPC_DATA = {
 
   '5_1_1': [
     {
-      gedcomId: '@I070@',
+      gedcomId: '@I009@',
       name: 'Gerardus van Duijnhoven',
       given: 'Gerardus',
       era: 5, spawnR: 7, spawnC: 9,
@@ -546,8 +546,8 @@ export const NPC_DATA = {
       item: { id:'boterkoek', label:'Boterkoek Recipe', emoji:'🍪' },
       lines: {
         generic: [
-          'Moorhead, Minnesota. My parents brought us here from Boekel in 1950 — and this is home now.',
-          'I was a grown man when we crossed. But my children? Born right here in Minnesota. True Americans.',
+          'Green Isle, Minnesota. I came here with my brother Johan in 1950.',
+          'I was a grown man when we crossed. My youngest were babies when we arrived. Born here in Minnesota.',
           { dutch:'Wij zijn nu Amerikaans. [We are American now.]', en:'But we remember where we came from.' },
           'Mother\'s boterkoek recipe — she made me memorize it. Take it, keep it going.',
         ],
@@ -558,7 +558,7 @@ export const NPC_DATA = {
         ],
         charlotte: [
           'Charlotte! Your father Chuck is my cousin — so we are family.',
-          'Moorhead is a good Dutch community. Everyone knows everyone.',
+          'Green Isle is a small tight-knit community. Mostly Dutch Catholic families. Everyone knows everyone.',
           { dutch:'Wij helpen elkaar. [We help each other.]', en:'That is how it works here.' },
         ],
         tenley: [
@@ -572,9 +572,9 @@ export const NPC_DATA = {
           'Find him. He will tell you everything.',
         ],
         isabella: [
-          'Isabella! Your grandfather Peter John is my brother.',
-          'You have the same eyes as your grandmother Mary Campbell.',
-          { dutch:'Welkom in Minnesota. [Welcome to Minnesota.]', en:'The Dutch community here is warm.' },
+          'Isabella! You look like your grandmother Mary Campbell.',
+          'Your grandfather Peter John is my nephew. His father Johan is my younger brother.',
+          { dutch:'Welkom in Minnesota. [Welcome to Minnesota.]', en:'Green Isle is a small Dutch Catholic village. Very different from Boekel — but with the same spirit.' },
         ],
         henry: [
           'Henry — you want to know how a Dutch farm family became American.',
@@ -582,7 +582,7 @@ export const NPC_DATA = {
           { dutch:'Nu zijn we Amerikaans, maar ons hart blijft Nederlands. [Now we are American, but our heart stays Dutch.]', en:'' },
         ],
         raven: [
-          { dutch:'Raven! Je spreekt Nederlands! Hier in Minnesota! [Raven! You speak Dutch! Here in Minnesota!]', en:'' },
+          { dutch:'Raven! Je spreekt Nederlands! Hier in Green Isle! [Raven! You speak Dutch! Here in Green Isle!]', en:'' },
           { dutch:'Je opa Peter John zal zo blij zijn. [Your grandpa Peter John will be so happy.]', en:'Go find him — he is just down the road.' },
           { dutch:'De boterkoekjes zijn net klaar. Wil je er eentje? [The boterkoekjes are just done. Do you want one?]', en:'Dutch butter cake — your dad\'s favourite.' },
         ],
@@ -597,22 +597,27 @@ export const NPC_DATA = {
 
   '5_2_3': [  // Lake — fishing
     {
-      gedcomId: '@I060@',
+      gedcomId: '@I014@',
       name: 'Johan van Duijnhoven',
       given: 'Johan',
       era: 5, spawnR: 9, spawnC: 8,
       bodyColor: '#2a3a5a', hairColor: '#3a3020', skinColor: '#c89050',
       lines: {
         generic: [
-          'On Sunday afternoons, we come to the lake. It reminds me of the rivers back in Brabant.',
-          { dutch:'Vissen is goed voor de ziel. [Fishing is good for the soul.]', en:'And the walleye are excellent here.' },
-          'My son caught his first fish right over there. Held it up so proud.',
-          'Sit with me a while. Bring a walleye and I will tell you about the crossing.',
+          'On Sunday afternoons, we come to the lake. The rest of the week I am at the cheese factory.',
+          'New Sweden — twenty minutes by truck. I work the morning shift, weighing and packing.',
+          { dutch:'Kaasmaker in Amerika. [Cheesemaker in America.]', en:'Not what I expected. But steady work, and good neighbours.' },
+          'Anna takes care of the children at home. The little ones are still very small.',
+        ],
+        repeat1: [
+          'The cheese factory pays well enough. The Dutch foreman knows Boekel — can you believe it?',
+          'Anna has her hands full with the children. Morris is four, the others still very small.',
+          'On Sundays we come here. The lake. The only hour of the week that feels like rest.',
         ],
         isabella: [
-          'You have been following our family story.',
+          'You have been following our family story — the crossing!',
           'This lake — this is where I finally felt at home in America. The water.',
-          'I left the Maas river behind in Brabant. I found this lake in Minnesota. Different water, same peace.',
+          'I left the rivers of Brabant behind. I found this lake in Minnesota. Different water, same peace.',
           { dutch:'Thuis is waar het water rustig is. [Home is where the water is calm.]', en:'I believe that.' },
         ],
         raven: [
@@ -646,76 +651,17 @@ export const NPC_DATA = {
           { dutch:'Op zondag is er tijd voor verhalen. [On Sunday there is time for stories.]', en:'Ask me anything.' },
         ],
         maxwell: [
-          'Maxwell — you want to know what the food and daily rhythm was really like.',
-          'Sunday afternoon: fishing. Monday to Saturday: work. That was the life.',
-          { dutch:'Simpel maar goed. [Simple but good.]', en:'The walleye was excellent.' },
+          'Maxwell — you want to know what daily life was really like here in 1955.',
+          'I work at the cheese factory in New Sweden, Monday through Saturday. Anna keeps the house.',
+          'The children are babies. Morris is four. The others not yet born.',
+          { dutch:'Simpel maar goed. [Simple but good.]', en:'Work, church, family. That was everything.' },
         ],
       },
     },
   ],
 
   '6_1_1': [
-    {
-      gedcomId: '@I080@',
-      name: 'Chuck Van Duynhoven Sr.',
-      given: 'Chuck Sr.',
-      era: 6, spawnR: 7, spawnC: 9,
-      bodyColor: '#3040a0', hairColor: '#2a2010', skinColor: '#c89050',
-      lines: {
-        generic: [
-          'Wisconsin now. Different from Minnesota — more German neighbours, fewer Dutch.',
-          'When Dad filled out the forms here, they wrote "Van Dyn Hoven." Close enough, he said.',
-          'Now we spell it three different ways across the family. Does it matter? We know who we are.',
-          { dutch:'Een naam is maar een naam. [A name is just a name.]', en:'The family is what counts.' },
-        ],
-        charlotte: [
-          'Charlotte — my girl! You came all the way back to find me.',
-          'I\'ve been thinking about the family name too. Let me tell you what really happened.',
-          'The clerk simplified it when we moved to Wisconsin. Just like that — a piece of history changed.',
-          'And look — I found your dad\'s old floppy disk with the first family tree database. Take it.',
-        ],
-        tenley: [
-          'Tenley! You\'re asking about the women of the family, I can tell.',
-          'Your grandmother Mary Campbell — she held this whole family together. Start with her.',
-          'And don\'t forget Grandpa Peter John. He\'s the one who brought us all together.',
-        ],
-        knoxley: [
-          'My youngest — and already asking the biggest questions! That\'s my girl.',
-          'You want to know how far back it goes? Your grandfather Peter John knew the whole story.',
-          'Go find Grandpa Peter John — he\'s back in 2026 Mankato. He knows the whole story.',
-        ],
-        // Generic parent for non-Chuck children
-        isabella: [
-          'Isabella! Your dad is William — my brother. So I\'m your uncle Chuck.',
-          'Our grandparents came from the Netherlands in 1950 — we were born here in America.',
-          'Find your grandfather Peter John. He was there when it all began.',
-        ],
-        henry: [
-          'Henry! Looking to meet everyone? That\'s the spirit.',
-          'Your grandfather Peter John is the key to it all. Find him in Mankato, 2026.',
-          'He can tell you more than anyone alive about this family.',
-        ],
-        maxwell: [
-          'Maxwell! You want to know what daily life was really like.',
-          'Your grandfather Peter John lived it. Farm in Minnesota, church every Sunday.',
-          'Find him in 2026 Mankato. He remembers every detail of the farm years.',
-        ],
-        raven: [
-          'Raven! Arthur\'s daughter — all the way from Haarlem to find me!',
-          'Your dad and I talk sometimes. He tells me you\'re growing up Dutch-American, just like we did.',
-          'Here — I found something in the attic. A floppy disk with the first family tree database.',
-          'Your dad built it on his first computer. Take it — it belongs with you.',
-        ],
-        starling: [
-          'Starling! Arthur\'s youngest — I can see the resemblance.',
-          'You were born in Haarlem, the country we left in 1950. That\'s something remarkable.',
-          'Here — take this old floppy disk. Your dad\'s first family tree, 1984 style.',
-        ],
-      },
-      item: { id:'floppy_disk', label:'Floppy Disk', emoji:'💾' },
-    },
-    // ── Peter John (born 1956, age 28 in 1984) — young married man ──────────
-    {
+  {
       gedcomId: '@I023@',
       name: 'Peter John van Duynhoven',
       given: 'Peter John',
@@ -723,15 +669,15 @@ export const NPC_DATA = {
       bodyColor: '#5a4830', hairColor: '#2a1808', skinColor: '#c89050',
       lines: {
         generic: [
-          'Peter John van Duynhoven. Twenty-eight years old and already chasing the history books.',
-          'Born here in Minnesota, 1956. My folks came over from Boekel, Netherlands six years before I arrived.',
+          'Peter John van Duynhoven. Twenty-eight years old. Born in Green Isle, 1956.',
+          'My folks came over from Boekel in 1950. Dad worked the cheese factory in New Sweden.',
           'I grew up hearing Dutch at the dinner table — "eet smakelijk" before every meal.',
-          'Now I have a family of my own. Trying to pass those stories on.',
+          'School taught me English. Dad taught me Dutch. Mom taught me both were necessary.',
         ],
         repeat1: [
-          'My father Johan told me the ship was called the Queen Elizabeth. Ten days across the Atlantic.',
-          'I never took that journey — I was born on American soil. But I know every detail from his stories.',
-          'I keep a Dutch prayer book from my grandmother Anna. I can\'t read it, but I keep it.',
+          'Dad was at the cheese factory every day. Mum held everything together at home.',
+          'We went to school. Learned English. Joined the sports teams. Became Americans.',
+          'But Sunday dinner was always Dutch. Stamppot, erwtensoep, boterkoek. That never changed.',
         ],
         heart2: [
           'You know what I want my kids to understand? That we didn\'t lose anything when we came here.',
@@ -768,7 +714,7 @@ export const NPC_DATA = {
           'My parents Johan and Anna came over from Boekel, Netherlands in 1950. I was their fourth child.',
           'I grew up hearing Dutch at the dinner table — Mom and Dad, Grandma Anna, all of them.',
           'Seventy years old now. America is the only home I\'ve ever known. But I carry Boekel in my heart.',
-          'The family farm is east of Moorhead. Come visit — I\'ll show you how we do things here.',
+          'The family farm was in Green Isle, Sibley County. Come visit — I\'ll show you how we do things here.',
         ],
         repeat1: [
           'I farmed this land for forty years. Retired now, but I still walk the fields.',
@@ -837,7 +783,7 @@ export const NPC_DATA = {
       bodyColor: '#a04060', hairColor: '#6a2010', skinColor: '#d8b080',
       lines: {
         generic: [
-          'Hi! I\'m Carolyn — Peter John\'s sister. We all grew up here in Moorhead.',
+          'Hi! I\'m Carolyn — Peter John\'s sister. We grew up in Green Isle, Minnesota.',
           'Mom and Dad spoke Dutch sometimes at home, but we kids never really learned it.',
           'I\'ve been trying to pick up a few words though. It feels important, you know?',
           'I keep a little notebook. I write down the Dutch words I learn.',
@@ -915,7 +861,7 @@ export const NPC_DATA = {
   // ── Era 6 · 1984 — Johan (age 69) + Anna (age 71) as visiting grandparents ─
   '6_2_3': [
     {
-      gedcomId: '@I060@',
+      gedcomId: '@I014@',
       name: 'Johan van Duijnhoven',
       given: 'Johan',
       era: 6, spawnR: 7, spawnC: 8,
@@ -954,22 +900,22 @@ export const NPC_DATA = {
       item: { id:'dutch_coin', label:'Dutch Coin', emoji:'🪙' },
     },
     {
-      gedcomId: '@I061@',
+      gedcomId: '@I019@',
       name: 'Anna Maria Cornelissen',
       given: 'Anna',
       era: 6, spawnR: 8, spawnC: 12,
       bodyColor: '#805060', hairColor: '#d8d0c0', skinColor: '#c89060',
       lines: {
         generic: [
-          'Anna Maria van Duijnhoven now — Cornelissen by birth. Seventy-one years old.',
-          'I still make Dutch recipes every Sunday. Stampot. Erwtensoep. The family knows when Sunday is coming.',
-          'This kitchen smells like Boekel on Sundays. That\'s how I keep it alive.',
-          { dutch:'Zondagse erwtensoep voor iedereen! [Sunday pea soup for everyone!]', en:'Come eat — you look too thin.' },
+          'Anna Maria van Duijnhoven. Seventy-one years old. Still in this same kitchen.',
+          'In 1955 I had five small children under my feet and Johan at the cheese factory all day.',
+          'I cooked, cleaned, sewed, kept the house. Nobody called it work. It was everything.',
+          { dutch:'De moeder houdt alles bij elkaar. [The mother keeps everything together.]', en:'That is still true.' },
         ],
         repeat1: [
-          'People ask me: do you miss the Netherlands? I say: yes, every single day.',
-          'But I would not trade this life. Not for anything.',
-          'My children are here. My grandchildren are here. This is where I am meant to be.',
+          'The children grew up so fast. One year they are toddlers, the next they come home speaking English with no accent.',
+          'Morris started school — came back saying his teacher couldn\'t pronounce Van Duijnhoven.',
+          'So it became Van Duynhoven. Then later Van Dyn Hoven in Wisconsin. A name changes like water finding a path.',
         ],
         heart2: [
           'I want to tell you about the ship. The Queen Elizabeth, November 1950.',
@@ -987,7 +933,7 @@ export const NPC_DATA = {
       },
     },
     {
-      gedcomId: '@I070@',
+      gedcomId: '@I009@',
       name: 'Gerardus van Duijnhoven',
       given: 'Gerardus',
       era: 6, spawnR: 10, spawnC: 9,
@@ -995,7 +941,7 @@ export const NPC_DATA = {
       lines: {
         generic: [
           'Gerardus van Duijnhoven. Seventy-five years old. Still sharp, still here.',
-          'I came to America in 1950 with Johan\'s family. We were neighbours in Boekel first.',
+          'I came to America with my brother Johan in 1950. Older brother follows younger — that is how we do things.',
           'You know what surprised me about Minnesota? The silence at night. After Boekel — quiet.',
           { dutch:'Stil als een muis. [Still as a mouse.]', en:'Beautiful silence. I never got used to the Netherlands noise after that.' },
         ],
@@ -1030,10 +976,10 @@ export const NPC_DATA = {
       bodyColor: '#2050a0', hairColor: '#1a1a2a', skinColor: '#c89050',
       lines: {
         generic: [
-          'From Boekel to Haarlem — almost a full circle. The family went to America and I came back to the Netherlands.',
-          'Raven and Starling are growing up Dutch-American. They speak both languages. Van Duinhoven himself would be amazed.',
-          'I built the family tree website trying to hold all these threads together.',
-          'Five hundred years of this family, and here we are. Still going.',
+          'Lockdown. Haarlem, 2020. Raven is three, Starling was just born in July.',
+          'I work from home, Merel handles everything else. The apartment is very small for four people.',
+          'I started the family tree website this year — something to do with the evenings.',
+          'Five hundred years of this family, and here we are. Still going, even through a pandemic.',
         ],
         repeat1: [
           'You know what surprised me when I moved to Haarlem? How normal it felt.',
@@ -1041,9 +987,9 @@ export const NPC_DATA = {
           { dutch:'Thuiskomen zonder het ooit te hebben verlaten. [Coming home without ever having left.]', en:'Strange feeling.' },
         ],
         repeat2: [
-          'The girls are doing well. Raven is learning Dutch faster than I did.',
-          'Starling keeps asking me about every single ancestor on the family tree.',
-          'She is four years old and already more curious about history than most adults I know.',
+          'Raven is learning Dutch faster than I did. She\'ll be fluent before she\'s five.',
+          'Starling just arrived. She sleeps through everything. Perfect lockdown companion.',
+          'I keep thinking about Johan on that ship in 1950. Starting over with a family. Different scale, same courage.',
         ],
         heart2: [
           'Can I tell you something? Building that family tree changed me.',
@@ -1128,6 +1074,98 @@ export const NPC_DATA = {
           'This is very strange. But also kind of wonderful.',
           { dutch:'Familie is altijd met je. [Family is always with you.]', en:'I think that\'s what this is all about.' },
         ],
+      },
+    },
+    // ── Chuck Van Duynhoven Sr. (born 1982, age 37 in 2020) ──────────────────
+    // In 2020 a young dad, age 37. Charlotte 4, Tenley 1, Knoxley not born.
+    // Grew up in Wisconsin in the 1990s. This 7_1_1 entry is the SAME person as above
+    // (era:7 filter means 6_1_1 key also loads here now — remove duplicate).
+    {
+      gedcomId: '@I026@',
+      name: 'Chuck Van Duynhoven Sr.',
+      given: 'Chuck Sr.',
+      era: 7, spawnR: 10, spawnC: 11,
+      bodyColor: '#3040a0', hairColor: '#c0b8a8', skinColor: '#c89050',
+      lines: {
+        generic: [
+          'Thirty-seven years old and already outnumbered. Three girls and Daina keeps winning.',
+          'Charlotte is four, full of questions. Tenley just turned one. Knoxley not yet arrived.',
+          'I keep thinking about Grandpa Johan at the cheese factory. Six days a week for twenty years.',
+          'Dad Peter John went to school. I went to college. Charlotte will probably work in tech.',
+        ],
+        repeat1: [
+          'Growing up in Wisconsin in the nineties — we were just a normal American family by then.',
+          'Sunday dinner at Grandma Mary\'s was still Dutch. Stamppot, erwtensoep.',
+          'At school I was just Chuck. Nobody could spell Van Duynhoven. Still can\'t.',
+        ],
+        repeat2: [
+          'Charlotte asked me where our family comes from. I said: Netherlands, across the ocean.',
+          'She said: can we go? I said: one day, yes.',
+          'She is four. That was enough for her.',
+        ],
+        heart2: [
+          'I want Charlotte and Tenley to know the whole story. And Knoxley when she arrives.',
+          'Grandpa Peter John grew up hearing Dutch at the table. I grew up hearing the stories.',
+          'Now my girls will grow up knowing all five hundred years. That feels right.',
+        ],
+        charlotte: [
+          'CHARLOTTE! You came all this way to find me!',
+          'You were four years old in 2020. Do you remember? We used to go to the park every morning.',
+          'Look how far you have come. I am so proud of you.',
+        ],
+        tenley:   ['Tenley! You were just a baby in 2020. Daina held you the whole lockdown.', 'Now here you are — exploring five hundred years of history. Wild.'],
+        knoxley:  ['Knoxley, my youngest — you weren\'t even born yet in 2020!', 'But here you are, asking the deepest questions. That\'s my girl.'],
+        raven:    ['Raven! Arthur\'s daughter — I\'m your Uncle Chuck. Your dad and I are brothers.', 'Growing up in Haarlem — Grandpa Peter John would not believe it.'],
+        starling: ['Starling! Arthur\'s youngest — I\'m Uncle Chuck. Born same year as this very era!', 'Your dad and I are brothers. He moved to the Netherlands; I stayed in Wisconsin. Same family.'],
+        isabella: ['Isabella! William\'s daughter — I\'m your Uncle Chuck. Your dad is my brother.', 'Charlotte and you are cousins. Different states, same family, same five-hundred-year story.'],
+        henry:    ['Henry! You were six years old in 2020. Do you remember the lockdown?', 'You probably played video games. Charlotte tried to learn to read. Lockdown kids.'],
+        maxwell:  ['Maxwell — you were two in 2020. Completely oblivious to everything.', 'Probably the right age for a global pandemic, honestly.'],
+      },
+    },
+    // ── William Van Duynhoven (born 1987, age 33 in 2020) ────────────────────
+    // Young dad during COVID lockdown. Isabella is 11, Henry 6, Maxwell 2.
+    // Remembers growing up in Wisconsin in the 90s/2000s; now starting his own family.
+    {
+      gedcomId: '@I028@',
+      name: 'William Van Duynhoven',
+      given: 'William',
+      era: 7, spawnR: 9, spawnC: 7,
+      bodyColor: '#205040', hairColor: '#1a2010', skinColor: '#c89050',
+      lines: {
+        generic: [
+          'William Van Duynhoven. Thirty-three years old, working from home, three kids under twelve.',
+          'Maxwell is two. He has no idea there\'s a pandemic. He\'s just happy Dad is always home.',
+          'Isabella is doing school on a laptop. Henry keeps asking when he can go back to football.',
+          'Me, Chuck, Arthur, Kathryn — same dad Peter John, same mom Mary. Four of us grew up in Minnesota and Wisconsin.',
+        ],
+        repeat1: [
+          'Growing up, Dad Chuck used to tell us about Grandpa Johan at the cheese factory.',
+          'Six days a week for twenty years so his kids could go to college.',
+          'I think about that a lot now that I have kids of my own.',
+        ],
+        repeat2: [
+          'Leslie has been incredible through all this. She keeps the kids on schedule.',
+          'I do the grocery run — masked, distanced, Dutch pragmatism.',
+          { dutch:'Gewoon doorgaan. [Just keep going.]', en:'That\'s what this family has always done.' },
+        ],
+        heart2: [
+          'Can I tell you something? The lockdown made me think about the 1950 crossing.',
+          'Johan and Anna on a ship for ten days, heading into the unknown. No guarantee of anything.',
+          'We\'re stuck at home for a few weeks and I think it\'s hard. Perspective.',
+        ],
+        isabella: [
+          'Isabella! You were eleven in 2020 — doing school on a laptop in the kitchen.',
+          'You kept asking me history questions. I didn\'t know half the answers.',
+          'I think that\'s why you\'re here now — finding the real ones.',
+        ],
+        henry:    ['Henry! Six years old, lockdown, could not go to football practice.', 'You were devastated. You made me play catch in the garden every single day.', 'Every. Single. Day. I don\'t regret a minute of it.'],
+        maxwell:  ['Maxwell — you were two. You thought every day was just a normal day.', 'Toddlers are the only truly pandemic-proof humans.'],
+        raven:    ['Raven! Arthur\'s daughter — I\'m your uncle William.', 'You were three in 2020. Growing up in Haarlem during COVID. Quite a start to life.'],
+        starling: ['Starling! You were born this year — 2020! Welcome to your birth year.', 'You arrived right in the middle of everything. Typical Van Duynhoven timing.'],
+        charlotte: ['Charlotte! You and Isabella are cousins — I\'m your Uncle William.', 'You were four in 2020. Charlotte and Maxwell were about the same age.'],
+        tenley:   ['Tenley! One year old in 2020. Completely oblivious. Perfectly happy.', 'Lucky you.'],
+        knoxley:  ['Knoxley — you weren\'t born yet in 2020!', 'But you came all the way back here to find us. The youngest one asking the deepest questions.'],
+        chuck:    ['Chuck! My brother. Miss you, man. St. Croix Falls is too far.', 'Isabella keeps asking about Charlotte. We should get the cousins together more.'],
       },
     },
   ],
@@ -1564,7 +1602,7 @@ export const NPC_DATA = {
     },
     // ── Geertruda Verwegen (@I031@) born ~1790, age ~9 in 1799 ──────────────
     {
-      gedcomId: '@I031@',
+      gedcomId: '@I931@',  // synthetic — @I031@ is Henry (Gen 7)
       name: 'Geertruda Verwegen',
       given: 'Geertruda',
       era: 2, spawnR: 9, spawnC: 8,
@@ -1694,6 +1732,42 @@ export const NPC_DATA = {
         ],
       },
     },
+    // ── Link — beagle, Arthur/Raven/Starling's dog ─────────────────────────
+    {
+      gedcomId: null,   // family dog, not a GEDCOM ancestor
+      name: 'Link',
+      given: 'Link',
+      location: 'haarlem',
+      era: 8, spawnR: 11, spawnC: 7,
+      bodyColor: '#c07820', hairColor: '#7a4010', skinColor: '#e8b060',
+      lines: {
+        generic: [
+          '🐕 A beagle bounds over, tail wagging furiously.',
+          'Link sniffs your hand, approves of you, and sits expectantly.',
+          '🐕 His ears are impossibly floppy. His nose never stops moving.',
+        ],
+        repeat1: [
+          '🐕 Link has already found three interesting smells this morning.',
+          'His nose leads him on adventures the rest of the family just has to follow.',
+        ],
+        raven: [
+          '🐕 RAVEN! Link explodes with energy, jumping and spinning in circles.',
+          'He grabs his favourite rope toy and drops it at your feet. Again. And again.',
+          'This is the best day of his life. (Every day is the best day of his life.)',
+        ],
+        starling: [
+          '🐕 Starling! Link immediately shows you his favourite stick.',
+          'He found it in the Haarlem Bos last Tuesday and has refused to leave it behind.',
+          '🐕 He sits down and stares at you with enormous hopeful eyes.',
+        ],
+        charlotte: [ '🐕 Link sniffs Charlotte cautiously, then decides she is acceptable and wags his tail.', 'Cousin approval: granted.' ],
+        tenley:    [ '🐕 Link trots over to Tenley and presents her with a found object.', 'It is a very muddy pine cone. He is very proud of it.' ],
+        knoxley:   [ '🐕 Link and Knoxley immediately start running in circles together.', 'Nobody is sure who is chasing whom. Both seem delighted.' ],
+        isabella:  [ '🐕 Link greets Isabella by sitting on her feet.', 'This is his highest compliment.' ],
+        henry:     [ '🐕 Henry! Link has been waiting. He has a stick. He would like to play fetch.', 'He has wanted this for three hours. Please, Henry.' ],
+        maxwell:   [ '🐕 Link assesses Maxwell very carefully, then gives one decisive bark.', 'Good dog bark. You passed.' ],
+      },
+    },
   ],
 
   // ── Era 8 · 2026 · Mankato — Chuck's wife Daina ─────────────────────────
@@ -1744,6 +1818,38 @@ export const NPC_DATA = {
         starling: ['Starling! My little adventurer.', 'You\'re collecting things from every era? That\'s my girl.', 'Come inside — I have something from the attic that might interest you.'],
       },
     },
+    // ── Freda — Great Dane, Chuck & Daina's dog ─────────────────────────────
+    {
+      gedcomId: null,
+      name: 'Freda',
+      given: 'Freda',
+      location: 'mankato',
+      era: 8, spawnR: 6, spawnC: 7,
+      bodyColor: '#d0d0d8', hairColor: '#b0b0c0', skinColor: '#e8e8f0',
+      lines: {
+        generic: [
+          '🐕 A Great Dane ambles over. She is enormous. She is also very gentle.',
+          'Freda dips her huge head for a pat, then leans against you like a very large, warm wall.',
+          '🐕 She watches you with calm, ancient dignity. And then licks your face.',
+        ],
+        repeat1: [
+          '🐕 Freda has already been for her morning walk. She would like another.',
+          'She finds the leash with her nose and brings it to you hopefully.',
+        ],
+        charlotte: [
+          '🐕 CHARLOTTE! Freda is immediately and completely ecstatic.',
+          'She does a full happy spin — which takes a while, given the size.',
+          'Then she puts both paws on Charlotte\'s shoulders and stares into her soul.',
+        ],
+        tenley:    [ '🐕 Freda immediately lies down next to Tenley and puts her head in her lap.', 'She weighs about as much as Tenley. Neither seems to mind.' ],
+        knoxley:   [ '🐕 KNOXLEY! Freda practically gallops over — which is thunderous.', 'She adores the youngest. They have a whole complicated greeting ritual that only they understand.' ],
+        raven:     [ '🐕 Freda eyes Raven with dignified curiosity, then gives a single enormous tail wag.', 'Haarlem cousin: approved.' ],
+        starling:  [ '🐕 Freda sniffs Starling\'s pocket. She can smell the snacks from fifteen metres away.', 'She sits. She stares. She waits.' ],
+        isabella:  [ '🐕 Isabella! Freda gives a low happy bark and presses her giant head against your hand.', 'She has always liked you.' ],
+        henry:     [ '🐕 Henry. Freda has been waiting all day for someone to throw the ball.', 'It is a very big ball. For a very big dog.' ],
+        maxwell:   [ '🐕 Freda and Maxwell have an understanding. He gives her the corner of his toast.', 'She lets him sit in her spot on the couch. Deal.' ],
+      },
+    },
   ],
 
   // ── Era 8 · 2026 · Mankato — William's wife Leslie ───────────────────────
@@ -1784,6 +1890,38 @@ export const NPC_DATA = {
         knoxley:   ['Knoxley! The littlest one on the biggest quest.', 'You know, I\'ve always thought the youngest ask the best questions.', 'Don\'t let anyone tell you you\'re too small for this adventure.'],
         raven:     ['Raven! How\'s Haarlem? We miss you.', 'You were born there, same city the family came from. That\'s remarkable.'],
         starling:  ['Starling! A collection from every era — brilliant idea.', 'I\'m going to want to see it when you\'re done.'],
+      },
+    },
+    // ── Ludo — Bernese Mountain Dog, William & Leslie's dog ─────────────────
+    {
+      gedcomId: null,
+      name: 'Ludo',
+      given: 'Ludo',
+      location: 'mankato',
+      era: 8, spawnR: 10, spawnC: 11,
+      bodyColor: '#1a1a18', hairColor: '#c07020', skinColor: '#f0e8d0',
+      lines: {
+        generic: [
+          '🐕 A Bernese Mountain Dog looks up at you with the most earnest eyes imaginable.',
+          'Ludo wags his tail slowly, once, with great seriousness. Then he leans on you.',
+          '🐕 He is fluffy. He is warm. He smells like outside.',
+        ],
+        repeat1: [
+          '🐕 Ludo has been lying in the sun since 8am. He has no complaints.',
+          'His favourite activity is being near his people. He is doing it right now.',
+        ],
+        isabella: [
+          '🐕 Isabella! Ludo scrambles to his feet, tail going like a helicopter.',
+          'He head-butts her hand, circles her twice, then lies back down at her feet.',
+          '🐕 He will not let her leave without a proper goodbye ritual.',
+        ],
+        henry:     [ '🐕 Henry! Ludo immediately brings him his special stick.', 'It is a very good stick. He has been saving it. It is a gift.' ],
+        maxwell:   [ '🐕 Ludo finds Maxwell and lays his whole enormous head on his knee.', 'This is how he says hello, I love you, and please do not go — all at once.' ],
+        raven:     [ '🐕 Ludo sniffs Raven carefully from all angles, then gives his verdict:', '🐕 One tail wag. Approved. He sits on her feet.' ],
+        starling:  [ '🐕 Ludo has heard great things about Starling. He is not disappointed.', 'He rolls over immediately. He shows his belly. This is trust.' ],
+        charlotte: [ '🐕 Ludo trots over to Charlotte and sits in a very dignified manner.', 'Then ruins the dignity by leaning his full weight against her.' ],
+        tenley:    [ '🐕 Tenley! Ludo puts one enormous paw on her arm. Gently. He just wants to say hi.', 'He is enormous. The paw is enormous. It is very gentle.' ],
+        knoxley:   [ '🐕 KNOXLEY! Ludo immediately starts the zoomies.', 'He tears around the garden twice, comes back, and collapses happily at her feet.' ],
       },
     },
   ],

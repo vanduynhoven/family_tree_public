@@ -21,15 +21,28 @@ export class DroppedItem extends Entity {
 
   draw(ctx, ox, oy, frame) {
     if (this.decorOnly) {
-      // Farm animals / decor: larger emoji, gentle shadow, no pickup glow
-      const s = TILE * 0.65;
+      // Farm animals / decor: solid, clearly visible emoji on a light circle
+      const s = TILE * 0.9;
       const x = this.x - ox, y = this.y - oy;
-      const bob = Math.sin(frame / 60) * 1.5;  // very gentle sway
-      ctx.fillStyle = 'rgba(0,0,0,0.18)';
-      ctx.beginPath(); ctx.ellipse(x + s/2, y + s - 3, s*.28, s*.07, 0, 0, Math.PI*2); ctx.fill();
-      ctx.font = `${Math.floor(s*.75)}px serif`;
+      const cx = x + s / 2, cy = y + s / 2;
+      const bob = Math.sin(frame / 55) * 2;  // gentle idle sway
+
+      // Bright circle background so the animal pops against any terrain
+      ctx.save();
+      ctx.globalAlpha = 0.88;
+      ctx.fillStyle = '#fffde8';
+      ctx.beginPath(); ctx.ellipse(cx, cy + bob, s * 0.44, s * 0.38, 0, 0, Math.PI * 2); ctx.fill();
+      ctx.globalAlpha = 1.0;
+
+      // Drop shadow below
+      ctx.fillStyle = 'rgba(0,0,0,0.22)';
+      ctx.beginPath(); ctx.ellipse(cx, y + s - 2, s * 0.3, s * 0.09, 0, 0, Math.PI * 2); ctx.fill();
+
+      // Emoji — full size, no alpha reduction
+      ctx.font = `${Math.floor(s * 0.72)}px serif`;
       ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-      ctx.fillText(this.item.emoji || '🐄', x + s/2, y + s/2 + bob);
+      ctx.fillText(this.item.emoji || '🐄', cx, cy + bob - 1);
+      ctx.restore();
       ctx.textBaseline = 'alphabetic';
     } else {
       drawDroppedItem(ctx, this.x - ox, this.y - oy, this.item.emoji || '📦', frame, this.item.id);
