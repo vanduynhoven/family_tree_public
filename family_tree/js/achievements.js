@@ -1,0 +1,675 @@
+/**
+ * Discovery Achievements / Badges
+ * ---------------------------------
+ * Tracks exploration of the Van Duynhoven family tree and unlocks badges.
+ * Progress persists in localStorage. Earned achievements pop up a toast, and
+ * an achievements panel can be rendered on any page (see Achievements.renderPanel).
+ *
+ * Public API:
+ *   Achievements.trackPersonView(id)   – record that a person was viewed (deduped by id)
+ *   Achievements.trackYear(year)       – record a discovered year (numbers or "1823" strings)
+ *   Achievements.trackCountry(code)    – record a discovered country (e.g. 'NL', 'US')
+ *   Achievements.renderPanel(el)       – render/refresh the badge panel into an element
+ *   Achievements.reset()               – clear all progress (used by the panel's reset link)
+ *
+ * The module auto-wires itself on DOMContentLoaded: it scans the page for
+ * person badges, country flags, and year mentions so that simply browsing the
+ * site makes progress. Individual generation/person pages can also call the
+ * track* helpers directly for more precise tracking.
+ */
+(function (global) {
+    'use strict';
+
+    var STORAGE_KEY = 'vdh_achievements_v1';
+    var KID_MODE_KEY = 'vdh-kid-mode';
+
+    // Check if Kid Mode is enabled - achievements only work in Kid Mode
+    function isKidModeOn() {
+        try { return global.localStorage.getItem(KID_MODE_KEY) === '1'; } catch (e) { return false; }
+    }
+
+    // Map flag emoji -> country name (used when auto-scanning pages for flags)
+    var FLAG_COUNTRIES = {
+        '🇳🇱': 'Netherlands',
+        '🇺🇸': 'United States',
+        '🇨🇦': 'Canada',
+        '🇳🇿': 'New Zealand',
+        '🇦🇺': 'Australia',
+        '🇩🇪': 'Germany',
+        '🇧🇪': 'Belgium',
+        '🇬🇧': 'United Kingdom',
+        '🇮🇪': 'Ireland'
+    };
+
+    // Achievement definitions. `check(state)` returns { earned, progress, goal }.
+    var DEFINITIONS = [
+        // ── Exploration achievements ──
+        {
+            id: 'explorer',
+            icon: '🧭',
+            title: 'Explorer',
+            desc: 'Viewed 5 people',
+            check: function (s) {
+                var n = s.peopleViewed.length;
+                return { earned: n >= 5, progress: Math.min(n, 5), goal: 5 };
+            }
+        },
+        {
+            id: 'adventurer',
+            icon: '🎒',
+            title: 'Adventurer',
+            desc: 'Viewed 15 people',
+            check: function (s) {
+                var n = s.peopleViewed.length;
+                return { earned: n >= 15, progress: Math.min(n, 15), goal: 15 };
+            }
+        },
+        {
+            id: 'super_explorer',
+            icon: '🦸',
+            title: 'Super Explorer',
+            desc: 'Viewed 30 people!',
+            check: function (s) {
+                var n = s.peopleViewed.length;
+                return { earned: n >= 30, progress: Math.min(n, 30), goal: 30 };
+            }
+        },
+        
+        // ── Time travel achievements ──
+        {
+            id: 'historian',
+            icon: '📜',
+            title: 'Historian',
+            desc: 'Found someone from the 1800s',
+            check: function (s) {
+                var hit = s.years.some(function (y) { return y >= 1800 && y <= 1899; });
+                return { earned: hit, progress: hit ? 1 : 0, goal: 1 };
+            }
+        },
+        {
+            id: 'time_traveler',
+            icon: '⏰',
+            title: 'Time Traveler',
+            desc: 'Found someone from the 1700s',
+            check: function (s) {
+                var hit = s.years.some(function (y) { return y >= 1700 && y <= 1799; });
+                return { earned: hit, progress: hit ? 1 : 0, goal: 1 };
+            }
+        },
+        {
+            id: 'ancient_finder',
+            icon: '🏛️',
+            title: 'Ancient Finder',
+            desc: 'Found someone from the 1500s or earlier!',
+            check: function (s) {
+                var hit = s.years.some(function (y) { return y <= 1599; });
+                return { earned: hit, progress: hit ? 1 : 0, goal: 1 };
+            }
+        },
+        {
+            id: 'century_hopper',
+            icon: '🦘',
+            title: 'Century Hopper',
+            desc: 'Found people from 4 different centuries',
+            check: function (s) {
+                var centuries = {};
+                s.years.forEach(function (y) { centuries[Math.floor(y / 100)] = true; });
+                var n = Object.keys(centuries).length;
+                return { earned: n >= 4, progress: Math.min(n, 4), goal: 4 };
+            }
+        },
+        
+        // ── Geography achievements ──
+        {
+            id: 'globe_trotter',
+            icon: '🌍',
+            title: 'Globe Trotter',
+            desc: 'Found family in 3 countries',
+            check: function (s) {
+                var n = s.countries.length;
+                return { earned: n >= 3, progress: Math.min(n, 3), goal: 3 };
+            }
+        },
+        {
+            id: 'world_traveler',
+            icon: '✈️',
+            title: 'World Traveler',
+            desc: 'Found family in 5 countries',
+            check: function (s) {
+                var n = s.countries.length;
+                return { earned: n >= 5, progress: Math.min(n, 5), goal: 5 };
+            }
+        },
+        {
+            id: 'dutch_roots',
+            icon: '🌷',
+            title: 'Dutch Roots',
+            desc: 'Found family in the Netherlands',
+            check: function (s) {
+                var hit = s.countries.indexOf('Netherlands') !== -1;
+                return { earned: hit, progress: hit ? 1 : 0, goal: 1 };
+            }
+        },
+        {
+            id: 'american_dream',
+            icon: '🗽',
+            title: 'American Dream',
+            desc: 'Found family in the United States',
+            check: function (s) {
+                var hit = s.countries.indexOf('United States') !== -1;
+                return { earned: hit, progress: hit ? 1 : 0, goal: 1 };
+            }
+        },
+        
+        // ── Story achievements ──
+        {
+            id: 'story_reader',
+            icon: '📖',
+            title: 'Story Reader',
+            desc: 'Read a family story',
+            check: function (s) {
+                var hit = s.storiesRead && s.storiesRead.length >= 1;
+                return { earned: hit, progress: hit ? 1 : 0, goal: 1 };
+            }
+        },
+        {
+            id: 'bookworm',
+            icon: '🐛',
+            title: 'Bookworm',
+            desc: 'Read 5 family stories',
+            check: function (s) {
+                var n = s.storiesRead ? s.storiesRead.length : 0;
+                return { earned: n >= 5, progress: Math.min(n, 5), goal: 5 };
+            }
+        },
+        {
+            id: 'master_storyteller',
+            icon: '👑',
+            title: 'Master Storyteller',
+            desc: 'Read 10 family stories!',
+            check: function (s) {
+                var n = s.storiesRead ? s.storiesRead.length : 0;
+                return { earned: n >= 10, progress: Math.min(n, 10), goal: 10 };
+            }
+        },
+        
+        // ── Special achievements ──
+        {
+            id: 'ship_spotter',
+            icon: '🚢',
+            title: 'Ship Spotter',
+            desc: 'Learned about the ocean voyage',
+            check: function (s) {
+                return { earned: !!s.sawShipStory, progress: s.sawShipStory ? 1 : 0, goal: 1 };
+            }
+        },
+        {
+            id: 'family_tree_fan',
+            icon: '🌳',
+            title: 'Family Tree Fan',
+            desc: 'Visited the interactive tree view',
+            check: function (s) {
+                return { earned: !!s.visitedTree, progress: s.visitedTree ? 1 : 0, goal: 1 };
+            }
+        },
+        {
+            id: 'chart_champion',
+            icon: '🥧',
+            title: 'Chart Champion',
+            desc: 'Visited the fan chart',
+            check: function (s) {
+                return { earned: !!s.visitedChart, progress: s.visitedChart ? 1 : 0, goal: 1 };
+            }
+        },
+        {
+            id: 'timeline_tracker',
+            icon: '📅',
+            title: 'Timeline Tracker',
+            desc: 'Visited the interactive timeline',
+            check: function (s) {
+                return { earned: !!s.visitedTimeline, progress: s.visitedTimeline ? 1 : 0, goal: 1 };
+            }
+        },
+        {
+            id: 'generation_jumper',
+            icon: '🔢',
+            title: 'Generation Jumper',
+            desc: 'Visited 5 different generation pages',
+            check: function (s) {
+                var n = s.generationsVisited ? s.generationsVisited.length : 0;
+                return { earned: n >= 5, progress: Math.min(n, 5), goal: 5 };
+            }
+        },
+        {
+            id: 'completionist',
+            icon: '🏆',
+            title: 'Completionist',
+            desc: 'Visited all 8 generation pages (Gen 0 through Gen 7)!',
+            check: function (s) {
+                var n = s.generationsVisited ? s.generationsVisited.length : 0;
+                return { earned: n >= 8, progress: Math.min(n, 8), goal: 8 };
+            }
+        },
+        
+        // ── Dutch Learning achievements ──
+        {
+            id: 'dutch_starter',
+            icon: '🇳🇱',
+            title: 'Dutch Starter',
+            desc: 'Got 3 Dutch words correct in a row!',
+            check: function (s) {
+                var best = s.dutchBestStreak || 0;
+                return { earned: best >= 3, progress: Math.min(best, 3), goal: 3 };
+            }
+        },
+        {
+            id: 'dutch_learner',
+            icon: '📚',
+            title: 'Dutch Learner',
+            desc: 'Got 5 Dutch words correct in a row!',
+            check: function (s) {
+                var best = s.dutchBestStreak || 0;
+                return { earned: best >= 5, progress: Math.min(best, 5), goal: 5 };
+            }
+        },
+        {
+            id: 'dutch_speaker',
+            icon: '🗣️',
+            title: 'Dutch Speaker',
+            desc: 'Got 10 Dutch words correct in a row!',
+            check: function (s) {
+                var best = s.dutchBestStreak || 0;
+                return { earned: best >= 10, progress: Math.min(best, 10), goal: 10 };
+            }
+        },
+        {
+            id: 'dutch_master',
+            icon: '👑',
+            title: 'Dutch Master',
+            desc: 'Got 20 Dutch words correct in a row!',
+            check: function (s) {
+                var best = s.dutchBestStreak || 0;
+                return { earned: best >= 20, progress: Math.min(best, 20), goal: 20 };
+            }
+        },
+        {
+            id: 'dutch_vocabulary',
+            icon: '📖',
+            title: 'Word Collector',
+            desc: 'Learned 25 different Dutch words',
+            check: function (s) {
+                var n = s.dutchWordsLearned ? s.dutchWordsLearned.length : 0;
+                return { earned: n >= 25, progress: Math.min(n, 25), goal: 25 };
+            }
+        }
+    ];
+
+    function defaultState() {
+        return { 
+            peopleViewed: [], 
+            years: [], 
+            countries: [], 
+            earned: [],
+            storiesRead: [],
+            generationsVisited: [],
+            sawShipStory: false,
+            visitedTree: false,
+            visitedChart: false,
+            visitedTimeline: false,
+            dutchBestStreak: 0,
+            dutchWordsLearned: []
+        };
+    }
+
+    function load() {
+        try {
+            var raw = global.localStorage.getItem(STORAGE_KEY);
+            if (!raw) return defaultState();
+            var parsed = JSON.parse(raw);
+            var d = defaultState();
+            return {
+                peopleViewed: Array.isArray(parsed.peopleViewed) ? parsed.peopleViewed : d.peopleViewed,
+                years: Array.isArray(parsed.years) ? parsed.years : d.years,
+                countries: Array.isArray(parsed.countries) ? parsed.countries : d.countries,
+                earned: Array.isArray(parsed.earned) ? parsed.earned : d.earned,
+                storiesRead: Array.isArray(parsed.storiesRead) ? parsed.storiesRead : d.storiesRead,
+                generationsVisited: Array.isArray(parsed.generationsVisited) ? parsed.generationsVisited : d.generationsVisited,
+                sawShipStory: !!parsed.sawShipStory,
+                visitedTree: !!parsed.visitedTree,
+                visitedChart: !!parsed.visitedChart,
+                visitedTimeline: !!parsed.visitedTimeline,
+                dutchBestStreak: typeof parsed.dutchBestStreak === 'number' ? parsed.dutchBestStreak : 0,
+                dutchWordsLearned: Array.isArray(parsed.dutchWordsLearned) ? parsed.dutchWordsLearned : []
+            };
+        } catch (e) {
+            return defaultState();
+        }
+    }
+
+    function save(state) {
+        try {
+            global.localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+        } catch (e) { /* storage unavailable / full — ignore */ }
+    }
+
+    var state = load();
+
+    function addUnique(arr, val) {
+        if (val === null || val === undefined || val === '') return false;
+        if (arr.indexOf(val) === -1) { arr.push(val); return true; }
+        return false;
+    }
+
+    // Evaluate all definitions, fire toasts for newly-earned ones, persist, refresh panels.
+    function evaluate() {
+        var newlyEarned = [];
+        DEFINITIONS.forEach(function (def) {
+            var res = def.check(state);
+            if (res.earned && state.earned.indexOf(def.id) === -1) {
+                state.earned.push(def.id);
+                newlyEarned.push(def);
+            }
+        });
+        save(state);
+        newlyEarned.forEach(showToast);
+        refreshPanels();
+        // Update the kid-mode achievements badge count
+        if (typeof updateAchievementsBadge === 'function') {
+            updateAchievementsBadge();
+        }
+        return newlyEarned;
+    }
+
+    // ── Public tracking helpers ──────────────────────────────
+    function trackPersonView(id) {
+        if (addUnique(state.peopleViewed, String(id))) { evaluate(); }
+    }
+    function trackYear(year) {
+        var y = parseInt(year, 10);
+        // Validate: only accept plausible genealogical years (1000 AD to current year)
+        var currentYear = new Date().getFullYear();
+        if (!isNaN(y) && y >= 1000 && y <= currentYear && addUnique(state.years, y)) { evaluate(); }
+    }
+    function trackCountry(name) {
+        if (addUnique(state.countries, name)) { evaluate(); }
+    }
+    function trackStoryRead(storyId) {
+        if (addUnique(state.storiesRead, String(storyId))) { evaluate(); }
+    }
+    function trackGenerationVisit(gen) {
+        if (addUnique(state.generationsVisited, String(gen))) { evaluate(); }
+    }
+    function trackShipStory() {
+        if (!state.sawShipStory) { state.sawShipStory = true; evaluate(); }
+    }
+    function trackTreeVisit() {
+        if (!state.visitedTree) { state.visitedTree = true; evaluate(); }
+    }
+    function trackChartVisit() {
+        if (!state.visitedChart) { state.visitedChart = true; evaluate(); }
+    }
+    function trackTimelineVisit() {
+        if (!state.visitedTimeline) { state.visitedTimeline = true; evaluate(); }
+    }
+    
+    // Dutch learning tracking - returns true if a new achievement was earned (for streak reset)
+    function trackDutchStreak(currentStreak) {
+        var changed = false;
+        if (currentStreak > state.dutchBestStreak) {
+            state.dutchBestStreak = currentStreak;
+            changed = true;
+        }
+        if (changed) {
+            var newAchievements = evaluate();
+            return newAchievements.length > 0;
+        }
+        return false;
+    }
+    function trackDutchWord(word) {
+        if (addUnique(state.dutchWordsLearned, String(word))) { evaluate(); }
+    }
+
+    function reset() {
+        state = defaultState();
+        save(state);
+        refreshPanels();
+    }
+
+    // ── Toast popups ─────────────────────────────────────────
+    function ensureToastHost() {
+        var host = document.getElementById('vdh-ach-toasts');
+        if (!host) {
+            host = document.createElement('div');
+            host.id = 'vdh-ach-toasts';
+            document.body.appendChild(host);
+        }
+        return host;
+    }
+
+    function showToast(def) {
+        // Only show toasts when Kid Mode is enabled
+        if (!isKidModeOn()) return;
+        
+        var host = ensureToastHost();
+        var el = document.createElement('div');
+        el.className = 'vdh-ach-toast';
+        el.setAttribute('role', 'status');
+        el.innerHTML =
+            '<div class="vdh-ach-toast-icon">' + def.icon + '</div>' +
+            '<div class="vdh-ach-toast-body">' +
+            '<div class="vdh-ach-toast-kicker">🏆 Achievement Unlocked!</div>' +
+            '<div class="vdh-ach-toast-title">' + def.title + '</div>' +
+            '<div class="vdh-ach-toast-desc">' + def.desc + '</div>' +
+            '</div>';
+        host.appendChild(el);
+        // trigger enter animation
+        requestAnimationFrame(function () { el.classList.add('show'); });
+        setTimeout(function () {
+            el.classList.remove('show');
+            setTimeout(function () { if (el.parentNode) el.parentNode.removeChild(el); }, 400);
+        }, 4600);
+    }
+
+    // ── Panel rendering ──────────────────────────────────────
+    var panels = [];
+
+    function renderPanel(el) {
+        if (typeof el === 'string') el = document.querySelector(el);
+        if (!el) return;
+        if (panels.indexOf(el) === -1) panels.push(el);
+        
+        // Hide panel entirely when Kid Mode is off
+        if (!isKidModeOn()) {
+            el.style.display = 'none';
+            return;
+        }
+        el.style.display = '';
+        paint(el);
+    }
+
+    function refreshPanels() {
+        panels.forEach(paint);
+    }
+
+    function paint(el) {
+        var earnedCount = state.earned.length;
+        var total = DEFINITIONS.length;
+
+        var cards = DEFINITIONS.map(function (def) {
+            var res = def.check(state);
+            var isEarned = res.earned;
+            var pct = res.goal ? Math.round((res.progress / res.goal) * 100) : 0;
+            return (
+                '<div class="vdh-ach-card' + (isEarned ? ' earned' : '') + '">' +
+                '<div class="vdh-ach-card-icon">' + def.icon + '</div>' +
+                '<div class="vdh-ach-card-main">' +
+                '<div class="vdh-ach-card-title">' + def.title +
+                (isEarned ? ' <span class="vdh-ach-check">✓</span>' : '') + '</div>' +
+                '<div class="vdh-ach-card-desc">' + def.desc + '</div>' +
+                '<div class="vdh-ach-bar"><div class="vdh-ach-bar-fill" style="width:' + pct + '%"></div></div>' +
+                '<div class="vdh-ach-progress">' + res.progress + ' / ' + res.goal + '</div>' +
+                '</div>' +
+                '</div>'
+            );
+        }).join('');
+
+        // Simple non-collapsible layout
+        el.innerHTML =
+            '<div class="vdh-ach-title-row">' +
+            '<h2 class="section-title" style="color:#f39c12; margin:0;">🏅 Discovery Achievements</h2>' +
+            '<span class="vdh-ach-count">' + earnedCount + ' / ' + total + ' unlocked</span>' +
+            '</div>' +
+            '<p class="vdh-ach-sub">Explore the family tree to earn badges — progress is saved on this device.</p>' +
+            '<div class="vdh-ach-grid">' + cards + '</div>' +
+            '<button type="button" class="vdh-ach-reset">Reset progress</button>';
+
+        var resetBtn = el.querySelector('.vdh-ach-reset');
+        if (resetBtn) {
+            resetBtn.addEventListener('click', function () { reset(); });
+        }
+    }
+
+    // ── Auto-wiring: make browsing count ─────────────────────
+    var autoScanWired = false;      // one-time DOM wiring (click listeners, gedcom event)
+    function autoScan() {
+        var kidModeOn = isKidModeOn();
+        var path = global.location.pathname;
+        
+        // Track page type visits (only when Kid Mode is on)
+        if (kidModeOn) {
+            if (path.indexOf('/visualizations/tree') !== -1) {
+                trackTreeVisit();
+            }
+            if (path.indexOf('/visualizations/family_chart') !== -1 || path.indexOf('/family_chart') !== -1) {
+                trackChartVisit();
+            }
+            if (path.indexOf('/timeline') !== -1) {
+                trackTimelineVisit();
+            }
+            
+            // Track generation page visits
+            // Actual paths: generation_1_1799, generation_2_1829, ..., generation_7_2000s, generation_0_ancestors
+            var genMatch = path.match(/generation_(\d+)/);
+            if (genMatch) {
+                trackGenerationVisit(genMatch[1]);
+            }
+        }
+        
+        // Wire up click listeners ONCE (they check Kid Mode at click time)
+        if (!autoScanWired) {
+            // Track stories page interactions
+            if (path.indexOf('/stories') !== -1) {
+                setTimeout(function() {
+                    var storyCards = document.querySelectorAll('.story-card');
+                    storyCards.forEach(function(card, i) {
+                        card.addEventListener('click', function() {
+                            if (!isKidModeOn()) return; // Check at click time
+                            var title = card.querySelector('h3');
+                            var storyId = title ? title.textContent.trim() : ('story-' + i);
+                            trackStoryRead(storyId);
+                            // Check for ship story
+                            if (storyId.toLowerCase().indexOf('ocean') !== -1 || 
+                                storyId.toLowerCase().indexOf('ship') !== -1 ||
+                                storyId.toLowerCase().indexOf('crossing') !== -1) {
+                                trackShipStory();
+                            }
+                        });
+                    });
+                }, 100);
+            }
+            
+            // Person badges — clicking counts as viewing a person
+            var personEls = document.querySelectorAll('.people-list .badge, [data-person-id]');
+            personEls.forEach(function (node, i) {
+                var id = node.getAttribute('data-person-id') || ('badge:' + (node.textContent || '').trim() || 'p' + i);
+                node.style.cursor = node.style.cursor || 'pointer';
+                node.addEventListener('click', function () { 
+                    if (!isKidModeOn()) return; // Check at click time
+                    trackPersonView(id); 
+                });
+            });
+            
+            // Country flags — only track when user clicks on flag elements, not just seeing them
+            var flagEls = document.querySelectorAll('[data-country], .country-flag');
+            flagEls.forEach(function(node) {
+                var country = node.getAttribute('data-country');
+                if (!country) {
+                    // Try to detect from emoji
+                    var text = node.textContent || '';
+                    Object.keys(FLAG_COUNTRIES).forEach(function(flag) {
+                        if (text.indexOf(flag) !== -1) country = FLAG_COUNTRIES[flag];
+                    });
+                }
+                if (country) {
+                    node.style.cursor = node.style.cursor || 'pointer';
+                    node.addEventListener('click', function() {
+                        if (!isKidModeOn()) return;
+                        trackCountry(country);
+                    });
+                }
+            });
+            
+            // NOTE: We no longer auto-track from gedcom-stats-loaded.
+            // Years should only be tracked when viewing individual person details.
+            
+            autoScanWired = true;
+        }
+
+        // NOTE: We no longer auto-scan body text for flags and years.
+        // Achievements should be earned through explicit interactions:
+        // - Clicking on person cards/badges
+        // - Clicking on story cards
+        // - Visiting specific pages (generations, tree, chart, timeline)
+        // - Clicking on country flags
+        // This prevents getting 8+ achievements just by loading the home page.
+
+        evaluate();
+    }
+
+    function togglePanel(el) {
+        if (el) el.classList.toggle('vdh-ach-open');
+    }
+
+    var api = {
+        trackPersonView: trackPersonView,
+        trackYear: trackYear,
+        trackCountry: trackCountry,
+        trackStoryRead: trackStoryRead,
+        trackGenerationVisit: trackGenerationVisit,
+        trackShipStory: trackShipStory,
+        trackTreeVisit: trackTreeVisit,
+        trackChartVisit: trackChartVisit,
+        trackTimelineVisit: trackTimelineVisit,
+        trackDutchStreak: trackDutchStreak,
+        trackDutchWord: trackDutchWord,
+        renderPanel: renderPanel,
+        togglePanel: togglePanel,
+        reset: reset,
+        getState: function () { return JSON.parse(JSON.stringify(state)); },
+        definitions: DEFINITIONS
+    };
+    global.Achievements = api;
+
+    // React to Kid Mode being toggled at runtime. When it flips ON we must both
+    // (re-)scan the page for trackable content AND render the panel — autoScan and
+    // renderPanel each bail out when Kid Mode is off, so nothing happens until now.
+    function onKidModeChange() {
+        autoScan(); // no-op if Kid Mode still off; scans + evaluates when on
+        var panel = document.getElementById('achievements-panel');
+        if (panel) renderPanel(panel);
+    }
+    document.addEventListener('kid-mode-changed', onKidModeChange);
+
+    function init() {
+        autoScan();
+        var panel = document.getElementById('achievements-panel');
+        if (panel) renderPanel(panel);
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', init);
+    } else {
+        init();
+    }
+
+})(window);
